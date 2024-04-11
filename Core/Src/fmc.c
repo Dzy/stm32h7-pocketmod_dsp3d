@@ -162,6 +162,10 @@ void MX_FMC_Init(void)
 
   //uint32_t REFRESH_COUNT_VALUE = (uint32_t)((64.0/1000.0)/4096.0)*(240.0)-20.0;
 
+ /* Set the device refresh rate
+    * COUNT = [(SDRAM self refresh time / number of row) x  SDRAM CLK] – 20
+            = [(64ms/4096) * 100MHz] - 20 = 1562.5 - 20 ~ 1542 */
+
   //HAL_SDRAM_ProgramRefreshRate(&hsdram1, 918);
   HAL_SDRAM_ProgramRefreshRate(&hsdram1, 1875);
 

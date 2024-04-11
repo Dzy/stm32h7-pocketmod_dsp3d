@@ -65,15 +65,19 @@ void dsp3D_LL_init(void)
 void __inline dsp3D_LL_drawPointF(uint16_t x, uint16_t y)
 {
 	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
-	uint16_t clippedc = pixel[0];
 
-	clippedc += 32;
+pixel[0] = 255;
+return;
 
-	if (clippedc>255)
-		clippedc = 255;
-
-	pixel[0] = ((uint8_t) clippedc);
-
+//	uint16_t clippedc = pixel[0];
+//
+//	clippedc += 32;
+//
+//	if (clippedc>255)
+//		clippedc = 255;
+//
+//	pixel[0] = ((uint8_t) clippedc);
+//
 }
 
 void __inline dsp3D_LL_drawPoint(uint32_t x, uint32_t y, color32_t color)
@@ -99,7 +103,8 @@ void __inline dsp3D_LL_drawPoint(uint32_t x, uint32_t y, color32_t color)
 	{
 
 	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
-
+pixel[0] = 255;
+return;
 #if 0
 	//__DSB();
 	*pixel = (uint8_t)color;

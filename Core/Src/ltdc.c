@@ -29,11 +29,11 @@ const LTDCSYNC_t LTDCSYNC[] = {
  { 400, 2, 2, 8,    800,  600,    56, 120,  64,   37, 6, 23 }, // 4 800x600_72Hz
  { 396, 2, 2, 8,    800,  600,    16,  80, 160,    1, 2, 21 }, // 5 800x600_75Hz
  { 450, 2, 2, 8,    800,  600,    32,  64, 152,    1, 3, 27 }, // 6 800x600_85Hz
- { 265, 4, 4, 4,   1024,  768,    24, 136, 160,    3, 6, 29 }, // 7 1024x768_60Hz
+ { 260, 4, 4, 4,   1024,  768,    24, 136, 160,    3, 6, 29 }, // 7 1024x768_60Hz
  { 300, 4, 4, 4,   1024,  768,    24, 136, 144,    3, 6, 29 }, // 8 1024x768_70Hz
  { 315, 4, 4, 4,   1024,  768,    16,  96, 176,    1, 3, 28 }, // 9 1024x768_75Hz
  { 432, 4, 4, 4,   1280, 1024,    48, 112, 248,    1, 3, 38 }, //10 1280x1024_60Hz
- { 432, 4, 4, 4,   1920, 1080,   128, 208, 336,    1, 3, 38 }, //11 1920x1080_60Hz
+ { 297, 4, 4, 2,   1920, 1080,    88,  44, 148,    4, 5, 36 }, //11 1920x1080_60Hz
 };    
 /*
 
@@ -168,7 +168,7 @@ void MX_LTDC_Init(void)
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AH;
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
-  hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IIPC;
+  hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
 
   hltdc.Init.HorizontalSync     = (LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
   hltdc.Init.VerticalSync       = (LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
