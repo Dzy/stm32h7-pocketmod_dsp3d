@@ -644,8 +644,8 @@ void tda_init(void) {
     /* shutdown audio */
     w_reg(REG_ENA_AP, 0);
 
-    line_clocks = LTDCSYNC[LTDC_VID_FORMAT].totalw+1; 
-    lines =       LTDCSYNC[LTDC_VID_FORMAT].totalh+1;
+    line_clocks = LTDCSYNC[LTDC_VID_FORMAT].totalw; 
+    lines =       LTDCSYNC[LTDC_VID_FORMAT].totalh;
 
     /* mute the audio FIFO */
     s_reg(REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_FIFO);
@@ -654,9 +654,10 @@ void tda_init(void) {
     c_reg(REG_TX33, TX33_HDMI);
     w_reg(REG_ENC_CNTRL, ENC_CNTRL_CTL_CODE(0));
 
-    /* no pre-filter or interpolator */
-    w_reg(REG_HVF_CNTRL_0, HVF_CNTRL_0_PREFIL(0) | HVF_CNTRL_0_INTPOL(0));
-    s_reg(REG_FEAT_POWERDOWN,FEAT_POWERDOWN_PREFILT);
+    // no pre-filter or interpolator
+    
+    //w_reg(REG_HVF_CNTRL_0, HVF_CNTRL_0_PREFIL(0) | HVF_CNTRL_0_INTPOL(0));
+    //s_reg(REG_FEAT_POWERDOWN,FEAT_POWERDOWN_PREFILT);
     w_reg(REG_VIP_CNTRL_5, VIP_CNTRL_5_SP_CNT(0));
     w_reg(REG_VIP_CNTRL_4, VIP_CNTRL_4_BLANKIT(0) | VIP_CNTRL_4_BLC(0) | VIP_CNTRL_4_TST_PAT);
 
@@ -667,15 +668,17 @@ void tda_init(void) {
     w_reg(REG_HVF_CNTRL_1, HVF_CNTRL_1_VQR(0));
 
     w_reg(REG_RPT_CNTRL, 0);
-    w_reg(REG_SEL_CLK, SEL_CLK_SEL_VRF_CLK(0) | SEL_CLK_SEL_CLK1 | SEL_CLK_ENA_SC_CLK);
+    w_reg(REG_SEL_CLK, SEL_CLK_SEL_VRF_CLK(0) );
     w_reg(REG_PLL_SERIAL_2, PLL_SERIAL_2_SRL_NOSC(div) | PLL_SERIAL_2_SRL_PR(0));
 
-    /* set color matrix bypass flag: */
+    // set color matrix bypass flag:
     w_reg(REG_MAT_CONTRL, MAT_CONTRL_MAT_BP | MAT_CONTRL_MAT_SC(1));
     s_reg(REG_FEAT_POWERDOWN, FEAT_POWERDOWN_CSC);
 
-    /* set BIAS tmds value: */
+    // set BIAS tmds value:
     w_reg(REG_ANA_GENERAL, 0x09);
+
+    //w_reg(REG_BUFFER_OUT, 0);
 
     reg = VIP_CNTRL_3_SYNC_HS;
 #if 0
@@ -721,25 +724,37 @@ void tda_init(void) {
     w16_reg(REG_DE_STOP_MSB, line_clocks);
 
 #else
+  //  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVideoStart   ActiveVideoEnd DeStart DeEnd
+//    npix  nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1  vw_e1   de_s  de_e    
+//   {1688, 1066,       1,          48,          4,         48,       48,       160,       41,  1065,   408, 1688, 0, 0} , // E_REGVFMT_1280x1024p_60Hz
 
-    w_reg(REG_VIDFORMAT, 0xff);
+//   pll3n 432  pll3p    4 pll3q  4 pll3r     4
+//   ahw  1280  avh   1024
+
+//   hfp    48  hsync  112 hbp  248
+//   hsw   111  ahbp   359 aaw 1639 totalw 1687
+
+//   vfp     1  vsync    3 vbp   38
+//   vsh     2  avbp    40 aah 1064 totalh 1065
+
+    w_reg(REG_VIDFORMAT, 0x00);
     w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
     w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
     w16_reg(REG_NPIX_MSB, line_clocks);
     w16_reg(REG_NLINE_MSB, lines);
-    w16_reg(REG_VS_LINE_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp);
-    w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
-    w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp + LTDCSYNC[LTDC_VID_FORMAT].vsync);
-    w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
+    w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
+    w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsync);
+    w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+    w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
     w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
-    w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
     w16_reg(REG_VS_LINE_END_2_MSB, 0);
+    w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
     w16_reg(REG_VS_PIX_END_2_MSB, 0);
     w16_reg(REG_HS_PIX_START_MSB, 0);
     w16_reg(REG_HS_PIX_STOP_MSB, line_clocks);
 
     w16_reg(REG_VWIN_START_1_MSB, 0); //-1
-    w16_reg(REG_VWIN_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avh); //-1
+    w16_reg(REG_VWIN_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].totalh); //-1
 
     //w16_reg(REG_VWIN_START_2_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh);
     //w16_reg(REG_VWIN_END_2_MSB, lines);

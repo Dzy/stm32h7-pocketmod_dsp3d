@@ -189,8 +189,8 @@ void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 
 
 
-#define PI 3.14159265358979323846
-#define TAU (2.0 * PI)
+#define PI 3.14159265358979f
+#define TAU (2.0f * PI)
 
 /* USER CODE END PV */
 
@@ -257,7 +257,7 @@ void MPU_Conf()
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
-
+float cz = 0.0;
 /* USER CODE END 0 */
 
 /**
@@ -393,34 +393,12 @@ MPU_Conf();
 
     if(redraw == 1) {
 
-        redraw = 0;
+        redraw = 1;
 
-        dsp3D_setMeshRotation(rx, ry, rz);
-        //cz += 0.05;
-
-        //dsp3D_setLightPosition(0.0, 0.0, 100.0);
-        //dsp3D_renderWireframe((float *)&MODELNAME);
-        dsp3D_renderFlat((float *)&MODELNAME);
-        //dsp3D_renderPoints((float *)&MODELNAME);
-        //dsp3D_renderGouraud((float *)&MODELNAME);
-
-        dsp3D_present();
-
-        to = tn;
-        tn = HAL_GetTick();
-        if(tn>to) {
-          te = tn-to;
-        } else {
-          te = to - tn;
-        }
-
-        if(tmax<te && to != 0) {
-          tmax = te;
-        }
-
-        if(tmin>te && to != 0) {
-          tmin = te;
-        }
+        //dsp3D_setMeshRotation(rx, ry, rz);
+        
+        cz += 0.05;
+        dsp3D_setMeshRotation(cz, cz, cz);
 
         sprintf(txtbuf, "%dms (min %dms/max %dms) %d FPS",te, tmin, tmax, (uint32_t)(1.0/(float)te*1000.0));
         blitstring2(0,1, txtbuf);
@@ -463,6 +441,31 @@ HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
 
         sprintf(txtbuf, "%.2u.%.2u.%.2u",sDate.Date, sDate.Month, sDate.Year);
         blitstring2(0,7, txtbuf);
+
+        //dsp3D_setLightPosition(0.0, 0.0, 100.0);
+        dsp3D_renderWireframe((float *)&MODELNAME);
+        //dsp3D_renderFlat((float *)&MODELNAME);
+        //dsp3D_renderPoints((float *)&MODELNAME);
+        //dsp3D_renderGouraud((float *)&MODELNAME);
+
+        dsp3D_present();
+
+        to = tn;
+        tn = HAL_GetTick();
+        if(tn>to) {
+          te = tn-to;
+        } else {
+          te = to - tn;
+        }
+
+        if(tmax<te && to != 0) {
+          tmax = te;
+        }
+
+        if(tmin>te && to != 0) {
+          tmin = te;
+        }
+
 
         HAL_LTDC_SetAddress_NoReload(&hltdc, bbuffer, 0);
 
@@ -547,17 +550,17 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_SPI1
-                              |RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_FMC;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_USB|RCC_PERIPHCLK_FMC;
+
   PeriphClkInitStruct.PLL2.PLL2M = 1;
-  PeriphClkInitStruct.PLL2.PLL2N = 19;
-  PeriphClkInitStruct.PLL2.PLL2P = 2;
-  PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2N = 36; //19
+  PeriphClkInitStruct.PLL2.PLL2P = 4;  //2
+  PeriphClkInitStruct.PLL2.PLL2Q = 4;  //2
+  PeriphClkInitStruct.PLL2.PLL2R = 4;  //2
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+
   PeriphClkInitStruct.PLL3.PLL3M = 8;
   PeriphClkInitStruct.PLL3.PLL3N = LTDCSYNC[LTDC_VID_FORMAT].pll3n; //295; //294; //296; //294; //252; //320; //252;
   PeriphClkInitStruct.PLL3.PLL3P = LTDCSYNC[LTDC_VID_FORMAT].pll3p; //2;
@@ -566,6 +569,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_0;
   PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
   PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
+
   PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_D1HCLK;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;

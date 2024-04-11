@@ -42,7 +42,13 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-//div 1 / 10 7 (odd) 8 9
+//div 1 / 10 7 (odd red on bg) 8 9
+#define LTDC_VID_FORMAT 0
+#define LTDC_VID_FORMAT 1
+#define LTDC_VID_FORMAT 3
+#define LTDC_VID_FORMAT 8
+#define LTDC_VID_FORMAT 9
+
 #define LTDC_VID_FORMAT 9
 
 /* USER CODE END EC */

@@ -22,19 +22,27 @@
 
 /* USER CODE BEGIN 0 */
 const LTDCSYNC_t LTDCSYNC[] = {
- { 252, 2, 2, 8, 640, 480, 24, 40, 128, 9, 3, 28, 39, 167, 807, 831, 2, 30, 510, 519 },         // 0 640x480_72Hz
- { 252, 2, 2, 8, 640, 480, 16, 96, 48, 11, 2, 32, 95, 143, 783, 799, 1, 33, 513, 524 },         // 1 640x480_75Hz
- { 288, 2, 2, 8, 640, 480, 32, 48, 112, 1, 3, 25, 47, 159, 799, 831, 2, 27, 507, 508 },         // 2 640x480_85Hz
- { 295, 2, 2, 8, 800, 600, 40, 128, 88, 1, 4, 23, 127, 215, 1015, 1055, 3, 26, 626, 627 },      // 3 800x600_60Hz
- { 400, 2, 2, 8, 800, 600, 56, 120, 64, 37, 6, 23, 119, 183, 983, 1039, 5, 28, 628, 665 },      // 4 800x600_72Hz
- { 396, 2, 2, 8, 800, 600, 16, 80, 160, 1, 2, 21, 79, 239, 1039, 1055, 1, 22, 622, 623 },       // 5 800x600_75Hz
- { 450, 2, 2, 8, 800, 600, 32, 64, 152, 1, 3, 27, 63, 215, 1015, 1047, 2, 29, 629, 630 },       // 6 800x600_85Hz
- { 265, 4, 4, 4, 1024, 768, 24, 136, 160, 3, 6, 29, 135, 295, 1319, 1343, 5, 34, 802, 805 },    // 7 1024x768_60Hz
- { 300, 4, 4, 4, 1024, 768, 24, 136, 144, 3, 6, 29, 135, 279, 1303, 1327, 5, 34, 802, 805 },    // 8 1024x768_70Hz
- { 315, 4, 4, 4, 1024, 768, 16, 96, 176, 1, 3, 28, 95, 271, 1295, 1311, 2, 30, 798, 799 },      // 9 1024x768_75Hz
- { 432, 4, 4, 4, 1280, 1024, 48, 112, 248, 1, 3, 38, 111, 359, 1639, 1687, 2, 40, 1064, 1065 }, //10 1280x1024_60Hz
-};
+ { 252, 2, 2, 8,    640,  480,    24,  40, 128,    9, 3, 28,    39, 167,  807,  831,   2, 30,  510,  519 }, // 0 640x480_72Hz
+ { 252, 2, 2, 8,    640,  480,    16,  96,  48,   11, 2, 32,    95, 143,  783,  799,   1, 33,  513,  524 }, // 1 640x480_75Hz
+ { 288, 2, 2, 8,    640,  480,    32,  48, 112,    1, 3, 25,    47, 159,  799,  831,   2, 27,  507,  508 }, // 2 640x480_85Hz
+ { 295, 2, 2, 8,    800,  600,    40, 128,  88,    1, 4, 23,   127, 215, 1015, 1055,   3, 26,  626,  627 }, // 3 800x600_60Hz
+ { 400, 2, 2, 8,    800,  600,    56, 120,  64,   37, 6, 23,   119, 183,  983, 1039,   5, 28,  628,  665 }, // 4 800x600_72Hz
+ { 396, 2, 2, 8,    800,  600,    16,  80, 160,    1, 2, 21,    79, 239, 1039, 1055,   1, 22,  622,  623 }, // 5 800x600_75Hz
+ { 450, 2, 2, 8,    800,  600,    32,  64, 152,    1, 3, 27,    63, 215, 1015, 1047,   2, 29,  629,  630 }, // 6 800x600_85Hz
+ { 265, 4, 4, 4,   1024,  768,    24, 136, 160,    3, 6, 29,   135, 295, 1319, 1343,   5, 34,  802,  805 }, // 7 1024x768_60Hz
+ { 300, 4, 4, 4,   1024,  768,    24, 136, 144,    3, 6, 29,   135, 279, 1303, 1327,   5, 34,  802,  805 }, // 8 1024x768_70Hz
+ { 315, 4, 4, 4,   1024,  768,    16,  96, 176,    1, 3, 28,    95, 271, 1295, 1311,   2, 30,  798,  799 }, // 9 1024x768_75Hz
+ { 432, 4, 4, 4,   1280, 1024,    48, 112, 248,    1, 3, 38,   111, 359, 1639, 1687,   2, 40, 1064, 1065 }, //10 1280x1024_60Hz
+ { 432, 4, 4, 4,   1920, 1080,   128, 208, 336,    1, 3, 38,   111, 359, 1639, 1687,   2, 40, 1064, 1065 }, //11 1920x1080_60Hz
+};    
 /*
+
+ { 252, 2, 2, 8,    640,  480,    16,  64, 120,    1, 3, 16,    95, 143,  783,  799,   1, 33,  513,  524 }, // 1 640x480_75Hz
+
+  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVideoStart   ActiveVideoEnd DeStart DeEnd
+  npix    nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1              vw_e1          de_s    de_e
+ {1688,   1066,  1,           48,         4,          48,         48,         160,    41,                1065,          408,    1688, 0, 0}, // E_REGVFMT_1280x1024p_60Hz 
+
 typedef struct _LTDCSYNC_t {
    uint16_t pll3n, pll3p, pll3q, pll3r;
    uint16_t ahw, avh;
@@ -44,9 +52,79 @@ typedef struct _LTDCSYNC_t {
    uint16_t vsh,  avbp, aah, totalh;
 } LTDCSYNC_t;
  { 432, 4, 4, 4, 1280, 1024, 48, 112, 248, 1, 3, 38, 111, 359, 1639, 1687, 2, 40, 1064, 1065 }, //10 1280x1024_60Hz
-*/
+
 //                        HTOTAL VTOTAL
 //1280 × 1024p [1] 60.020 1688 1066 63.98132 108.0004682
+
+  regVal = 0x00; 
+  err = setHwRegister(pDis, E_REG_P00_VIDFORMAT_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].nPix;
+  err = setHwRegister(pDis, E_REG_P00_NPIX_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].nPix >> 8);
+  err = setHwRegister(pDis, E_REG_P00_NPIX_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].nLine;
+  err = setHwRegister(pDis, E_REG_P00_NLINE_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].nLine >> 8);
+  err = setHwRegister(pDis, E_REG_P00_NLINE_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].VsLineStart;
+  err = setHwRegister(pDis, E_REG_P00_VS_LINE_STRT_1_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].VsPixStart;
+  err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].VsPixStart >> 8);
+  err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].VsLineEnd;
+  err = setHwRegister(pDis, E_REG_P00_VS_LINE_END_1_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].VsPixEnd;
+  err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].VsPixEnd >> 8);
+  err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].HsStart;
+  err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].HsStart >> 8);
+  err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].HsEnd;
+  err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].HsEnd >> 8);
+  err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].ActiveVideoStart;
+  err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_MSB_W, 0);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].ActiveVideoEnd;
+  err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].ActiveVideoEnd >> 8);
+  err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].DeStart;
+  err = setHwRegister(pDis, E_REG_P00_DE_START_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].DeStart >> 8);
+  err = setHwRegister(pDis, E_REG_P00_DE_START_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) format_param[reg_idx].DeEnd;
+  err = setHwRegister(pDis, E_REG_P00_DE_STOP_LSB_W, regVal);
+  RETIF_REG_FAIL(err);
+  regVal = (UInt8) (format_param[reg_idx].DeEnd >> 8);
+  err = setHwRegister(pDis, E_REG_P00_DE_STOP_MSB_W, regVal);
+  RETIF_REG_FAIL(err);
+*/
 
 /* USER CODE END 0 */
 
@@ -89,26 +167,39 @@ void MX_LTDC_Init(void)
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IIPC;
-  hltdc.Init.HorizontalSync = LTDCSYNC[LTDC_VID_FORMAT].hsw;      //HSW;
-  hltdc.Init.VerticalSync = LTDCSYNC[LTDC_VID_FORMAT].vsh;        //VSH;
-  hltdc.Init.AccumulatedHBP = LTDCSYNC[LTDC_VID_FORMAT].ahbp;     //AHBP;
-  hltdc.Init.AccumulatedVBP = LTDCSYNC[LTDC_VID_FORMAT].avbp;     //AVBP;
-  hltdc.Init.AccumulatedActiveW = LTDCSYNC[LTDC_VID_FORMAT].aaw;  //AAW;
-  hltdc.Init.AccumulatedActiveH = LTDCSYNC[LTDC_VID_FORMAT].aah;  //AAH;
-  hltdc.Init.TotalWidth = LTDCSYNC[LTDC_VID_FORMAT].totalw;       //TOTALW;
-  hltdc.Init.TotalHeigh = LTDCSYNC[LTDC_VID_FORMAT].totalh;       //TOTALH;
+
+
+//  hltdc.Init.HorizontalSync = LTDCSYNC[LTDC_VID_FORMAT].hsw;      //HSW;
+//  hltdc.Init.VerticalSync = LTDCSYNC[LTDC_VID_FORMAT].vsh;        //VSH;
+//  hltdc.Init.AccumulatedHBP = LTDCSYNC[LTDC_VID_FORMAT].ahbp;     //AHBP;
+//  hltdc.Init.AccumulatedVBP = LTDCSYNC[LTDC_VID_FORMAT].avbp;     //AVBP;
+//  hltdc.Init.AccumulatedActiveW = LTDCSYNC[LTDC_VID_FORMAT].aaw;  //AAW;
+//  hltdc.Init.AccumulatedActiveH = LTDCSYNC[LTDC_VID_FORMAT].aah;  //AAH;
+//  hltdc.Init.TotalWidth = LTDCSYNC[LTDC_VID_FORMAT].totalw;       //TOTALW;
+//  hltdc.Init.TotalHeigh = LTDCSYNC[LTDC_VID_FORMAT].totalh;       //TOTALH;
+
+
+  hltdc.Init.HorizontalSync     = (LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
+  hltdc.Init.VerticalSync       = (LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
+  hltdc.Init.AccumulatedHBP     = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].hbp - 1);
+  hltdc.Init.AccumulatedVBP     = (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].vbp - 1);
+  hltdc.Init.AccumulatedActiveW = (LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
+  hltdc.Init.AccumulatedActiveH = (LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
+  hltdc.Init.TotalWidth         = (LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].hfp - 1);
+  hltdc.Init.TotalHeigh         = (LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].vfp - 1);
+
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
   hltdc.Init.Backcolor.Red = 0;
   HAL_LTDC_Init(&hltdc);
 
   pLayerCfg.WindowX0 = 0;
-  pLayerCfg.WindowX1 = LTDCSYNC[LTDC_VID_FORMAT].ahw; //800;
+  pLayerCfg.WindowX1 = LTDCSYNC[LTDC_VID_FORMAT].ahw;
   pLayerCfg.WindowY0 = 0;
-  pLayerCfg.WindowY1 = LTDCSYNC[LTDC_VID_FORMAT].avh; //600;
+  pLayerCfg.WindowY1 = LTDCSYNC[LTDC_VID_FORMAT].avh;
   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_L8; //RGB565;
   pLayerCfg.Alpha = 255;
-  pLayerCfg.Alpha0 = 0;
+  pLayerCfg.Alpha0 = 255;
   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
   pLayerCfg.FBStartAdress = 0xc0000000;

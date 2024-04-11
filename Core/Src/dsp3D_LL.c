@@ -62,6 +62,20 @@ void dsp3D_LL_init(void)
 
 }
 
+void __inline dsp3D_LL_drawPointF(uint16_t x, uint16_t y)
+{
+	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
+	uint16_t clippedc = pixel[0];
+
+	clippedc += 32;
+
+	if (clippedc>255)
+		clippedc = 255;
+
+	pixel[0] = ((uint8_t) clippedc);
+
+}
+
 void __inline dsp3D_LL_drawPoint(uint32_t x, uint32_t y, color32_t color)
 {
 
@@ -79,19 +93,21 @@ void __inline dsp3D_LL_drawPoint(uint32_t x, uint32_t y, color32_t color)
 
 	//volatile uint8_t *pixel = bbuffer + ((y * SCREEN_WIDTH) + x);
 
-	if(x<LTDCSYNC[LTDC_VID_FORMAT].ahw) {
-	if(y<LTDCSYNC[LTDC_VID_FORMAT].avh) {
+	//if(x<LTDCSYNC[LTDC_VID_FORMAT].ahw)
+	{
+	//if(y<LTDCSYNC[LTDC_VID_FORMAT].avh)
+	{
 
 	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
 
-#if 1
-	__DSB();
+#if 0
+	//__DSB();
 	*pixel = (uint8_t)color;
-	__DSB();
+	//__DSB();
 #else
-	__DSB();
+	//__DSB();
 	uint16_t clippedc = pixel[0];
-	__DSB();
+	//__DSB();
 	clippedc += 32;
 
 	if (clippedc>255)
@@ -154,7 +170,7 @@ float32_t __inline dsp3D_LL_readFromDepthBuffer(uint32_t pos)
 	volatile float32_t *zbuffer;
 	
 	zbuffer = 0xc0000000+(1024*1024*8) + pos;
-__DSB();
+//__DSB();
 	return *zbuffer;
 
 }

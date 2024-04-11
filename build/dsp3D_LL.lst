@@ -1,0 +1,585 @@
+ARM GAS  /tmp/ccobrh6d.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"dsp3D_LL.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/dsp3D_LL.c"
+  19              		.section	.text.dsp3D_LL_init,"ax",%progbits
+  20              		.align	1
+  21              		.global	dsp3D_LL_init
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	dsp3D_LL_init:
+  27              	.LFB361:
+   1:Core/Src/dsp3D_LL.c **** /******************************************************************************
+   2:Core/Src/dsp3D_LL.c **** Copyright (c) 2016 - Fabio Angeletti
+   3:Core/Src/dsp3D_LL.c **** e-mail: fabio.angeletti89@gmail.com
+   4:Core/Src/dsp3D_LL.c **** All rights reserved.
+   5:Core/Src/dsp3D_LL.c **** 
+   6:Core/Src/dsp3D_LL.c **** Redistribution and use in source and binary forms, with or without
+   7:Core/Src/dsp3D_LL.c **** modification, are permitted provided that the following conditions are met:
+   8:Core/Src/dsp3D_LL.c **** 
+   9:Core/Src/dsp3D_LL.c **** * Redistributions of source code must retain the above copyright notice, this
+  10:Core/Src/dsp3D_LL.c ****   list of conditions and the following disclaimer.
+  11:Core/Src/dsp3D_LL.c **** 
+  12:Core/Src/dsp3D_LL.c **** * Redistributions in binary form must reproduce the above copyright notice,
+  13:Core/Src/dsp3D_LL.c ****   this list of conditions and the following disclaimer in the documentation
+  14:Core/Src/dsp3D_LL.c ****   and/or other materials provided with the distribution.
+  15:Core/Src/dsp3D_LL.c **** 
+  16:Core/Src/dsp3D_LL.c **** * Neither the name of dsp3D nor the names of its contributors may be used
+  17:Core/Src/dsp3D_LL.c ****   to endorse or promote products derived from this software without
+  18:Core/Src/dsp3D_LL.c ****   specific prior written permission.
+  19:Core/Src/dsp3D_LL.c **** 
+  20:Core/Src/dsp3D_LL.c **** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  21:Core/Src/dsp3D_LL.c **** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  22:Core/Src/dsp3D_LL.c **** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  23:Core/Src/dsp3D_LL.c **** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  24:Core/Src/dsp3D_LL.c **** FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  25:Core/Src/dsp3D_LL.c **** DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  26:Core/Src/dsp3D_LL.c **** SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  27:Core/Src/dsp3D_LL.c **** CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  28:Core/Src/dsp3D_LL.c **** OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  29:Core/Src/dsp3D_LL.c **** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  30:Core/Src/dsp3D_LL.c **** 
+  31:Core/Src/dsp3D_LL.c **** This work was inspired by the excellent tutorial series by David Rousset:
+ARM GAS  /tmp/ccobrh6d.s 			page 2
+
+
+  32:Core/Src/dsp3D_LL.c **** "learning how to write a 3D soft engine from scratch in C#, TypeScript
+  33:Core/Src/dsp3D_LL.c **** or JavaScript" - available on David's website https://www.davrous.com
+  34:Core/Src/dsp3D_LL.c **** 
+  35:Core/Src/dsp3D_LL.c **** ******************************************************************************/
+  36:Core/Src/dsp3D_LL.c **** 
+  37:Core/Src/dsp3D_LL.c **** /******************************************************************************
+  38:Core/Src/dsp3D_LL.c **** The dsp3D_ll provides low level interface to the hardware.
+  39:Core/Src/dsp3D_LL.c **** ******************************************************************************/
+  40:Core/Src/dsp3D_LL.c **** 
+  41:Core/Src/dsp3D_LL.c **** /******************************************************************************
+  42:Core/Src/dsp3D_LL.c **** Customize thw following to your needs
+  43:Core/Src/dsp3D_LL.c **** ******************************************************************************/
+  44:Core/Src/dsp3D_LL.c **** 
+  45:Core/Src/dsp3D_LL.c **** #include "main.h"
+  46:Core/Src/dsp3D_LL.c **** #include "ltdc.h"
+  47:Core/Src/dsp3D_LL.c **** 
+  48:Core/Src/dsp3D_LL.c **** #include "dsp3D_LL.h"
+  49:Core/Src/dsp3D_LL.c **** 
+  50:Core/Src/dsp3D_LL.c **** 
+  51:Core/Src/dsp3D_LL.c **** extern const LTDCSYNC_t LTDCSYNC[];
+  52:Core/Src/dsp3D_LL.c **** 
+  53:Core/Src/dsp3D_LL.c **** extern uint32_t fbuffer, bbuffer, tmp;
+  54:Core/Src/dsp3D_LL.c **** 
+  55:Core/Src/dsp3D_LL.c **** //uint32_t zbuffer = 0xc0000000 + 1024*1024*5;//1024*768;
+  56:Core/Src/dsp3D_LL.c **** 
+  57:Core/Src/dsp3D_LL.c **** 
+  58:Core/Src/dsp3D_LL.c **** 
+  59:Core/Src/dsp3D_LL.c **** 
+  60:Core/Src/dsp3D_LL.c **** void dsp3D_LL_init(void)
+  61:Core/Src/dsp3D_LL.c **** {
+  28              		.loc 1 61 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  62:Core/Src/dsp3D_LL.c **** 
+  63:Core/Src/dsp3D_LL.c **** }
+  33              		.loc 1 63 1 view .LVU1
+  34 0000 7047     		bx	lr
+  35              		.cfi_endproc
+  36              	.LFE361:
+  38              		.section	.text.dsp3D_LL_drawPointF,"ax",%progbits
+  39              		.align	1
+  40              		.global	dsp3D_LL_drawPointF
+  41              		.syntax unified
+  42              		.thumb
+  43              		.thumb_func
+  45              	dsp3D_LL_drawPointF:
+  46              	.LVL0:
+  47              	.LFB362:
+  64:Core/Src/dsp3D_LL.c **** 
+  65:Core/Src/dsp3D_LL.c **** void __inline dsp3D_LL_drawPointF(uint16_t x, uint16_t y)
+  66:Core/Src/dsp3D_LL.c **** {
+  48              		.loc 1 66 1 view -0
+  49              		.cfi_startproc
+  50              		@ args = 0, pretend = 0, frame = 0
+  51              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/ccobrh6d.s 			page 3
+
+
+  52              		@ link register save eliminated.
+  67:Core/Src/dsp3D_LL.c **** 	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
+  53              		.loc 1 67 2 view .LVU3
+  54              		.loc 1 67 60 is_stmt 0 view .LVU4
+  55 0000 064B     		ldr	r3, .L5
+  56 0002 B3F87031 		ldrh	r3, [r3, #368]
+  57              		.loc 1 67 66 view .LVU5
+  58 0006 03FB0100 		mla	r0, r3, r1, r0
+  59              	.LVL1:
+  60              		.loc 1 67 27 view .LVU6
+  61 000a 054B     		ldr	r3, .L5+4
+  62 000c 1A68     		ldr	r2, [r3]
+  63              	.LVL2:
+  68:Core/Src/dsp3D_LL.c **** 	uint16_t clippedc = pixel[0];
+  64              		.loc 1 68 2 is_stmt 1 view .LVU7
+  65              		.loc 1 68 27 is_stmt 0 view .LVU8
+  66 000e 835C     		ldrb	r3, [r0, r2]	@ zero_extendqisi2
+  67              	.LVL3:
+  69:Core/Src/dsp3D_LL.c **** 
+  70:Core/Src/dsp3D_LL.c **** 	clippedc += 32;
+  68              		.loc 1 70 2 is_stmt 1 view .LVU9
+  69              		.loc 1 70 11 is_stmt 0 view .LVU10
+  70 0010 2033     		adds	r3, r3, #32
+  71              	.LVL4:
+  71:Core/Src/dsp3D_LL.c **** 
+  72:Core/Src/dsp3D_LL.c **** 	if (clippedc>255)
+  72              		.loc 1 72 2 is_stmt 1 view .LVU11
+  73              		.loc 1 72 5 is_stmt 0 view .LVU12
+  74 0012 FF2B     		cmp	r3, #255
+  75 0014 00D9     		bls	.L3
+  73:Core/Src/dsp3D_LL.c **** 		clippedc = 255;
+  76              		.loc 1 73 12 view .LVU13
+  77 0016 FF23     		movs	r3, #255
+  78              	.LVL5:
+  79              	.L3:
+  74:Core/Src/dsp3D_LL.c **** 
+  75:Core/Src/dsp3D_LL.c **** 	pixel[0] = ((uint8_t) clippedc);
+  80              		.loc 1 75 2 is_stmt 1 view .LVU14
+  81              		.loc 1 75 11 is_stmt 0 view .LVU15
+  82 0018 8354     		strb	r3, [r0, r2]
+  76:Core/Src/dsp3D_LL.c **** 
+  77:Core/Src/dsp3D_LL.c **** }
+  83              		.loc 1 77 1 view .LVU16
+  84 001a 7047     		bx	lr
+  85              	.L6:
+  86              		.align	2
+  87              	.L5:
+  88 001c 00000000 		.word	LTDCSYNC
+  89 0020 00000000 		.word	bbuffer
+  90              		.cfi_endproc
+  91              	.LFE362:
+  93              		.section	.text.dsp3D_LL_drawPoint,"ax",%progbits
+  94              		.align	1
+  95              		.global	dsp3D_LL_drawPoint
+  96              		.syntax unified
+  97              		.thumb
+  98              		.thumb_func
+ARM GAS  /tmp/ccobrh6d.s 			page 4
+
+
+ 100              	dsp3D_LL_drawPoint:
+ 101              	.LVL6:
+ 102              	.LFB363:
+  78:Core/Src/dsp3D_LL.c **** 
+  79:Core/Src/dsp3D_LL.c **** void __inline dsp3D_LL_drawPoint(uint32_t x, uint32_t y, color32_t color)
+  80:Core/Src/dsp3D_LL.c **** {
+ 103              		.loc 1 80 1 is_stmt 1 view -0
+ 104              		.cfi_startproc
+ 105              		@ args = 0, pretend = 0, frame = 0
+ 106              		@ frame_needed = 0, uses_anonymous_args = 0
+ 107              		@ link register save eliminated.
+ 108              	.LBB4:
+  81:Core/Src/dsp3D_LL.c **** 
+  82:Core/Src/dsp3D_LL.c **** /*
+  83:Core/Src/dsp3D_LL.c **** 	if(x < minX)
+  84:Core/Src/dsp3D_LL.c **** 		minX = x;
+  85:Core/Src/dsp3D_LL.c **** 	if(x > maxX)
+  86:Core/Src/dsp3D_LL.c **** 		maxX = x;
+  87:Core/Src/dsp3D_LL.c **** 	if(y < minY)
+  88:Core/Src/dsp3D_LL.c **** 		minY = y;
+  89:Core/Src/dsp3D_LL.c **** 	if(y > maxY)
+  90:Core/Src/dsp3D_LL.c **** 		maxY = y;
+  91:Core/Src/dsp3D_LL.c **** */
+  92:Core/Src/dsp3D_LL.c **** 
+  93:Core/Src/dsp3D_LL.c **** 
+  94:Core/Src/dsp3D_LL.c **** 	//volatile uint8_t *pixel = bbuffer + ((y * SCREEN_WIDTH) + x);
+  95:Core/Src/dsp3D_LL.c **** 
+  96:Core/Src/dsp3D_LL.c **** 	//if(x<LTDCSYNC[LTDC_VID_FORMAT].ahw)
+  97:Core/Src/dsp3D_LL.c **** 	{
+  98:Core/Src/dsp3D_LL.c **** 	//if(y<LTDCSYNC[LTDC_VID_FORMAT].avh)
+  99:Core/Src/dsp3D_LL.c **** 	{
+ 100:Core/Src/dsp3D_LL.c **** 
+ 101:Core/Src/dsp3D_LL.c **** 	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
+ 109              		.loc 1 101 2 view .LVU18
+ 110              		.loc 1 101 60 is_stmt 0 view .LVU19
+ 111 0000 064B     		ldr	r3, .L10
+ 112 0002 B3F87031 		ldrh	r3, [r3, #368]
+ 113              		.loc 1 101 66 view .LVU20
+ 114 0006 01FB0300 		mla	r0, r1, r3, r0
+ 115              	.LVL7:
+ 116              		.loc 1 101 27 view .LVU21
+ 117 000a 054B     		ldr	r3, .L10+4
+ 118 000c 1A68     		ldr	r2, [r3]
+ 119              	.LVL8:
+ 102:Core/Src/dsp3D_LL.c **** 
+ 103:Core/Src/dsp3D_LL.c **** #if 0
+ 104:Core/Src/dsp3D_LL.c **** 	//__DSB();
+ 105:Core/Src/dsp3D_LL.c **** 	*pixel = (uint8_t)color;
+ 106:Core/Src/dsp3D_LL.c **** 	//__DSB();
+ 107:Core/Src/dsp3D_LL.c **** #else
+ 108:Core/Src/dsp3D_LL.c **** 	//__DSB();
+ 109:Core/Src/dsp3D_LL.c **** 	uint16_t clippedc = pixel[0];
+ 120              		.loc 1 109 2 is_stmt 1 view .LVU22
+ 121              		.loc 1 109 27 is_stmt 0 view .LVU23
+ 122 000e 835C     		ldrb	r3, [r0, r2]	@ zero_extendqisi2
+ 123              	.LVL9:
+ 110:Core/Src/dsp3D_LL.c **** 	//__DSB();
+ARM GAS  /tmp/ccobrh6d.s 			page 5
+
+
+ 111:Core/Src/dsp3D_LL.c **** 	clippedc += 32;
+ 124              		.loc 1 111 2 is_stmt 1 view .LVU24
+ 125              		.loc 1 111 11 is_stmt 0 view .LVU25
+ 126 0010 2033     		adds	r3, r3, #32
+ 127              	.LVL10:
+ 112:Core/Src/dsp3D_LL.c **** 
+ 113:Core/Src/dsp3D_LL.c **** 	if (clippedc>255)
+ 128              		.loc 1 113 2 is_stmt 1 view .LVU26
+ 129              		.loc 1 113 5 is_stmt 0 view .LVU27
+ 130 0012 FF2B     		cmp	r3, #255
+ 131 0014 00D9     		bls	.L8
+ 114:Core/Src/dsp3D_LL.c **** 		clippedc = 255;
+ 132              		.loc 1 114 12 view .LVU28
+ 133 0016 FF23     		movs	r3, #255
+ 134              	.LVL11:
+ 135              	.L8:
+ 115:Core/Src/dsp3D_LL.c **** 
+ 116:Core/Src/dsp3D_LL.c **** 	pixel[0] = ((uint8_t) clippedc);
+ 136              		.loc 1 116 2 is_stmt 1 view .LVU29
+ 137              		.loc 1 116 11 is_stmt 0 view .LVU30
+ 138 0018 8354     		strb	r3, [r0, r2]
+ 139              	.LBE4:
+ 117:Core/Src/dsp3D_LL.c **** #endif
+ 118:Core/Src/dsp3D_LL.c **** /*
+ 119:Core/Src/dsp3D_LL.c ****     uint8_t *pixel = bbuffer + ((y * SCREEN_WIDTH) + x);
+ 120:Core/Src/dsp3D_LL.c **** 
+ 121:Core/Src/dsp3D_LL.c ****     pixel[0] += 40; //(uint8_t)color;
+ 122:Core/Src/dsp3D_LL.c **** */
+ 123:Core/Src/dsp3D_LL.c **** 	// YOUR IMPLEMENTATION
+ 124:Core/Src/dsp3D_LL.c **** }
+ 125:Core/Src/dsp3D_LL.c **** }
+ 126:Core/Src/dsp3D_LL.c **** 
+ 127:Core/Src/dsp3D_LL.c **** }
+ 140              		.loc 1 127 1 view .LVU31
+ 141 001a 7047     		bx	lr
+ 142              	.L11:
+ 143              		.align	2
+ 144              	.L10:
+ 145 001c 00000000 		.word	LTDCSYNC
+ 146 0020 00000000 		.word	bbuffer
+ 147              		.cfi_endproc
+ 148              	.LFE363:
+ 150              		.section	.text.dsp3D_LL_clearScreen,"ax",%progbits
+ 151              		.align	1
+ 152              		.global	dsp3D_LL_clearScreen
+ 153              		.syntax unified
+ 154              		.thumb
+ 155              		.thumb_func
+ 157              	dsp3D_LL_clearScreen:
+ 158              	.LVL12:
+ 159              	.LFB364:
+ 128:Core/Src/dsp3D_LL.c **** 
+ 129:Core/Src/dsp3D_LL.c **** void __inline dsp3D_LL_clearScreen(color32_t color)
+ 130:Core/Src/dsp3D_LL.c **** {
+ 160              		.loc 1 130 1 is_stmt 1 view -0
+ 161              		.cfi_startproc
+ 162              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/ccobrh6d.s 			page 6
+
+
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164              		@ link register save eliminated.
+ 131:Core/Src/dsp3D_LL.c **** 	// YOUR IMPLEMENTATION
+ 132:Core/Src/dsp3D_LL.c **** }
+ 165              		.loc 1 132 1 view .LVU33
+ 166 0000 7047     		bx	lr
+ 167              		.cfi_endproc
+ 168              	.LFE364:
+ 170              		.section	.text.dsp3D_LL_switchScreen,"ax",%progbits
+ 171              		.align	1
+ 172              		.global	dsp3D_LL_switchScreen
+ 173              		.syntax unified
+ 174              		.thumb
+ 175              		.thumb_func
+ 177              	dsp3D_LL_switchScreen:
+ 178              	.LFB365:
+ 133:Core/Src/dsp3D_LL.c **** 
+ 134:Core/Src/dsp3D_LL.c **** void __inline dsp3D_LL_switchScreen(void)
+ 135:Core/Src/dsp3D_LL.c **** {
+ 179              		.loc 1 135 1 view -0
+ 180              		.cfi_startproc
+ 181              		@ args = 0, pretend = 0, frame = 0
+ 182              		@ frame_needed = 0, uses_anonymous_args = 0
+ 183              		@ link register save eliminated.
+ 136:Core/Src/dsp3D_LL.c **** 	// YOUR IMPLEMENTATION
+ 137:Core/Src/dsp3D_LL.c **** }
+ 184              		.loc 1 137 1 view .LVU35
+ 185 0000 7047     		bx	lr
+ 186              		.cfi_endproc
+ 187              	.LFE365:
+ 189              		.section	.text.dsp3D_LL_writeToDepthBuffer,"ax",%progbits
+ 190              		.align	1
+ 191              		.global	dsp3D_LL_writeToDepthBuffer
+ 192              		.syntax unified
+ 193              		.thumb
+ 194              		.thumb_func
+ 196              	dsp3D_LL_writeToDepthBuffer:
+ 197              	.LVL13:
+ 198              	.LFB366:
+ 138:Core/Src/dsp3D_LL.c **** 
+ 139:Core/Src/dsp3D_LL.c **** /*
+ 140:Core/Src/dsp3D_LL.c **** void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float32_t z, color32_t color)
+ 141:Core/Src/dsp3D_LL.c **** {
+ 142:Core/Src/dsp3D_LL.c **** 	if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
+ 143:Core/Src/dsp3D_LL.c **** 	{
+ 144:Core/Src/dsp3D_LL.c **** 		int32_t index = (x + y * SCREEN_WIDTH) * sizeof(float32_t);
+ 145:Core/Src/dsp3D_LL.c **** 
+ 146:Core/Src/dsp3D_LL.c **** 		if(dsp3D_LL_readFromDepthBuffer(index) < z)
+ 147:Core/Src/dsp3D_LL.c **** 			return;
+ 148:Core/Src/dsp3D_LL.c **** 
+ 149:Core/Src/dsp3D_LL.c **** 		dsp3D_LL_writeToDepthBuffer(index, z);
+ 150:Core/Src/dsp3D_LL.c **** 		dsp3D_LL_drawPoint(x, y, color);
+ 151:Core/Src/dsp3D_LL.c **** 	}
+ 152:Core/Src/dsp3D_LL.c **** }
+ 153:Core/Src/dsp3D_LL.c **** */
+ 154:Core/Src/dsp3D_LL.c **** 
+ 155:Core/Src/dsp3D_LL.c **** void __inline dsp3D_LL_writeToDepthBuffer(uint32_t pos, float32_t value)
+ARM GAS  /tmp/ccobrh6d.s 			page 7
+
+
+ 156:Core/Src/dsp3D_LL.c **** {
+ 199              		.loc 1 156 1 view -0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+ 203              		@ link register save eliminated.
+ 157:Core/Src/dsp3D_LL.c **** 	// YOUR IMPLEMENTATION
+ 158:Core/Src/dsp3D_LL.c **** 
+ 159:Core/Src/dsp3D_LL.c **** 	volatile float32_t *zbuffer;
+ 204              		.loc 1 159 2 view .LVU37
+ 160:Core/Src/dsp3D_LL.c **** 	zbuffer = 0xc0000000+(1024*1024*8) + pos;
+ 205              		.loc 1 160 2 view .LVU38
+ 206              		.loc 1 160 37 is_stmt 0 view .LVU39
+ 207 0000 A0F17E50 		sub	r0, r0, #1065353216
+ 208              	.LVL14:
+ 161:Core/Src/dsp3D_LL.c **** 
+ 162:Core/Src/dsp3D_LL.c **** 	*zbuffer = value;
+ 209              		.loc 1 162 2 is_stmt 1 view .LVU40
+ 210              		.loc 1 162 11 is_stmt 0 view .LVU41
+ 211 0004 80ED000A 		vstr.32	s0, [r0]
+ 163:Core/Src/dsp3D_LL.c **** 
+ 164:Core/Src/dsp3D_LL.c **** }
+ 212              		.loc 1 164 1 view .LVU42
+ 213 0008 7047     		bx	lr
+ 214              		.cfi_endproc
+ 215              	.LFE366:
+ 217              		.section	.text.dsp3D_LL_readFromDepthBuffer,"ax",%progbits
+ 218              		.align	1
+ 219              		.global	dsp3D_LL_readFromDepthBuffer
+ 220              		.syntax unified
+ 221              		.thumb
+ 222              		.thumb_func
+ 224              	dsp3D_LL_readFromDepthBuffer:
+ 225              	.LVL15:
+ 226              	.LFB367:
+ 165:Core/Src/dsp3D_LL.c **** 
+ 166:Core/Src/dsp3D_LL.c **** float32_t __inline dsp3D_LL_readFromDepthBuffer(uint32_t pos)
+ 167:Core/Src/dsp3D_LL.c **** {
+ 227              		.loc 1 167 1 is_stmt 1 view -0
+ 228              		.cfi_startproc
+ 229              		@ args = 0, pretend = 0, frame = 0
+ 230              		@ frame_needed = 0, uses_anonymous_args = 0
+ 231              		@ link register save eliminated.
+ 168:Core/Src/dsp3D_LL.c **** 	// YOUR IMPLEMENTATION
+ 169:Core/Src/dsp3D_LL.c **** 
+ 170:Core/Src/dsp3D_LL.c **** 	volatile float32_t *zbuffer;
+ 232              		.loc 1 170 2 view .LVU44
+ 171:Core/Src/dsp3D_LL.c **** 	
+ 172:Core/Src/dsp3D_LL.c **** 	zbuffer = 0xc0000000+(1024*1024*8) + pos;
+ 233              		.loc 1 172 2 view .LVU45
+ 234              		.loc 1 172 37 is_stmt 0 view .LVU46
+ 235 0000 A0F17E50 		sub	r0, r0, #1065353216
+ 236              	.LVL16:
+ 173:Core/Src/dsp3D_LL.c **** //__DSB();
+ 174:Core/Src/dsp3D_LL.c **** 	return *zbuffer;
+ 237              		.loc 1 174 2 is_stmt 1 view .LVU47
+ 238              		.loc 1 174 9 is_stmt 0 view .LVU48
+ARM GAS  /tmp/ccobrh6d.s 			page 8
+
+
+ 239 0004 90ED000A 		vldr.32	s0, [r0]
+ 175:Core/Src/dsp3D_LL.c **** 
+ 176:Core/Src/dsp3D_LL.c **** }
+ 240              		.loc 1 176 1 view .LVU49
+ 241 0008 7047     		bx	lr
+ 242              		.cfi_endproc
+ 243              	.LFE367:
+ 245              		.section	.text.dsp3D_LL_clearDepthBuffer,"ax",%progbits
+ 246              		.align	1
+ 247              		.global	dsp3D_LL_clearDepthBuffer
+ 248              		.syntax unified
+ 249              		.thumb
+ 250              		.thumb_func
+ 252              	dsp3D_LL_clearDepthBuffer:
+ 253              	.LFB368:
+ 177:Core/Src/dsp3D_LL.c **** 
+ 178:Core/Src/dsp3D_LL.c **** void __inline dsp3D_LL_clearDepthBuffer(void)
+ 179:Core/Src/dsp3D_LL.c **** {
+ 254              		.loc 1 179 1 is_stmt 1 view -0
+ 255              		.cfi_startproc
+ 256              		@ args = 0, pretend = 0, frame = 0
+ 257              		@ frame_needed = 0, uses_anonymous_args = 0
+ 258              		@ link register save eliminated.
+ 180:Core/Src/dsp3D_LL.c **** 	uint32_t x, y;
+ 259              		.loc 1 180 2 view .LVU51
+ 181:Core/Src/dsp3D_LL.c **** 
+ 182:Core/Src/dsp3D_LL.c **** 	uint32_t zbuffer;
+ 260              		.loc 1 182 2 view .LVU52
+ 183:Core/Src/dsp3D_LL.c **** 	zbuffer = 0xc0000000+(1024*1024*8);
+ 261              		.loc 1 183 2 view .LVU53
+ 262              	.LVL17:
+ 184:Core/Src/dsp3D_LL.c **** 
+ 185:Core/Src/dsp3D_LL.c **** 	for(x = 0; x < LTDCSYNC[LTDC_VID_FORMAT].ahw; x++)
+ 263              		.loc 1 185 2 view .LVU54
+ 264              		.loc 1 185 8 is_stmt 0 view .LVU55
+ 265 0000 0020     		movs	r0, #0
+ 266              		.loc 1 185 2 view .LVU56
+ 267 0002 0EE0     		b	.L17
+ 268              	.LVL18:
+ 269              	.L18:
+ 186:Core/Src/dsp3D_LL.c **** 		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
+ 187:Core/Src/dsp3D_LL.c **** 			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_M
+ 270              		.loc 1 187 4 is_stmt 1 view .LVU57
+ 271              		.loc 1 187 35 is_stmt 0 view .LVU58
+ 272 0004 02FB0C03 		mla	r3, r2, ip, r0
+ 273              		.loc 1 187 4 view .LVU59
+ 274 0008 9B00     		lsls	r3, r3, #2
+ 275              	.LVL19:
+ 276              	.LBB5:
+ 277              	.LBI5:
+ 155:Core/Src/dsp3D_LL.c **** {
+ 278              		.loc 1 155 15 is_stmt 1 view .LVU60
+ 279              	.LBB6:
+ 159:Core/Src/dsp3D_LL.c **** 	zbuffer = 0xc0000000+(1024*1024*8) + pos;
+ 280              		.loc 1 159 2 view .LVU61
+ 160:Core/Src/dsp3D_LL.c **** 
+ 281              		.loc 1 160 2 view .LVU62
+ARM GAS  /tmp/ccobrh6d.s 			page 9
+
+
+ 160:Core/Src/dsp3D_LL.c **** 
+ 282              		.loc 1 160 37 is_stmt 0 view .LVU63
+ 283 000a A3F17E53 		sub	r3, r3, #1065353216
+ 284              	.LVL20:
+ 162:Core/Src/dsp3D_LL.c **** 
+ 285              		.loc 1 162 2 is_stmt 1 view .LVU64
+ 162:Core/Src/dsp3D_LL.c **** 
+ 286              		.loc 1 162 11 is_stmt 0 view .LVU65
+ 287 000e 4FF40001 		mov	r1, #8388608
+ 288 0012 1960     		str	r1, [r3]	@ float
+ 289              	.LVL21:
+ 162:Core/Src/dsp3D_LL.c **** 
+ 290              		.loc 1 162 11 view .LVU66
+ 291              	.LBE6:
+ 292              	.LBE5:
+ 186:Core/Src/dsp3D_LL.c **** 			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_M
+ 293              		.loc 1 186 50 is_stmt 1 discriminator 3 view .LVU67
+ 294 0014 0132     		adds	r2, r2, #1
+ 295              	.LVL22:
+ 296              	.L19:
+ 186:Core/Src/dsp3D_LL.c **** 			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_M
+ 297              		.loc 1 186 16 discriminator 1 view .LVU68
+ 186:Core/Src/dsp3D_LL.c **** 			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_M
+ 298              		.loc 1 186 43 is_stmt 0 discriminator 1 view .LVU69
+ 299 0016 074B     		ldr	r3, .L22
+ 300 0018 B3F87231 		ldrh	r3, [r3, #370]
+ 186:Core/Src/dsp3D_LL.c **** 			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_M
+ 301              		.loc 1 186 16 discriminator 1 view .LVU70
+ 302 001c 9342     		cmp	r3, r2
+ 303 001e F1D8     		bhi	.L18
+ 185:Core/Src/dsp3D_LL.c **** 		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
+ 304              		.loc 1 185 49 is_stmt 1 discriminator 2 view .LVU71
+ 305 0020 0130     		adds	r0, r0, #1
+ 306              	.LVL23:
+ 307              	.L17:
+ 185:Core/Src/dsp3D_LL.c **** 		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
+ 308              		.loc 1 185 15 discriminator 1 view .LVU72
+ 185:Core/Src/dsp3D_LL.c **** 		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
+ 309              		.loc 1 185 42 is_stmt 0 discriminator 1 view .LVU73
+ 310 0022 044B     		ldr	r3, .L22
+ 311 0024 B3F870C1 		ldrh	ip, [r3, #368]
+ 185:Core/Src/dsp3D_LL.c **** 		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
+ 312              		.loc 1 185 15 discriminator 1 view .LVU74
+ 313 0028 8445     		cmp	ip, r0
+ 314 002a 01D9     		bls	.L21
+ 186:Core/Src/dsp3D_LL.c **** 			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_M
+ 315              		.loc 1 186 9 view .LVU75
+ 316 002c 0022     		movs	r2, #0
+ 317 002e F2E7     		b	.L19
+ 318              	.L21:
+ 188:Core/Src/dsp3D_LL.c **** 
+ 189:Core/Src/dsp3D_LL.c **** 	//memset(zbuffer, 0x00, LTDCSYNC[LTDC_VID_FORMAT].ahw*LTDCSYNC[LTDC_VID_FORMAT].avh);
+ 190:Core/Src/dsp3D_LL.c **** 
+ 191:Core/Src/dsp3D_LL.c **** 	//dsp3D_LL_writeToDepthBuffer((LTDCSYNC[LTDC_VID_FORMAT].ahw*LTDCSYNC[LTDC_VID_FORMAT].avh) * size
+ 192:Core/Src/dsp3D_LL.c **** 
+ 193:Core/Src/dsp3D_LL.c **** 
+ 194:Core/Src/dsp3D_LL.c **** }
+ARM GAS  /tmp/ccobrh6d.s 			page 10
+
+
+ 319              		.loc 1 194 1 view .LVU76
+ 320 0030 7047     		bx	lr
+ 321              	.L23:
+ 322 0032 00BF     		.align	2
+ 323              	.L22:
+ 324 0034 00000000 		.word	LTDCSYNC
+ 325              		.cfi_endproc
+ 326              	.LFE368:
+ 328              		.text
+ 329              	.Letext0:
+ 330              		.file 2 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 331              		.file 3 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 332              		.file 4 "Core/Inc/ltdc.h"
+ 333              		.file 5 "Drivers/CMSIS/DSP/Include/arm_math.h"
+ARM GAS  /tmp/ccobrh6d.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 dsp3D_LL.c
+     /tmp/ccobrh6d.s:20     .text.dsp3D_LL_init:00000000 $t
+     /tmp/ccobrh6d.s:26     .text.dsp3D_LL_init:00000000 dsp3D_LL_init
+     /tmp/ccobrh6d.s:39     .text.dsp3D_LL_drawPointF:00000000 $t
+     /tmp/ccobrh6d.s:45     .text.dsp3D_LL_drawPointF:00000000 dsp3D_LL_drawPointF
+     /tmp/ccobrh6d.s:88     .text.dsp3D_LL_drawPointF:0000001c $d
+     /tmp/ccobrh6d.s:94     .text.dsp3D_LL_drawPoint:00000000 $t
+     /tmp/ccobrh6d.s:100    .text.dsp3D_LL_drawPoint:00000000 dsp3D_LL_drawPoint
+     /tmp/ccobrh6d.s:145    .text.dsp3D_LL_drawPoint:0000001c $d
+     /tmp/ccobrh6d.s:151    .text.dsp3D_LL_clearScreen:00000000 $t
+     /tmp/ccobrh6d.s:157    .text.dsp3D_LL_clearScreen:00000000 dsp3D_LL_clearScreen
+     /tmp/ccobrh6d.s:171    .text.dsp3D_LL_switchScreen:00000000 $t
+     /tmp/ccobrh6d.s:177    .text.dsp3D_LL_switchScreen:00000000 dsp3D_LL_switchScreen
+     /tmp/ccobrh6d.s:190    .text.dsp3D_LL_writeToDepthBuffer:00000000 $t
+     /tmp/ccobrh6d.s:196    .text.dsp3D_LL_writeToDepthBuffer:00000000 dsp3D_LL_writeToDepthBuffer
+     /tmp/ccobrh6d.s:218    .text.dsp3D_LL_readFromDepthBuffer:00000000 $t
+     /tmp/ccobrh6d.s:224    .text.dsp3D_LL_readFromDepthBuffer:00000000 dsp3D_LL_readFromDepthBuffer
+     /tmp/ccobrh6d.s:246    .text.dsp3D_LL_clearDepthBuffer:00000000 $t
+     /tmp/ccobrh6d.s:252    .text.dsp3D_LL_clearDepthBuffer:00000000 dsp3D_LL_clearDepthBuffer
+     /tmp/ccobrh6d.s:324    .text.dsp3D_LL_clearDepthBuffer:00000034 $d
+
+UNDEFINED SYMBOLS
+LTDCSYNC
+bbuffer

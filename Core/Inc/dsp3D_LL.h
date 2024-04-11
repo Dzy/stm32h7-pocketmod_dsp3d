@@ -80,6 +80,7 @@ void dsp3D_LL_init(void);
  * @param[in]  color  The color
  */
 void dsp3D_LL_drawPoint(uint32_t x, uint32_t y, uint32_t color);
+void dsp3D_LL_drawPointF(uint16_t x, uint16_t y);
 
 /**
  * @brief      Clear the screen with the specified color

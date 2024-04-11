@@ -130,8 +130,12 @@ BIN = $(CP) -O binary -S
 # cpu
 CPU = -mcpu=cortex-m7
 
-# fpu
+# fpu fpv5-sp-d16 (949,736 bytes) 55ms/73ms 40ms/53ms -Wdouble-promotion -fsingle-precision-constant
+#        fpv5-d16 (947,192 bytes) 55ms/73ms 40ms/53ms
+# LTDC_VID_FORMAT 10
 FPU = -mfpu=fpv5-d16
+
+FPU_FLAGS = -Wdouble-promotion -fsingle-precision-constant
 
 # float-abi
 FLOAT-ABI = -mfloat-abi=hard
@@ -169,9 +173,8 @@ C_INCLUDES =  \
 -IMiddlewares/ST/STM32_USB_Host_Library/Class/HID/Inc
 
 # compile gcc flags
-ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
-
-CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections $(FPU_FLAGS)
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections $(FPU_FLAGS)
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2

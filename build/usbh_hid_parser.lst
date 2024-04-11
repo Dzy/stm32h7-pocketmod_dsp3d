@@ -1,0 +1,675 @@
+ARM GAS  /tmp/ccGhTATv.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"usbh_hid_parser.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c"
+  19              		.section	.text.HID_ReadItem,"ax",%progbits
+  20              		.align	1
+  21              		.global	HID_ReadItem
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	HID_ReadItem:
+  27              	.LVL0:
+  28              	.LFB331:
+   1:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+   2:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   ******************************************************************************
+   3:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @file    usbh_hid_parser.c
+   4:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @author  MCD Application Team
+   5:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @brief   This file is the HID Layer Handlers for USB Host HID class.
+   6:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   ******************************************************************************
+   7:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @attention
+   8:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   *
+   9:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * <h2><center>&copy; Copyright (c) 2015 STMicroelectronics.
+  10:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * All rights reserved.</center></h2>
+  11:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   *
+  12:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * This software component is licensed by ST under Ultimate Liberty license
+  13:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * SLA0044, the "License"; You may not use this file except in compliance with
+  14:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * the License. You may obtain a copy of the License at:
+  15:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   *                      www.st.com/SLA0044
+  16:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   *
+  17:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   ******************************************************************************
+  18:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  19:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  20:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /* BSPDependencies
+  21:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** - "stm32xxxxx_{eval}{discovery}{nucleo_144}.c"
+  22:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** - "stm32xxxxx_{eval}{discovery}_io.c"
+  23:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** - "stm32xxxxx_{eval}{discovery}{adafruit}_lcd.c"
+  24:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** - "stm32xxxxx_{eval}{discovery}_sdram.c"
+  25:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** EndBSPDependencies */
+  26:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  27:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /* Includes ------------------------------------------------------------------*/
+  28:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** #include "usbh_hid_parser.h"
+  29:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  30:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ARM GAS  /tmp/ccGhTATv.s 			page 2
+
+
+  31:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @addtogroup USBH_LIB
+  32:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  33:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  34:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  35:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @addtogroup USBH_CLASS
+  36:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  37:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  38:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  39:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @addtogroup USBH_HID_CLASS
+  40:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  41:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  42:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  43:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER
+  44:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @brief    This file includes HID parsers for USB Host HID class.
+  45:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  46:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  47:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  48:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER_Private_TypesDefinitions
+  49:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  50:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  51:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+  52:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @}
+  53:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  54:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  55:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  56:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER_Private_Defines
+  57:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  58:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  59:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+  60:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @}
+  61:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  62:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  63:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  64:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER_Private_Macros
+  65:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  66:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  67:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+  68:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @}
+  69:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  70:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  71:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER_Private_FunctionPrototypes
+  72:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  73:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  74:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  75:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+  76:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @}
+  77:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  78:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  79:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  80:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER_Private_Variables
+  81:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  82:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  83:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  84:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+  85:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @}
+  86:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  87:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ARM GAS  /tmp/ccGhTATv.s 			page 3
+
+
+  88:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  89:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /** @defgroup USBH_HID_PARSER_Private_Functions
+  90:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @{
+  91:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+  92:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+  93:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+  94:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @brief  HID_ReadItem
+  95:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   *         The function read a report item.
+  96:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @param  ri: report item
+  97:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @param  ndx: report index
+  98:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** * @retval status (0 : fail / otherwise: item value)
+  99:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+ 100:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** uint32_t HID_ReadItem(HID_Report_ItemTypedef *ri, uint8_t ndx)
+ 101:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** {
+  29              		.loc 1 101 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 101 1 is_stmt 0 view .LVU1
+  34 0000 10B5     		push	{r4, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39 0002 8646     		mov	lr, r0
+ 102:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t val = 0U;
+  40              		.loc 1 102 3 is_stmt 1 view .LVU2
+  41              	.LVL1:
+ 103:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t x = 0U;
+  42              		.loc 1 103 3 view .LVU3
+ 104:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t bofs;
+  43              		.loc 1 104 3 view .LVU4
+ 105:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint8_t *data = ri->data;
+  44              		.loc 1 105 3 view .LVU5
+  45              		.loc 1 105 12 is_stmt 0 view .LVU6
+  46 0004 0068     		ldr	r0, [r0]
+  47              	.LVL2:
+ 106:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint8_t shift = ri->shift;
+  48              		.loc 1 106 3 is_stmt 1 view .LVU7
+  49              		.loc 1 106 11 is_stmt 0 view .LVU8
+  50 0006 9EF80840 		ldrb	r4, [lr, #8]	@ zero_extendqisi2
+  51              	.LVL3:
+ 107:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 108:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* get the logical value of the item */
+ 109:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 110:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* if this is an array, wee may need to offset ri->data.*/
+ 111:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   if (ri->count > 0U)
+  52              		.loc 1 111 3 is_stmt 1 view .LVU9
+  53              		.loc 1 111 9 is_stmt 0 view .LVU10
+  54 000a 9EF80930 		ldrb	r3, [lr, #9]	@ zero_extendqisi2
+  55              		.loc 1 111 6 view .LVU11
+  56 000e 4BB1     		cbz	r3, .L2
+ 112:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 113:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* If app tries to read outside of the array. */
+ 114:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     if (ri->count <= ndx)
+  57              		.loc 1 114 5 is_stmt 1 view .LVU12
+  58              		.loc 1 114 8 is_stmt 0 view .LVU13
+ARM GAS  /tmp/ccGhTATv.s 			page 4
+
+
+  59 0010 8B42     		cmp	r3, r1
+  60 0012 45D9     		bls	.L9
+ 115:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     {
+ 116:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****       return (0U);
+ 117:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 118:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 119:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* calculate bit offset */
+ 120:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     bofs = ndx * ri->size;
+  61              		.loc 1 120 5 is_stmt 1 view .LVU14
+  62              		.loc 1 120 20 is_stmt 0 view .LVU15
+  63 0014 DEF80430 		ldr	r3, [lr, #4]
+  64              	.LVL4:
+ 121:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     bofs += shift;
+  65              		.loc 1 121 5 is_stmt 1 view .LVU16
+  66              		.loc 1 121 10 is_stmt 0 view .LVU17
+  67 0018 03FB0144 		mla	r4, r3, r1, r4
+  68              	.LVL5:
+ 122:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* calculate byte offset + shift pair from bit offset. */
+ 123:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     data += bofs / 8U;
+  69              		.loc 1 123 5 is_stmt 1 view .LVU18
+  70              		.loc 1 123 10 is_stmt 0 view .LVU19
+  71 001c 00EBD400 		add	r0, r0, r4, lsr #3
+  72              	.LVL6:
+ 124:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     shift = (uint8_t)(bofs % 8U);
+  73              		.loc 1 124 5 is_stmt 1 view .LVU20
+  74              		.loc 1 124 11 is_stmt 0 view .LVU21
+  75 0020 04F00704 		and	r4, r4, #7
+  76              	.LVL7:
+  77              	.L2:
+ 125:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 126:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* read data bytes in little endian order */
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   for (x = 0U; x < ((ri->size & 0x7U) ? (ri->size / 8U) + 1U : (ri->size / 8U)); x++)
+  78              		.loc 1 127 3 is_stmt 1 view .LVU22
+  79              		.loc 1 127 10 is_stmt 0 view .LVU23
+  80 0024 0023     		movs	r3, #0
+ 102:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t x = 0U;
+  81              		.loc 1 102 12 view .LVU24
+  82 0026 1A46     		mov	r2, r3
+  83              		.loc 1 127 3 view .LVU25
+  84 0028 07E0     		b	.L4
+  85              	.LVL8:
+  86              	.L5:
+  87              		.loc 1 127 62 discriminator 4 view .LVU26
+  88 002a 4FEAD10C 		lsr	ip, r1, #3
+  89              	.L6:
+  90              		.loc 1 127 18 discriminator 6 view .LVU27
+  91 002e 6345     		cmp	r3, ip
+  92 0030 0DD2     		bcs	.L13
+ 128:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 129:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     val = (uint32_t)((uint32_t)(*data) << (x * 8U));
+  93              		.loc 1 129 5 is_stmt 1 view .LVU28
+  94              		.loc 1 129 33 is_stmt 0 view .LVU29
+  95 0032 0278     		ldrb	r2, [r0]	@ zero_extendqisi2
+  96              	.LVL9:
+  97              		.loc 1 129 46 view .LVU30
+  98 0034 D900     		lsls	r1, r3, #3
+  99              		.loc 1 129 9 view .LVU31
+ARM GAS  /tmp/ccGhTATv.s 			page 5
+
+
+ 100 0036 8A40     		lsls	r2, r2, r1
+ 101              	.LVL10:
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 102              		.loc 1 127 83 is_stmt 1 discriminator 7 view .LVU32
+ 103 0038 0133     		adds	r3, r3, #1
+ 104              	.LVL11:
+ 105              	.L4:
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 106              		.loc 1 127 18 discriminator 1 view .LVU33
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 107              		.loc 1 127 24 is_stmt 0 discriminator 1 view .LVU34
+ 108 003a DEF80410 		ldr	r1, [lr, #4]
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 109              		.loc 1 127 62 discriminator 1 view .LVU35
+ 110 003e 11F0070F 		tst	r1, #7
+ 111 0042 F2D0     		beq	.L5
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 112              		.loc 1 127 51 discriminator 3 view .LVU36
+ 113 0044 4FEAD10C 		lsr	ip, r1, #3
+ 127:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 114              		.loc 1 127 62 discriminator 3 view .LVU37
+ 115 0048 0CF1010C 		add	ip, ip, #1
+ 116 004c EFE7     		b	.L6
+ 117              	.L13:
+ 130:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 131:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   val = (val >> shift) & ((1U << ri->size) - 1U);
+ 118              		.loc 1 131 3 is_stmt 1 view .LVU38
+ 119              		.loc 1 131 14 is_stmt 0 view .LVU39
+ 120 004e E240     		lsrs	r2, r2, r4
+ 121              	.LVL12:
+ 122              		.loc 1 131 31 view .LVU40
+ 123 0050 0123     		movs	r3, #1
+ 124              	.LVL13:
+ 125              		.loc 1 131 31 view .LVU41
+ 126 0052 03FA01F4 		lsl	r4, r3, r1
+ 127              	.LVL14:
+ 128              		.loc 1 131 7 view .LVU42
+ 129 0056 4FF0FF33 		mov	r3, #-1
+ 130 005a 8B40     		lsls	r3, r3, r1
+ 131 005c 22EA0300 		bic	r0, r2, r3
+ 132              	.LVL15:
+ 132:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 133:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   if (val < ri->logical_min || val > ri->logical_max)
+ 133              		.loc 1 133 3 is_stmt 1 view .LVU43
+ 134              		.loc 1 133 15 is_stmt 0 view .LVU44
+ 135 0060 DEF80C30 		ldr	r3, [lr, #12]
+ 136              		.loc 1 133 6 view .LVU45
+ 137 0064 8342     		cmp	r3, r0
+ 138 0066 1DD8     		bhi	.L10
+ 139              		.loc 1 133 40 discriminator 1 view .LVU46
+ 140 0068 DEF81030 		ldr	r3, [lr, #16]
+ 141              		.loc 1 133 29 discriminator 1 view .LVU47
+ 142 006c 8342     		cmp	r3, r0
+ 143 006e 1BD3     		bcc	.L11
+ 134:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 135:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     return (0U);
+ 136:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ARM GAS  /tmp/ccGhTATv.s 			page 6
+
+
+ 137:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 138:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* convert logical value to physical value */
+ 139:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* See if the number is negative or not. */
+ 140:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   if ((ri->sign) && (val & (1U << (ri->size - 1U))))
+ 144              		.loc 1 140 3 is_stmt 1 view .LVU48
+ 145              		.loc 1 140 10 is_stmt 0 view .LVU49
+ 146 0070 9EF80A30 		ldrb	r3, [lr, #10]	@ zero_extendqisi2
+ 147              		.loc 1 140 6 view .LVU50
+ 148 0074 6BB1     		cbz	r3, .L8
+ 149              		.loc 1 140 45 discriminator 1 view .LVU51
+ 150 0076 0139     		subs	r1, r1, #1
+ 151              		.loc 1 140 32 discriminator 1 view .LVU52
+ 152 0078 0123     		movs	r3, #1
+ 153 007a 8B40     		lsls	r3, r3, r1
+ 154              		.loc 1 140 18 discriminator 1 view .LVU53
+ 155 007c 0342     		tst	r3, r0
+ 156 007e 08D0     		beq	.L8
+ 157              	.LBB2:
+ 141:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 142:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* yes, so sign extend value to 32 bits. */
+ 143:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     uint32_t vs = (uint32_t)((0xffffffffU & ~((1U << (ri->size)) - 1U)) | val);
+ 158              		.loc 1 143 5 is_stmt 1 view .LVU54
+ 159              		.loc 1 143 43 is_stmt 0 view .LVU55
+ 160 0080 6342     		rsbs	r3, r4, #0
+ 161              		.loc 1 143 14 view .LVU56
+ 162 0082 1843     		orrs	r0, r0, r3
+ 163              	.LVL16:
+ 144:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 145:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     if (ri->resolution == 1U)
+ 164              		.loc 1 145 5 is_stmt 1 view .LVU57
+ 165              		.loc 1 145 11 is_stmt 0 view .LVU58
+ 166 0084 DEF81C30 		ldr	r3, [lr, #28]
+ 167              		.loc 1 145 8 view .LVU59
+ 168 0088 012B     		cmp	r3, #1
+ 169 008a 0CD0     		beq	.L1
+ 146:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     {
+ 147:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****       return ((uint32_t)vs);
+ 148:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 149:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     return ((uint32_t)(vs * ri->resolution));
+ 170              		.loc 1 149 5 is_stmt 1 view .LVU60
+ 171              		.loc 1 149 13 is_stmt 0 view .LVU61
+ 172 008c 03FB00F0 		mul	r0, r3, r0
+ 173              	.LVL17:
+ 174              		.loc 1 149 13 view .LVU62
+ 175 0090 09E0     		b	.L1
+ 176              	.LVL18:
+ 177              	.L8:
+ 178              		.loc 1 149 13 view .LVU63
+ 179              	.LBE2:
+ 150:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 151:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   else
+ 152:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 153:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     if (ri->resolution == 1U)
+ 180              		.loc 1 153 5 is_stmt 1 view .LVU64
+ 181              		.loc 1 153 11 is_stmt 0 view .LVU65
+ 182 0092 DEF81C30 		ldr	r3, [lr, #28]
+ 183              		.loc 1 153 8 view .LVU66
+ARM GAS  /tmp/ccGhTATv.s 			page 7
+
+
+ 184 0096 012B     		cmp	r3, #1
+ 185 0098 05D0     		beq	.L1
+ 154:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     {
+ 155:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****       return (val);
+ 156:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 157:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     return (val * ri->resolution);
+ 186              		.loc 1 157 5 is_stmt 1 view .LVU67
+ 187              		.loc 1 157 17 is_stmt 0 view .LVU68
+ 188 009a 03FB00F0 		mul	r0, r3, r0
+ 189              	.LVL19:
+ 190              		.loc 1 157 17 view .LVU69
+ 191 009e 02E0     		b	.L1
+ 192              	.LVL20:
+ 193              	.L9:
+ 116:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 194              		.loc 1 116 14 view .LVU70
+ 195 00a0 0020     		movs	r0, #0
+ 196              	.LVL21:
+ 116:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 197              		.loc 1 116 14 view .LVU71
+ 198 00a2 00E0     		b	.L1
+ 199              	.LVL22:
+ 200              	.L10:
+ 135:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 201              		.loc 1 135 12 view .LVU72
+ 202 00a4 0020     		movs	r0, #0
+ 203              	.LVL23:
+ 204              	.L1:
+ 158:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 159:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** }
+ 205              		.loc 1 159 1 view .LVU73
+ 206 00a6 10BD     		pop	{r4, pc}
+ 207              	.LVL24:
+ 208              	.L11:
+ 135:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 209              		.loc 1 135 12 view .LVU74
+ 210 00a8 0020     		movs	r0, #0
+ 211              	.LVL25:
+ 135:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 212              		.loc 1 135 12 view .LVU75
+ 213 00aa FCE7     		b	.L1
+ 214              		.cfi_endproc
+ 215              	.LFE331:
+ 217              		.section	.text.HID_WriteItem,"ax",%progbits
+ 218              		.align	1
+ 219              		.global	HID_WriteItem
+ 220              		.syntax unified
+ 221              		.thumb
+ 222              		.thumb_func
+ 224              	HID_WriteItem:
+ 225              	.LVL26:
+ 226              	.LFB332:
+ 160:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 161:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** /**
+ 162:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @brief  HID_WriteItem
+ 163:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   *         The function write a report item.
+ 164:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @param  ri: report item
+ARM GAS  /tmp/ccGhTATv.s 			page 8
+
+
+ 165:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @param  ndx: report index
+ 166:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   * @retval status (1: fail/ 0 : Ok)
+ 167:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   */
+ 168:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** uint32_t HID_WriteItem(HID_Report_ItemTypedef *ri, uint32_t value, uint8_t ndx)
+ 169:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** {
+ 227              		.loc 1 169 1 is_stmt 1 view -0
+ 228              		.cfi_startproc
+ 229              		@ args = 0, pretend = 0, frame = 0
+ 230              		@ frame_needed = 0, uses_anonymous_args = 0
+ 231              		.loc 1 169 1 is_stmt 0 view .LVU77
+ 232 0000 30B5     		push	{r4, r5, lr}
+ 233              	.LCFI1:
+ 234              		.cfi_def_cfa_offset 12
+ 235              		.cfi_offset 4, -12
+ 236              		.cfi_offset 5, -8
+ 237              		.cfi_offset 14, -4
+ 170:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t x;
+ 238              		.loc 1 170 3 is_stmt 1 view .LVU78
+ 171:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t mask;
+ 239              		.loc 1 171 3 view .LVU79
+ 172:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint32_t bofs;
+ 240              		.loc 1 172 3 view .LVU80
+ 173:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint8_t *data = ri->data;
+ 241              		.loc 1 173 3 view .LVU81
+ 242              	.LVL27:
+ 174:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   uint8_t shift = ri->shift;
+ 243              		.loc 1 174 3 view .LVU82
+ 244              		.loc 1 174 11 is_stmt 0 view .LVU83
+ 245 0002 057A     		ldrb	r5, [r0, #8]	@ zero_extendqisi2
+ 246              	.LVL28:
+ 175:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 176:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   if (value < ri->physical_min || value > ri->physical_max)
+ 247              		.loc 1 176 3 is_stmt 1 view .LVU84
+ 248              		.loc 1 176 17 is_stmt 0 view .LVU85
+ 249 0004 4369     		ldr	r3, [r0, #20]
+ 250              		.loc 1 176 6 view .LVU86
+ 251 0006 8B42     		cmp	r3, r1
+ 252 0008 36D8     		bhi	.L22
+ 253              		.loc 1 176 45 discriminator 1 view .LVU87
+ 254 000a 8369     		ldr	r3, [r0, #24]
+ 255              		.loc 1 176 32 discriminator 1 view .LVU88
+ 256 000c 8B42     		cmp	r3, r1
+ 257 000e 35D3     		bcc	.L23
+ 177:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 178:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     return (1U);
+ 179:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 180:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 181:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* if this is an array, wee may need to offset ri->data.*/
+ 182:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   if (ri->count > 0U)
+ 258              		.loc 1 182 3 is_stmt 1 view .LVU89
+ 259              		.loc 1 182 9 is_stmt 0 view .LVU90
+ 260 0010 437A     		ldrb	r3, [r0, #9]	@ zero_extendqisi2
+ 261              		.loc 1 182 6 view .LVU91
+ 262 0012 33B1     		cbz	r3, .L16
+ 183:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 184:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* If app tries to read outside of the array. */
+ 185:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     if (ri->count >= ndx)
+ARM GAS  /tmp/ccGhTATv.s 			page 9
+
+
+ 263              		.loc 1 185 5 is_stmt 1 view .LVU92
+ 264              		.loc 1 185 8 is_stmt 0 view .LVU93
+ 265 0014 9342     		cmp	r3, r2
+ 266 0016 33D2     		bcs	.L24
+ 186:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     {
+ 187:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****       return (0U);
+ 188:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 189:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* calculate bit offset */
+ 190:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     bofs = ndx * ri->size;
+ 267              		.loc 1 190 5 is_stmt 1 view .LVU94
+ 268              		.loc 1 190 20 is_stmt 0 view .LVU95
+ 269 0018 4368     		ldr	r3, [r0, #4]
+ 270              	.LVL29:
+ 191:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     bofs += shift;
+ 271              		.loc 1 191 5 is_stmt 1 view .LVU96
+ 272              		.loc 1 191 10 is_stmt 0 view .LVU97
+ 273 001a 03FB0255 		mla	r5, r3, r2, r5
+ 274              	.LVL30:
+ 192:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     /* calculate byte offset + shift pair from bit offset. */
+ 193:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     data += bofs / 8U;
+ 275              		.loc 1 193 5 is_stmt 1 view .LVU98
+ 194:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     shift = (uint8_t)(bofs % 8U);
+ 276              		.loc 1 194 5 view .LVU99
+ 277              		.loc 1 194 11 is_stmt 0 view .LVU100
+ 278 001e 05F00705 		and	r5, r5, #7
+ 279              	.LVL31:
+ 280              	.L16:
+ 195:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 196:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 197:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 198:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* Convert physical value to logical value. */
+ 199:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   if (ri->resolution != 1U)
+ 281              		.loc 1 199 3 is_stmt 1 view .LVU101
+ 282              		.loc 1 199 9 is_stmt 0 view .LVU102
+ 283 0022 C369     		ldr	r3, [r0, #28]
+ 284              		.loc 1 199 6 view .LVU103
+ 285 0024 012B     		cmp	r3, #1
+ 286 0026 01D0     		beq	.L17
+ 200:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 201:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     value = value / ri->resolution;
+ 287              		.loc 1 201 5 is_stmt 1 view .LVU104
+ 288              		.loc 1 201 11 is_stmt 0 view .LVU105
+ 289 0028 B1FBF3F1 		udiv	r1, r1, r3
+ 290              	.LVL32:
+ 291              	.L17:
+ 202:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 203:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 204:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   /* Write logical value to report in little endian order. */
+ 205:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   mask = (1U << ri->size) - 1U;
+ 292              		.loc 1 205 3 is_stmt 1 view .LVU106
+ 293              		.loc 1 205 19 is_stmt 0 view .LVU107
+ 294 002c 4368     		ldr	r3, [r0, #4]
+ 295              		.loc 1 205 14 view .LVU108
+ 296 002e 0124     		movs	r4, #1
+ 297 0030 9C40     		lsls	r4, r4, r3
+ 298              		.loc 1 205 8 view .LVU109
+ 299 0032 013C     		subs	r4, r4, #1
+ARM GAS  /tmp/ccGhTATv.s 			page 10
+
+
+ 300              	.LVL33:
+ 206:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   value = (value & mask) << shift;
+ 301              		.loc 1 206 3 is_stmt 1 view .LVU110
+ 302              		.loc 1 206 18 is_stmt 0 view .LVU111
+ 303 0034 2140     		ands	r1, r1, r4
+ 304              	.LVL34:
+ 305              		.loc 1 206 9 view .LVU112
+ 306 0036 A940     		lsls	r1, r1, r5
+ 307              	.LVL35:
+ 207:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 208:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   for (x = 0U; x < ((ri->size & 0x7U) ? (ri->size / 8U) + 1U : (ri->size / 8U)); x++)
+ 308              		.loc 1 208 3 is_stmt 1 view .LVU113
+ 309              		.loc 1 208 10 is_stmt 0 view .LVU114
+ 310 0038 0022     		movs	r2, #0
+ 311              	.LVL36:
+ 312              		.loc 1 208 3 view .LVU115
+ 313 003a 15E0     		b	.L18
+ 314              	.LVL37:
+ 315              	.L27:
+ 316              		.loc 1 208 51 discriminator 3 view .LVU116
+ 317 003c DB08     		lsrs	r3, r3, #3
+ 318              		.loc 1 208 62 discriminator 3 view .LVU117
+ 319 003e 0133     		adds	r3, r3, #1
+ 320              	.L20:
+ 321              		.loc 1 208 18 discriminator 6 view .LVU118
+ 322 0040 9A42     		cmp	r2, r3
+ 323 0042 17D2     		bcs	.L26
+ 209:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 210:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     *(ri->data + x) = (uint8_t)((*(ri->data + x) & ~(mask >> (x * 8U))) |
+ 324              		.loc 1 210 5 is_stmt 1 view .LVU119
+ 325              		.loc 1 210 38 is_stmt 0 view .LVU120
+ 326 0044 0568     		ldr	r5, [r0]
+ 327              		.loc 1 210 34 view .LVU121
+ 328 0046 15F802C0 		ldrb	ip, [r5, r2]	@ zero_extendqisi2
+ 329              		.loc 1 210 65 view .LVU122
+ 330 004a 4FEAC20E 		lsl	lr, r2, #3
+ 331              		.loc 1 210 59 view .LVU123
+ 332 004e 24FA0EF3 		lsr	r3, r4, lr
+ 333              		.loc 1 210 50 view .LVU124
+ 334 0052 DBB2     		uxtb	r3, r3
+ 335 0054 2CEA030C 		bic	ip, ip, r3
+ 211:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****                                 ((value >> (x * 8U)) & (mask >> (x * 8U))));
+ 336              		.loc 1 211 41 view .LVU125
+ 337 0058 21FA0EFE 		lsr	lr, r1, lr
+ 338              		.loc 1 211 54 view .LVU126
+ 339 005c 03EA0E03 		and	r3, r3, lr
+ 210:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****                                 ((value >> (x * 8U)) & (mask >> (x * 8U))));
+ 340              		.loc 1 210 23 view .LVU127
+ 341 0060 4CEA0303 		orr	r3, ip, r3
+ 210:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****                                 ((value >> (x * 8U)) & (mask >> (x * 8U))));
+ 342              		.loc 1 210 21 view .LVU128
+ 343 0064 AB54     		strb	r3, [r5, r2]
+ 208:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 344              		.loc 1 208 83 is_stmt 1 discriminator 7 view .LVU129
+ 345 0066 0132     		adds	r2, r2, #1
+ 346              	.LVL38:
+ 347              	.L18:
+ARM GAS  /tmp/ccGhTATv.s 			page 11
+
+
+ 208:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 348              		.loc 1 208 18 discriminator 1 view .LVU130
+ 208:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 349              		.loc 1 208 24 is_stmt 0 discriminator 1 view .LVU131
+ 350 0068 4368     		ldr	r3, [r0, #4]
+ 208:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 351              		.loc 1 208 62 discriminator 1 view .LVU132
+ 352 006a 13F0070F 		tst	r3, #7
+ 353 006e E5D1     		bne	.L27
+ 208:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   {
+ 354              		.loc 1 208 62 discriminator 4 view .LVU133
+ 355 0070 DB08     		lsrs	r3, r3, #3
+ 356 0072 E5E7     		b	.L20
+ 357              	.L26:
+ 212:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 213:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** 
+ 214:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   return 0U;
+ 358              		.loc 1 214 10 view .LVU134
+ 359 0074 0020     		movs	r0, #0
+ 360              	.LVL39:
+ 361              	.L14:
+ 215:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c **** }
+ 362              		.loc 1 215 1 view .LVU135
+ 363 0076 30BD     		pop	{r4, r5, pc}
+ 364              	.LVL40:
+ 365              	.L22:
+ 178:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 366              		.loc 1 178 12 view .LVU136
+ 367 0078 0120     		movs	r0, #1
+ 368              	.LVL41:
+ 178:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 369              		.loc 1 178 12 view .LVU137
+ 370 007a FCE7     		b	.L14
+ 371              	.LVL42:
+ 372              	.L23:
+ 178:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 373              		.loc 1 178 12 view .LVU138
+ 374 007c 0120     		movs	r0, #1
+ 375              	.LVL43:
+ 178:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****   }
+ 376              		.loc 1 178 12 view .LVU139
+ 377 007e FAE7     		b	.L14
+ 378              	.LVL44:
+ 379              	.L24:
+ 187:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 380              		.loc 1 187 14 view .LVU140
+ 381 0080 0020     		movs	r0, #0
+ 382              	.LVL45:
+ 187:Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c ****     }
+ 383              		.loc 1 187 14 view .LVU141
+ 384 0082 F8E7     		b	.L14
+ 385              		.cfi_endproc
+ 386              	.LFE332:
+ 388              		.text
+ 389              	.Letext0:
+ 390              		.file 2 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 391              		.file 3 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ARM GAS  /tmp/ccGhTATv.s 			page 12
+
+
+ 392              		.file 4 "Middlewares/ST/STM32_USB_Host_Library/Class/HID/Inc/usbh_hid_parser.h"
+ARM GAS  /tmp/ccGhTATv.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 usbh_hid_parser.c
+     /tmp/ccGhTATv.s:20     .text.HID_ReadItem:00000000 $t
+     /tmp/ccGhTATv.s:26     .text.HID_ReadItem:00000000 HID_ReadItem
+     /tmp/ccGhTATv.s:218    .text.HID_WriteItem:00000000 $t
+     /tmp/ccGhTATv.s:224    .text.HID_WriteItem:00000000 HID_WriteItem
+
+NO UNDEFINED SYMBOLS

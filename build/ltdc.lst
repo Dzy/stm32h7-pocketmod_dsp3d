@@ -1,0 +1,1212 @@
+ARM GAS  /tmp/ccjvrTEr.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"ltdc.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/ltdc.c"
+  19              		.section	.text.MX_LTDC_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	MX_LTDC_Init
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	MX_LTDC_Init:
+  27              	.LFB328:
+   1:Core/Src/ltdc.c **** /**
+   2:Core/Src/ltdc.c ****   ******************************************************************************
+   3:Core/Src/ltdc.c ****   * @file    ltdc.c
+   4:Core/Src/ltdc.c ****   * @brief   This file provides code for the configuration
+   5:Core/Src/ltdc.c ****   *          of the LTDC instances.
+   6:Core/Src/ltdc.c ****   ******************************************************************************
+   7:Core/Src/ltdc.c ****   * @attention
+   8:Core/Src/ltdc.c ****   *
+   9:Core/Src/ltdc.c ****   * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  10:Core/Src/ltdc.c ****   * All rights reserved.</center></h2>
+  11:Core/Src/ltdc.c ****   *
+  12:Core/Src/ltdc.c ****   * This software component is licensed by ST under Ultimate Liberty license
+  13:Core/Src/ltdc.c ****   * SLA0044, the "License"; You may not use this file except in compliance with
+  14:Core/Src/ltdc.c ****   * the License. You may obtain a copy of the License at:
+  15:Core/Src/ltdc.c ****   *                             www.st.com/SLA0044
+  16:Core/Src/ltdc.c ****   *
+  17:Core/Src/ltdc.c ****   ******************************************************************************
+  18:Core/Src/ltdc.c ****   */
+  19:Core/Src/ltdc.c **** 
+  20:Core/Src/ltdc.c **** /* Includes ------------------------------------------------------------------*/
+  21:Core/Src/ltdc.c **** #include "ltdc.h"
+  22:Core/Src/ltdc.c **** 
+  23:Core/Src/ltdc.c **** /* USER CODE BEGIN 0 */
+  24:Core/Src/ltdc.c **** const LTDCSYNC_t LTDCSYNC[] = {
+  25:Core/Src/ltdc.c ****  { 252, 2, 2, 8,    640,  480,    24,  40, 128,    9, 3, 28,    39, 167,  807,  831,   2, 30,  510,
+  26:Core/Src/ltdc.c ****  { 252, 2, 2, 8,    640,  480,    16,  96,  48,   11, 2, 32,    95, 143,  783,  799,   1, 33,  513,
+  27:Core/Src/ltdc.c ****  { 288, 2, 2, 8,    640,  480,    32,  48, 112,    1, 3, 25,    47, 159,  799,  831,   2, 27,  507,
+  28:Core/Src/ltdc.c ****  { 295, 2, 2, 8,    800,  600,    40, 128,  88,    1, 4, 23,   127, 215, 1015, 1055,   3, 26,  626,
+  29:Core/Src/ltdc.c ****  { 400, 2, 2, 8,    800,  600,    56, 120,  64,   37, 6, 23,   119, 183,  983, 1039,   5, 28,  628,
+  30:Core/Src/ltdc.c ****  { 396, 2, 2, 8,    800,  600,    16,  80, 160,    1, 2, 21,    79, 239, 1039, 1055,   1, 22,  622,
+  31:Core/Src/ltdc.c ****  { 450, 2, 2, 8,    800,  600,    32,  64, 152,    1, 3, 27,    63, 215, 1015, 1047,   2, 29,  629,
+ARM GAS  /tmp/ccjvrTEr.s 			page 2
+
+
+  32:Core/Src/ltdc.c ****  { 265, 4, 4, 4,   1024,  768,    24, 136, 160,    3, 6, 29,   135, 295, 1319, 1343,   5, 34,  802,
+  33:Core/Src/ltdc.c ****  { 300, 4, 4, 4,   1024,  768,    24, 136, 144,    3, 6, 29,   135, 279, 1303, 1327,   5, 34,  802,
+  34:Core/Src/ltdc.c ****  { 315, 4, 4, 4,   1024,  768,    16,  96, 176,    1, 3, 28,    95, 271, 1295, 1311,   2, 30,  798,
+  35:Core/Src/ltdc.c ****  { 432, 4, 4, 4,   1280, 1024,    48, 112, 248,    1, 3, 38,   111, 359, 1639, 1687,   2, 40, 1064,
+  36:Core/Src/ltdc.c ****  { 432, 4, 4, 4,   1920, 1080,   128, 208, 336,    1, 3, 38,   111, 359, 1639, 1687,   2, 40, 1064,
+  37:Core/Src/ltdc.c **** };    
+  38:Core/Src/ltdc.c **** /*
+  39:Core/Src/ltdc.c **** 
+  40:Core/Src/ltdc.c ****  { 252, 2, 2, 8,    640,  480,    16,  64, 120,    1, 3, 16,    95, 143,  783,  799,   1, 33,  513,
+  41:Core/Src/ltdc.c **** 
+  42:Core/Src/ltdc.c ****   NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVideoSt
+  43:Core/Src/ltdc.c ****   npix    nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1        
+  44:Core/Src/ltdc.c ****  {1688,   1066,  1,           48,         4,          48,         48,         160,    41,          
+  45:Core/Src/ltdc.c **** 
+  46:Core/Src/ltdc.c **** typedef struct _LTDCSYNC_t {
+  47:Core/Src/ltdc.c ****    uint16_t pll3n, pll3p, pll3q, pll3r;
+  48:Core/Src/ltdc.c ****    uint16_t ahw, avh;
+  49:Core/Src/ltdc.c ****    uint16_t hfp, hsync, hbp;
+  50:Core/Src/ltdc.c ****    uint16_t vfp, vsync, vbp;
+  51:Core/Src/ltdc.c ****    uint16_t hsw,  ahbp, aaw, totalw;
+  52:Core/Src/ltdc.c ****    uint16_t vsh,  avbp, aah, totalh;
+  53:Core/Src/ltdc.c **** } LTDCSYNC_t;
+  54:Core/Src/ltdc.c ****  { 432, 4, 4, 4, 1280, 1024, 48, 112, 248, 1, 3, 38, 111, 359, 1639, 1687, 2, 40, 1064, 1065 }, //1
+  55:Core/Src/ltdc.c **** 
+  56:Core/Src/ltdc.c **** //                        HTOTAL VTOTAL
+  57:Core/Src/ltdc.c **** //1280 × 1024p [1] 60.020 1688 1066 63.98132 108.0004682
+  58:Core/Src/ltdc.c **** 
+  59:Core/Src/ltdc.c ****   regVal = 0x00; 
+  60:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VIDFORMAT_W, regVal);
+  61:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  62:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].nPix;
+  63:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_NPIX_LSB_W, regVal);
+  64:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  65:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].nPix >> 8);
+  66:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_NPIX_MSB_W, regVal);
+  67:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  68:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].nLine;
+  69:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_NLINE_LSB_W, regVal);
+  70:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  71:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].nLine >> 8);
+  72:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_NLINE_MSB_W, regVal);
+  73:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  74:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].VsLineStart;
+  75:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VS_LINE_STRT_1_LSB_W, regVal);
+  76:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  77:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].VsPixStart;
+  78:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_LSB_W, regVal);
+  79:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  80:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].VsPixStart >> 8);
+  81:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_MSB_W, regVal);
+  82:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  83:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].VsLineEnd;
+  84:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VS_LINE_END_1_LSB_W, regVal);
+  85:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  86:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].VsPixEnd;
+  87:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_LSB_W, regVal);
+  88:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ARM GAS  /tmp/ccjvrTEr.s 			page 3
+
+
+  89:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].VsPixEnd >> 8);
+  90:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_MSB_W, regVal);
+  91:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  92:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].HsStart;
+  93:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_LSB_W, regVal);
+  94:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  95:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].HsStart >> 8);
+  96:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_MSB_W, regVal);
+  97:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+  98:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].HsEnd;
+  99:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_LSB_W, regVal);
+ 100:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 101:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].HsEnd >> 8);
+ 102:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_MSB_W, regVal);
+ 103:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 104:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].ActiveVideoStart;
+ 105:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_LSB_W, regVal);
+ 106:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 107:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_MSB_W, 0);
+ 108:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 109:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].ActiveVideoEnd;
+ 110:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_LSB_W, regVal);
+ 111:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 112:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].ActiveVideoEnd >> 8);
+ 113:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_MSB_W, regVal);
+ 114:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 115:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].DeStart;
+ 116:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_DE_START_LSB_W, regVal);
+ 117:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 118:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].DeStart >> 8);
+ 119:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_DE_START_MSB_W, regVal);
+ 120:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 121:Core/Src/ltdc.c ****   regVal = (UInt8) format_param[reg_idx].DeEnd;
+ 122:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_DE_STOP_LSB_W, regVal);
+ 123:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 124:Core/Src/ltdc.c ****   regVal = (UInt8) (format_param[reg_idx].DeEnd >> 8);
+ 125:Core/Src/ltdc.c ****   err = setHwRegister(pDis, E_REG_P00_DE_STOP_MSB_W, regVal);
+ 126:Core/Src/ltdc.c ****   RETIF_REG_FAIL(err);
+ 127:Core/Src/ltdc.c **** */
+ 128:Core/Src/ltdc.c **** 
+ 129:Core/Src/ltdc.c **** /* USER CODE END 0 */
+ 130:Core/Src/ltdc.c **** 
+ 131:Core/Src/ltdc.c **** 
+ 132:Core/Src/ltdc.c **** /*
+ 133:Core/Src/ltdc.c **** #ifdef FORMAT_PC
+ 134:Core/Src/ltdc.c **** static CONST_DAT tmHdmiTxVidReg_t format_param_PC[HDMITX_VFMT_PC_NUM] =
+ 135:Core/Src/ltdc.c **** {
+ 136:Core/Src/ltdc.c ****    //  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVi
+ 137:Core/Src/ltdc.c ****    //  npix    nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1   
+ 138:Core/Src/ltdc.c ****     {832,   520,      1,          24,          4,           24,         24,     64,     31,        
+ 139:Core/Src/ltdc.c ****     {840,   500,      1,          16,          4,           16,         16,     80,     19,        
+ 140:Core/Src/ltdc.c ****     {832,   509,      1,          56,          4,           56,         56,     112,    28,        
+ 141:Core/Src/ltdc.c ****     {1056,  628,      1,          40,          5,           40,         40,     168,    27,        
+ 142:Core/Src/ltdc.c ****     {1040,  666,      1,          56,          7,           56,         56,     176,    29,        
+ 143:Core/Src/ltdc.c ****     {1056,  625,      1,          16,          4,           16,         16,     96,     24,        
+ 144:Core/Src/ltdc.c ****     {1048,  631,      1,          32,          4,           32,         32,     96,     30,        
+ 145:Core/Src/ltdc.c ****     {1344,  806,      1,          24,          7,           24,         24,     160,    35,        
+ARM GAS  /tmp/ccjvrTEr.s 			page 4
+
+
+ 146:Core/Src/ltdc.c ****     {1328,  806,      1,          24,          7,           24,         24,     160,    35,        
+ 147:Core/Src/ltdc.c ****     {1312,  800,      1,          16,          4,           16,         16,     112,    31,        
+ 148:Core/Src/ltdc.c ****     {1664,  798,      1,          64,          8,           64,         64,     192,    27,        
+ 149:Core/Src/ltdc.c ****     {1688,  1066,     1,          48,          4,           48,         48,     160,    41,        
+ 150:Core/Src/ltdc.c ****     {1792,  795,      1,          64,          7,           64,         64,     176,    24,        
+ 151:Core/Src/ltdc.c ****     {1864,  1089,     1,          88,          5,           88,         88,     232,    36,        
+ 152:Core/Src/ltdc.c ****     {2160,  1250,     1,          64,          4,           64,         64,     256,    49,        
+ 153:Core/Src/ltdc.c ****     {1728,  1072,     1,          64,          4,           64,         64,     224,    47,        
+ 154:Core/Src/ltdc.c **** };
+ 155:Core/Src/ltdc.c **** #endif
+ 156:Core/Src/ltdc.c **** */
+ 157:Core/Src/ltdc.c **** 
+ 158:Core/Src/ltdc.c **** LTDC_HandleTypeDef hltdc;
+ 159:Core/Src/ltdc.c **** 
+ 160:Core/Src/ltdc.c **** /* LTDC init function */
+ 161:Core/Src/ltdc.c **** void MX_LTDC_Init(void)
+ 162:Core/Src/ltdc.c **** {
+  28              		.loc 1 162 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 56
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 30B5     		push	{r4, r5, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 12
+  35              		.cfi_offset 4, -12
+  36              		.cfi_offset 5, -8
+  37              		.cfi_offset 14, -4
+  38 0002 8FB0     		sub	sp, sp, #60
+  39              	.LCFI1:
+  40              		.cfi_def_cfa_offset 72
+ 163:Core/Src/ltdc.c ****   LTDC_LayerCfgTypeDef pLayerCfg;
+  41              		.loc 1 163 3 view .LVU1
+ 164:Core/Src/ltdc.c **** 
+ 165:Core/Src/ltdc.c ****   hltdc.Instance = LTDC;
+  42              		.loc 1 165 3 view .LVU2
+  43              		.loc 1 165 18 is_stmt 0 view .LVU3
+  44 0004 284C     		ldr	r4, .L3
+  45 0006 294B     		ldr	r3, .L3+4
+  46 0008 2360     		str	r3, [r4]
+ 166:Core/Src/ltdc.c ****   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AH;
+  47              		.loc 1 166 3 is_stmt 1 view .LVU4
+  48              		.loc 1 166 25 is_stmt 0 view .LVU5
+  49 000a 4FF00043 		mov	r3, #-2147483648
+  50 000e 6360     		str	r3, [r4, #4]
+ 167:Core/Src/ltdc.c ****   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
+  51              		.loc 1 167 3 is_stmt 1 view .LVU6
+  52              		.loc 1 167 25 is_stmt 0 view .LVU7
+  53 0010 4FF08043 		mov	r3, #1073741824
+  54 0014 A360     		str	r3, [r4, #8]
+ 168:Core/Src/ltdc.c ****   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
+  55              		.loc 1 168 3 is_stmt 1 view .LVU8
+  56              		.loc 1 168 25 is_stmt 0 view .LVU9
+  57 0016 4FF00053 		mov	r3, #536870912
+  58 001a E360     		str	r3, [r4, #12]
+ 169:Core/Src/ltdc.c ****   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IIPC;
+  59              		.loc 1 169 3 is_stmt 1 view .LVU10
+  60              		.loc 1 169 25 is_stmt 0 view .LVU11
+ARM GAS  /tmp/ccjvrTEr.s 			page 5
+
+
+  61 001c 4FF08053 		mov	r3, #268435456
+  62 0020 2361     		str	r3, [r4, #16]
+ 170:Core/Src/ltdc.c **** 
+ 171:Core/Src/ltdc.c **** 
+ 172:Core/Src/ltdc.c **** //  hltdc.Init.HorizontalSync = LTDCSYNC[LTDC_VID_FORMAT].hsw;      //HSW;
+ 173:Core/Src/ltdc.c **** //  hltdc.Init.VerticalSync = LTDCSYNC[LTDC_VID_FORMAT].vsh;        //VSH;
+ 174:Core/Src/ltdc.c **** //  hltdc.Init.AccumulatedHBP = LTDCSYNC[LTDC_VID_FORMAT].ahbp;     //AHBP;
+ 175:Core/Src/ltdc.c **** //  hltdc.Init.AccumulatedVBP = LTDCSYNC[LTDC_VID_FORMAT].avbp;     //AVBP;
+ 176:Core/Src/ltdc.c **** //  hltdc.Init.AccumulatedActiveW = LTDCSYNC[LTDC_VID_FORMAT].aaw;  //AAW;
+ 177:Core/Src/ltdc.c **** //  hltdc.Init.AccumulatedActiveH = LTDCSYNC[LTDC_VID_FORMAT].aah;  //AAH;
+ 178:Core/Src/ltdc.c **** //  hltdc.Init.TotalWidth = LTDCSYNC[LTDC_VID_FORMAT].totalw;       //TOTALW;
+ 179:Core/Src/ltdc.c **** //  hltdc.Init.TotalHeigh = LTDCSYNC[LTDC_VID_FORMAT].totalh;       //TOTALH;
+ 180:Core/Src/ltdc.c **** 
+ 181:Core/Src/ltdc.c **** 
+ 182:Core/Src/ltdc.c ****   hltdc.Init.HorizontalSync     = (LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
+  63              		.loc 1 182 3 is_stmt 1 view .LVU12
+  64              		.loc 1 182 33 is_stmt 0 view .LVU13
+  65 0022 5E23     		movs	r3, #94
+  66 0024 6361     		str	r3, [r4, #20]
+ 183:Core/Src/ltdc.c ****   hltdc.Init.VerticalSync       = (LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
+  67              		.loc 1 183 3 is_stmt 1 view .LVU14
+  68              		.loc 1 183 33 is_stmt 0 view .LVU15
+  69 0026 0123     		movs	r3, #1
+  70 0028 A361     		str	r3, [r4, #24]
+ 184:Core/Src/ltdc.c ****   hltdc.Init.AccumulatedHBP     = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].hbp - 
+  71              		.loc 1 184 3 is_stmt 1 view .LVU16
+  72              		.loc 1 184 33 is_stmt 0 view .LVU17
+  73 002a 4FF48773 		mov	r3, #270
+  74 002e E361     		str	r3, [r4, #28]
+ 185:Core/Src/ltdc.c ****   hltdc.Init.AccumulatedVBP     = (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].vbp - 
+  75              		.loc 1 185 3 is_stmt 1 view .LVU18
+  76              		.loc 1 185 33 is_stmt 0 view .LVU19
+  77 0030 1D23     		movs	r3, #29
+  78 0032 2362     		str	r3, [r4, #32]
+ 186:Core/Src/ltdc.c ****   hltdc.Init.AccumulatedActiveW = (LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + 
+  79              		.loc 1 186 3 is_stmt 1 view .LVU20
+  80              		.loc 1 186 33 is_stmt 0 view .LVU21
+  81 0034 40F20E53 		movw	r3, #1294
+  82 0038 6362     		str	r3, [r4, #36]
+ 187:Core/Src/ltdc.c ****   hltdc.Init.AccumulatedActiveH = (LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + 
+  83              		.loc 1 187 3 is_stmt 1 view .LVU22
+  84              		.loc 1 187 33 is_stmt 0 view .LVU23
+  85 003a 40F21D33 		movw	r3, #797
+  86 003e A362     		str	r3, [r4, #40]
+ 188:Core/Src/ltdc.c ****   hltdc.Init.TotalWidth         = (LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + 
+  87              		.loc 1 188 3 is_stmt 1 view .LVU24
+  88              		.loc 1 188 33 is_stmt 0 view .LVU25
+  89 0040 40F21E53 		movw	r3, #1310
+  90 0044 E362     		str	r3, [r4, #44]
+ 189:Core/Src/ltdc.c ****   hltdc.Init.TotalHeigh         = (LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + 
+  91              		.loc 1 189 3 is_stmt 1 view .LVU26
+  92              		.loc 1 189 33 is_stmt 0 view .LVU27
+  93 0046 40F21E33 		movw	r3, #798
+  94 004a 2363     		str	r3, [r4, #48]
+ 190:Core/Src/ltdc.c **** 
+ 191:Core/Src/ltdc.c ****   hltdc.Init.Backcolor.Blue = 0;
+  95              		.loc 1 191 3 is_stmt 1 view .LVU28
+ARM GAS  /tmp/ccjvrTEr.s 			page 6
+
+
+  96              		.loc 1 191 29 is_stmt 0 view .LVU29
+  97 004c 0025     		movs	r5, #0
+  98 004e 84F83450 		strb	r5, [r4, #52]
+ 192:Core/Src/ltdc.c ****   hltdc.Init.Backcolor.Green = 0;
+  99              		.loc 1 192 3 is_stmt 1 view .LVU30
+ 100              		.loc 1 192 30 is_stmt 0 view .LVU31
+ 101 0052 84F83550 		strb	r5, [r4, #53]
+ 193:Core/Src/ltdc.c ****   hltdc.Init.Backcolor.Red = 0;
+ 102              		.loc 1 193 3 is_stmt 1 view .LVU32
+ 103              		.loc 1 193 28 is_stmt 0 view .LVU33
+ 104 0056 84F83650 		strb	r5, [r4, #54]
+ 194:Core/Src/ltdc.c ****   HAL_LTDC_Init(&hltdc);
+ 105              		.loc 1 194 3 is_stmt 1 view .LVU34
+ 106 005a 2046     		mov	r0, r4
+ 107 005c FFF7FEFF 		bl	HAL_LTDC_Init
+ 108              	.LVL0:
+ 195:Core/Src/ltdc.c **** 
+ 196:Core/Src/ltdc.c ****   pLayerCfg.WindowX0 = 0;
+ 109              		.loc 1 196 3 view .LVU35
+ 110              		.loc 1 196 22 is_stmt 0 view .LVU36
+ 111 0060 0195     		str	r5, [sp, #4]
+ 197:Core/Src/ltdc.c ****   pLayerCfg.WindowX1 = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+ 112              		.loc 1 197 3 is_stmt 1 view .LVU37
+ 113              		.loc 1 197 22 is_stmt 0 view .LVU38
+ 114 0062 4FF48061 		mov	r1, #1024
+ 115 0066 0291     		str	r1, [sp, #8]
+ 198:Core/Src/ltdc.c ****   pLayerCfg.WindowY0 = 0;
+ 116              		.loc 1 198 3 is_stmt 1 view .LVU39
+ 117              		.loc 1 198 22 is_stmt 0 view .LVU40
+ 118 0068 0395     		str	r5, [sp, #12]
+ 199:Core/Src/ltdc.c ****   pLayerCfg.WindowY1 = LTDCSYNC[LTDC_VID_FORMAT].avh;
+ 119              		.loc 1 199 3 is_stmt 1 view .LVU41
+ 120              		.loc 1 199 22 is_stmt 0 view .LVU42
+ 121 006a 4FF44072 		mov	r2, #768
+ 122 006e 0492     		str	r2, [sp, #16]
+ 200:Core/Src/ltdc.c ****   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_L8; //RGB565;
+ 123              		.loc 1 200 3 is_stmt 1 view .LVU43
+ 124              		.loc 1 200 25 is_stmt 0 view .LVU44
+ 125 0070 0523     		movs	r3, #5
+ 126 0072 0593     		str	r3, [sp, #20]
+ 201:Core/Src/ltdc.c ****   pLayerCfg.Alpha = 255;
+ 127              		.loc 1 201 3 is_stmt 1 view .LVU45
+ 128              		.loc 1 201 19 is_stmt 0 view .LVU46
+ 129 0074 FF23     		movs	r3, #255
+ 130 0076 0693     		str	r3, [sp, #24]
+ 202:Core/Src/ltdc.c ****   pLayerCfg.Alpha0 = 255;
+ 131              		.loc 1 202 3 is_stmt 1 view .LVU47
+ 132              		.loc 1 202 20 is_stmt 0 view .LVU48
+ 133 0078 0793     		str	r3, [sp, #28]
+ 203:Core/Src/ltdc.c ****   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
+ 134              		.loc 1 203 3 is_stmt 1 view .LVU49
+ 135              		.loc 1 203 29 is_stmt 0 view .LVU50
+ 136 007a 4FF4C060 		mov	r0, #1536
+ 137 007e 0890     		str	r0, [sp, #32]
+ 204:Core/Src/ltdc.c ****   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
+ 138              		.loc 1 204 3 is_stmt 1 view .LVU51
+ 139              		.loc 1 204 29 is_stmt 0 view .LVU52
+ARM GAS  /tmp/ccjvrTEr.s 			page 7
+
+
+ 140 0080 0720     		movs	r0, #7
+ 141 0082 0990     		str	r0, [sp, #36]
+ 205:Core/Src/ltdc.c ****   pLayerCfg.FBStartAdress = 0xc0000000;
+ 142              		.loc 1 205 3 is_stmt 1 view .LVU53
+ 143              		.loc 1 205 27 is_stmt 0 view .LVU54
+ 144 0084 4FF04040 		mov	r0, #-1073741824
+ 145 0088 0A90     		str	r0, [sp, #40]
+ 206:Core/Src/ltdc.c ****   pLayerCfg.ImageWidth = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+ 146              		.loc 1 206 3 is_stmt 1 view .LVU55
+ 147              		.loc 1 206 24 is_stmt 0 view .LVU56
+ 148 008a 0B91     		str	r1, [sp, #44]
+ 207:Core/Src/ltdc.c ****   pLayerCfg.ImageHeight = LTDCSYNC[LTDC_VID_FORMAT].avh;
+ 149              		.loc 1 207 3 is_stmt 1 view .LVU57
+ 150              		.loc 1 207 25 is_stmt 0 view .LVU58
+ 151 008c 0C92     		str	r2, [sp, #48]
+ 208:Core/Src/ltdc.c ****   pLayerCfg.Backcolor.Blue = 255;
+ 152              		.loc 1 208 3 is_stmt 1 view .LVU59
+ 153              		.loc 1 208 28 is_stmt 0 view .LVU60
+ 154 008e 8DF83430 		strb	r3, [sp, #52]
+ 209:Core/Src/ltdc.c ****   pLayerCfg.Backcolor.Green = 255;
+ 155              		.loc 1 209 3 is_stmt 1 view .LVU61
+ 156              		.loc 1 209 29 is_stmt 0 view .LVU62
+ 157 0092 8DF83530 		strb	r3, [sp, #53]
+ 210:Core/Src/ltdc.c ****   pLayerCfg.Backcolor.Red = 255;
+ 158              		.loc 1 210 3 is_stmt 1 view .LVU63
+ 159              		.loc 1 210 27 is_stmt 0 view .LVU64
+ 160 0096 8DF83630 		strb	r3, [sp, #54]
+ 211:Core/Src/ltdc.c ****   HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg, 0);
+ 161              		.loc 1 211 3 is_stmt 1 view .LVU65
+ 162 009a 2A46     		mov	r2, r5
+ 163 009c 01A9     		add	r1, sp, #4
+ 164 009e 2046     		mov	r0, r4
+ 165 00a0 FFF7FEFF 		bl	HAL_LTDC_ConfigLayer
+ 166              	.LVL1:
+ 212:Core/Src/ltdc.c **** 
+ 213:Core/Src/ltdc.c **** }
+ 167              		.loc 1 213 1 is_stmt 0 view .LVU66
+ 168 00a4 0FB0     		add	sp, sp, #60
+ 169              	.LCFI2:
+ 170              		.cfi_def_cfa_offset 12
+ 171              		@ sp needed
+ 172 00a6 30BD     		pop	{r4, r5, pc}
+ 173              	.L4:
+ 174              		.align	2
+ 175              	.L3:
+ 176 00a8 00000000 		.word	hltdc
+ 177 00ac 00100050 		.word	1342181376
+ 178              		.cfi_endproc
+ 179              	.LFE328:
+ 181              		.section	.text.HAL_LTDC_MspInit,"ax",%progbits
+ 182              		.align	1
+ 183              		.global	HAL_LTDC_MspInit
+ 184              		.syntax unified
+ 185              		.thumb
+ 186              		.thumb_func
+ 188              	HAL_LTDC_MspInit:
+ 189              	.LVL2:
+ARM GAS  /tmp/ccjvrTEr.s 			page 8
+
+
+ 190              	.LFB329:
+ 214:Core/Src/ltdc.c **** 
+ 215:Core/Src/ltdc.c **** void HAL_LTDC_MspInit(LTDC_HandleTypeDef* ltdcHandle)
+ 216:Core/Src/ltdc.c **** {
+ 191              		.loc 1 216 1 is_stmt 1 view -0
+ 192              		.cfi_startproc
+ 193              		@ args = 0, pretend = 0, frame = 56
+ 194              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217:Core/Src/ltdc.c **** 
+ 218:Core/Src/ltdc.c ****   GPIO_InitTypeDef GPIO_InitStruct;
+ 195              		.loc 1 218 3 view .LVU68
+ 219:Core/Src/ltdc.c ****   if(ltdcHandle->Instance==LTDC)
+ 196              		.loc 1 219 3 view .LVU69
+ 197              		.loc 1 219 16 is_stmt 0 view .LVU70
+ 198 0000 0268     		ldr	r2, [r0]
+ 199              		.loc 1 219 5 view .LVU71
+ 200 0002 764B     		ldr	r3, .L12
+ 201 0004 9A42     		cmp	r2, r3
+ 202 0006 00D0     		beq	.L11
+ 203 0008 7047     		bx	lr
+ 204              	.L11:
+ 216:Core/Src/ltdc.c **** 
+ 205              		.loc 1 216 1 view .LVU72
+ 206 000a 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 207              	.LCFI3:
+ 208              		.cfi_def_cfa_offset 24
+ 209              		.cfi_offset 4, -24
+ 210              		.cfi_offset 5, -20
+ 211              		.cfi_offset 6, -16
+ 212              		.cfi_offset 7, -12
+ 213              		.cfi_offset 8, -8
+ 214              		.cfi_offset 14, -4
+ 215 000e 8EB0     		sub	sp, sp, #56
+ 216              	.LCFI4:
+ 217              		.cfi_def_cfa_offset 80
+ 220:Core/Src/ltdc.c ****   {
+ 221:Core/Src/ltdc.c ****   /* USER CODE BEGIN LTDC_MspInit 0 */
+ 222:Core/Src/ltdc.c **** 
+ 223:Core/Src/ltdc.c ****   /* USER CODE END LTDC_MspInit 0 */
+ 224:Core/Src/ltdc.c ****     /* LTDC clock enable */
+ 225:Core/Src/ltdc.c ****     __HAL_RCC_LTDC_CLK_ENABLE();
+ 218              		.loc 1 225 5 is_stmt 1 view .LVU73
+ 219              	.LBB2:
+ 220              		.loc 1 225 5 view .LVU74
+ 221              		.loc 1 225 5 view .LVU75
+ 222 0010 734B     		ldr	r3, .L12+4
+ 223 0012 D3F8E420 		ldr	r2, [r3, #228]
+ 224 0016 42F00802 		orr	r2, r2, #8
+ 225 001a C3F8E420 		str	r2, [r3, #228]
+ 226              		.loc 1 225 5 view .LVU76
+ 227 001e D3F8E420 		ldr	r2, [r3, #228]
+ 228 0022 02F00802 		and	r2, r2, #8
+ 229 0026 0092     		str	r2, [sp]
+ 230              		.loc 1 225 5 view .LVU77
+ 231 0028 009A     		ldr	r2, [sp]
+ 232              	.LBE2:
+ 233              		.loc 1 225 5 view .LVU78
+ARM GAS  /tmp/ccjvrTEr.s 			page 9
+
+
+ 226:Core/Src/ltdc.c **** 
+ 227:Core/Src/ltdc.c ****     __HAL_RCC_GPIOI_CLK_ENABLE();
+ 234              		.loc 1 227 5 view .LVU79
+ 235              	.LBB3:
+ 236              		.loc 1 227 5 view .LVU80
+ 237              		.loc 1 227 5 view .LVU81
+ 238 002a D3F8E020 		ldr	r2, [r3, #224]
+ 239 002e 42F48072 		orr	r2, r2, #256
+ 240 0032 C3F8E020 		str	r2, [r3, #224]
+ 241              		.loc 1 227 5 view .LVU82
+ 242 0036 D3F8E020 		ldr	r2, [r3, #224]
+ 243 003a 02F48072 		and	r2, r2, #256
+ 244 003e 0192     		str	r2, [sp, #4]
+ 245              		.loc 1 227 5 view .LVU83
+ 246 0040 019A     		ldr	r2, [sp, #4]
+ 247              	.LBE3:
+ 248              		.loc 1 227 5 view .LVU84
+ 228:Core/Src/ltdc.c ****     __HAL_RCC_GPIOF_CLK_ENABLE();
+ 249              		.loc 1 228 5 view .LVU85
+ 250              	.LBB4:
+ 251              		.loc 1 228 5 view .LVU86
+ 252              		.loc 1 228 5 view .LVU87
+ 253 0042 D3F8E020 		ldr	r2, [r3, #224]
+ 254 0046 42F02002 		orr	r2, r2, #32
+ 255 004a C3F8E020 		str	r2, [r3, #224]
+ 256              		.loc 1 228 5 view .LVU88
+ 257 004e D3F8E020 		ldr	r2, [r3, #224]
+ 258 0052 02F02002 		and	r2, r2, #32
+ 259 0056 0292     		str	r2, [sp, #8]
+ 260              		.loc 1 228 5 view .LVU89
+ 261 0058 029A     		ldr	r2, [sp, #8]
+ 262              	.LBE4:
+ 263              		.loc 1 228 5 view .LVU90
+ 229:Core/Src/ltdc.c ****     __HAL_RCC_GPIOC_CLK_ENABLE();
+ 264              		.loc 1 229 5 view .LVU91
+ 265              	.LBB5:
+ 266              		.loc 1 229 5 view .LVU92
+ 267              		.loc 1 229 5 view .LVU93
+ 268 005a D3F8E020 		ldr	r2, [r3, #224]
+ 269 005e 42F00402 		orr	r2, r2, #4
+ 270 0062 C3F8E020 		str	r2, [r3, #224]
+ 271              		.loc 1 229 5 view .LVU94
+ 272 0066 D3F8E020 		ldr	r2, [r3, #224]
+ 273 006a 02F00402 		and	r2, r2, #4
+ 274 006e 0392     		str	r2, [sp, #12]
+ 275              		.loc 1 229 5 view .LVU95
+ 276 0070 039A     		ldr	r2, [sp, #12]
+ 277              	.LBE5:
+ 278              		.loc 1 229 5 view .LVU96
+ 230:Core/Src/ltdc.c ****     __HAL_RCC_GPIOH_CLK_ENABLE();
+ 279              		.loc 1 230 5 view .LVU97
+ 280              	.LBB6:
+ 281              		.loc 1 230 5 view .LVU98
+ 282              		.loc 1 230 5 view .LVU99
+ 283 0072 D3F8E020 		ldr	r2, [r3, #224]
+ 284 0076 42F08002 		orr	r2, r2, #128
+ 285 007a C3F8E020 		str	r2, [r3, #224]
+ARM GAS  /tmp/ccjvrTEr.s 			page 10
+
+
+ 286              		.loc 1 230 5 view .LVU100
+ 287 007e D3F8E020 		ldr	r2, [r3, #224]
+ 288 0082 02F08002 		and	r2, r2, #128
+ 289 0086 0492     		str	r2, [sp, #16]
+ 290              		.loc 1 230 5 view .LVU101
+ 291 0088 049A     		ldr	r2, [sp, #16]
+ 292              	.LBE6:
+ 293              		.loc 1 230 5 view .LVU102
+ 231:Core/Src/ltdc.c ****     __HAL_RCC_GPIOA_CLK_ENABLE();
+ 294              		.loc 1 231 5 view .LVU103
+ 295              	.LBB7:
+ 296              		.loc 1 231 5 view .LVU104
+ 297              		.loc 1 231 5 view .LVU105
+ 298 008a D3F8E020 		ldr	r2, [r3, #224]
+ 299 008e 42F00102 		orr	r2, r2, #1
+ 300 0092 C3F8E020 		str	r2, [r3, #224]
+ 301              		.loc 1 231 5 view .LVU106
+ 302 0096 D3F8E020 		ldr	r2, [r3, #224]
+ 303 009a 02F00102 		and	r2, r2, #1
+ 304 009e 0592     		str	r2, [sp, #20]
+ 305              		.loc 1 231 5 view .LVU107
+ 306 00a0 059A     		ldr	r2, [sp, #20]
+ 307              	.LBE7:
+ 308              		.loc 1 231 5 view .LVU108
+ 232:Core/Src/ltdc.c ****     __HAL_RCC_GPIOB_CLK_ENABLE();
+ 309              		.loc 1 232 5 view .LVU109
+ 310              	.LBB8:
+ 311              		.loc 1 232 5 view .LVU110
+ 312              		.loc 1 232 5 view .LVU111
+ 313 00a2 D3F8E020 		ldr	r2, [r3, #224]
+ 314 00a6 42F00202 		orr	r2, r2, #2
+ 315 00aa C3F8E020 		str	r2, [r3, #224]
+ 316              		.loc 1 232 5 view .LVU112
+ 317 00ae D3F8E020 		ldr	r2, [r3, #224]
+ 318 00b2 02F00202 		and	r2, r2, #2
+ 319 00b6 0692     		str	r2, [sp, #24]
+ 320              		.loc 1 232 5 view .LVU113
+ 321 00b8 069A     		ldr	r2, [sp, #24]
+ 322              	.LBE8:
+ 323              		.loc 1 232 5 view .LVU114
+ 233:Core/Src/ltdc.c ****     __HAL_RCC_GPIOG_CLK_ENABLE();
+ 324              		.loc 1 233 5 view .LVU115
+ 325              	.LBB9:
+ 326              		.loc 1 233 5 view .LVU116
+ 327              		.loc 1 233 5 view .LVU117
+ 328 00ba D3F8E020 		ldr	r2, [r3, #224]
+ 329 00be 42F04002 		orr	r2, r2, #64
+ 330 00c2 C3F8E020 		str	r2, [r3, #224]
+ 331              		.loc 1 233 5 view .LVU118
+ 332 00c6 D3F8E020 		ldr	r2, [r3, #224]
+ 333 00ca 02F04002 		and	r2, r2, #64
+ 334 00ce 0792     		str	r2, [sp, #28]
+ 335              		.loc 1 233 5 view .LVU119
+ 336 00d0 079A     		ldr	r2, [sp, #28]
+ 337              	.LBE9:
+ 338              		.loc 1 233 5 view .LVU120
+ 234:Core/Src/ltdc.c ****     __HAL_RCC_GPIOD_CLK_ENABLE();
+ARM GAS  /tmp/ccjvrTEr.s 			page 11
+
+
+ 339              		.loc 1 234 5 view .LVU121
+ 340              	.LBB10:
+ 341              		.loc 1 234 5 view .LVU122
+ 342              		.loc 1 234 5 view .LVU123
+ 343 00d2 D3F8E020 		ldr	r2, [r3, #224]
+ 344 00d6 42F00802 		orr	r2, r2, #8
+ 345 00da C3F8E020 		str	r2, [r3, #224]
+ 346              		.loc 1 234 5 view .LVU124
+ 347 00de D3F8E030 		ldr	r3, [r3, #224]
+ 348 00e2 03F00803 		and	r3, r3, #8
+ 349 00e6 0893     		str	r3, [sp, #32]
+ 350              		.loc 1 234 5 view .LVU125
+ 351 00e8 089B     		ldr	r3, [sp, #32]
+ 352              	.LBE10:
+ 353              		.loc 1 234 5 view .LVU126
+ 235:Core/Src/ltdc.c ****     /**LTDC GPIO Configuration
+ 236:Core/Src/ltdc.c ****     
+ 237:Core/Src/ltdc.c ****     PF10    ------> LTDC_DE
+ 238:Core/Src/ltdc.c ****     PA4     ------> LTDC_VSYNC
+ 239:Core/Src/ltdc.c ****     PG7     ------> LTDC_CLK
+ 240:Core/Src/ltdc.c ****     PC6     ------> LTDC_HSYNC
+ 241:Core/Src/ltdc.c ****     
+ 242:Core/Src/ltdc.c ****     PB0     ------> LTDC_R3
+ 243:Core/Src/ltdc.c ****     PA5     ------> LTDC_R4
+ 244:Core/Src/ltdc.c ****     PC0     ------> LTDC_R5
+ 245:Core/Src/ltdc.c ****     PB1     ------> LTDC_R6
+ 246:Core/Src/ltdc.c ****     PG6     ------> LTDC_R7
+ 247:Core/Src/ltdc.c **** 
+ 248:Core/Src/ltdc.c ****     PA6     ------> LTDC_G2
+ 249:Core/Src/ltdc.c ****     PC9     ------> LTDC_G3
+ 250:Core/Src/ltdc.c ****     PB10    ------> LTDC_G4
+ 251:Core/Src/ltdc.c ****     PH4     ------> LTDC_G5
+ 252:Core/Src/ltdc.c ****     PI11    ------> LTDC_G6
+ 253:Core/Src/ltdc.c ****     PD3     ------> LTDC_G7
+ 254:Core/Src/ltdc.c **** 
+ 255:Core/Src/ltdc.c ****     PA8     ------> LTDC_B3
+ 256:Core/Src/ltdc.c ****     PG12    ------> LTDC_B4
+ 257:Core/Src/ltdc.c ****     PA3     ------> LTDC_B5
+ 258:Core/Src/ltdc.c ****     PB8     ------> LTDC_B6
+ 259:Core/Src/ltdc.c ****     PB9     ------> LTDC_B7
+ 260:Core/Src/ltdc.c ****     */
+ 261:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_11;
+ 354              		.loc 1 261 5 view .LVU127
+ 355              		.loc 1 261 25 is_stmt 0 view .LVU128
+ 356 00ea 4FF40063 		mov	r3, #2048
+ 357 00ee 0993     		str	r3, [sp, #36]
+ 262:Core/Src/ltdc.c ****     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+ 358              		.loc 1 262 5 is_stmt 1 view .LVU129
+ 359              		.loc 1 262 26 is_stmt 0 view .LVU130
+ 360 00f0 0223     		movs	r3, #2
+ 361 00f2 0A93     		str	r3, [sp, #40]
+ 263:Core/Src/ltdc.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 362              		.loc 1 263 5 is_stmt 1 view .LVU131
+ 363              		.loc 1 263 26 is_stmt 0 view .LVU132
+ 364 00f4 0024     		movs	r4, #0
+ 365 00f6 0B94     		str	r4, [sp, #44]
+ 264:Core/Src/ltdc.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+ARM GAS  /tmp/ccjvrTEr.s 			page 12
+
+
+ 366              		.loc 1 264 5 is_stmt 1 view .LVU133
+ 367              		.loc 1 264 27 is_stmt 0 view .LVU134
+ 368 00f8 0325     		movs	r5, #3
+ 369 00fa 0C95     		str	r5, [sp, #48]
+ 265:Core/Src/ltdc.c ****     GPIO_InitStruct.Alternate = GPIO_AF9_LTDC;
+ 370              		.loc 1 265 5 is_stmt 1 view .LVU135
+ 371              		.loc 1 265 31 is_stmt 0 view .LVU136
+ 372 00fc 0923     		movs	r3, #9
+ 373 00fe 0D93     		str	r3, [sp, #52]
+ 266:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+ 374              		.loc 1 266 5 is_stmt 1 view .LVU137
+ 375 0100 09A9     		add	r1, sp, #36
+ 376 0102 3848     		ldr	r0, .L12+8
+ 377              	.LVL3:
+ 378              		.loc 1 266 5 is_stmt 0 view .LVU138
+ 379 0104 FFF7FEFF 		bl	HAL_GPIO_Init
+ 380              	.LVL4:
+ 267:Core/Src/ltdc.c **** 
+ 268:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_4;
+ 381              		.loc 1 268 5 is_stmt 1 view .LVU139
+ 382              		.loc 1 268 25 is_stmt 0 view .LVU140
+ 383 0108 1023     		movs	r3, #16
+ 384 010a 0993     		str	r3, [sp, #36]
+ 269:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF9_LTDC;
+ 270:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+ 385              		.loc 1 270 5 is_stmt 1 view .LVU141
+ 386 010c 09A9     		add	r1, sp, #36
+ 387 010e 3648     		ldr	r0, .L12+12
+ 388 0110 FFF7FEFF 		bl	HAL_GPIO_Init
+ 389              	.LVL5:
+ 271:Core/Src/ltdc.c **** 
+ 272:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+ 390              		.loc 1 272 5 view .LVU142
+ 391              		.loc 1 272 25 is_stmt 0 view .LVU143
+ 392 0114 0995     		str	r5, [sp, #36]
+ 273:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF9_LTDC;
+ 274:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 393              		.loc 1 274 5 is_stmt 1 view .LVU144
+ 394 0116 DFF8E880 		ldr	r8, .L12+36
+ 395 011a 09A9     		add	r1, sp, #36
+ 396 011c 4046     		mov	r0, r8
+ 397 011e FFF7FEFF 		bl	HAL_GPIO_Init
+ 398              	.LVL6:
+ 275:Core/Src/ltdc.c **** 
+ 276:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_12;
+ 399              		.loc 1 276 5 view .LVU145
+ 400              		.loc 1 276 25 is_stmt 0 view .LVU146
+ 401 0122 4FF48053 		mov	r3, #4096
+ 402 0126 0993     		str	r3, [sp, #36]
+ 277:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF9_LTDC;
+ 278:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+ 403              		.loc 1 278 5 is_stmt 1 view .LVU147
+ 404 0128 304D     		ldr	r5, .L12+16
+ 405 012a 09A9     		add	r1, sp, #36
+ 406 012c 2846     		mov	r0, r5
+ 407 012e FFF7FEFF 		bl	HAL_GPIO_Init
+ 408              	.LVL7:
+ARM GAS  /tmp/ccjvrTEr.s 			page 13
+
+
+ 279:Core/Src/ltdc.c **** 
+ 280:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_10;
+ 409              		.loc 1 280 5 view .LVU148
+ 410              		.loc 1 280 25 is_stmt 0 view .LVU149
+ 411 0132 4FF48063 		mov	r3, #1024
+ 412 0136 0993     		str	r3, [sp, #36]
+ 281:Core/Src/ltdc.c ****     GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 413              		.loc 1 281 5 is_stmt 1 view .LVU150
+ 414              		.loc 1 281 31 is_stmt 0 view .LVU151
+ 415 0138 0E23     		movs	r3, #14
+ 416 013a 0D93     		str	r3, [sp, #52]
+ 282:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+ 417              		.loc 1 282 5 is_stmt 1 view .LVU152
+ 418 013c 09A9     		add	r1, sp, #36
+ 419 013e 2C48     		ldr	r0, .L12+20
+ 420 0140 FFF7FEFF 		bl	HAL_GPIO_Init
+ 421              	.LVL8:
+ 283:Core/Src/ltdc.c **** 
+ 284:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_6;
+ 422              		.loc 1 284 5 view .LVU153
+ 423              		.loc 1 284 25 is_stmt 0 view .LVU154
+ 424 0144 4123     		movs	r3, #65
+ 425 0146 0993     		str	r3, [sp, #36]
+ 285:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 286:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+ 426              		.loc 1 286 5 is_stmt 1 view .LVU155
+ 427 0148 2A4F     		ldr	r7, .L12+24
+ 428 014a 09A9     		add	r1, sp, #36
+ 429 014c 3846     		mov	r0, r7
+ 430 014e FFF7FEFF 		bl	HAL_GPIO_Init
+ 431              	.LVL9:
+ 287:Core/Src/ltdc.c **** 
+ 288:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
+ 432              		.loc 1 288 5 view .LVU156
+ 433              		.loc 1 288 25 is_stmt 0 view .LVU157
+ 434 0152 7823     		movs	r3, #120
+ 435 0154 0993     		str	r3, [sp, #36]
+ 289:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 290:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 436              		.loc 1 290 5 is_stmt 1 view .LVU158
+ 437 0156 284E     		ldr	r6, .L12+28
+ 438 0158 09A9     		add	r1, sp, #36
+ 439 015a 3046     		mov	r0, r6
+ 440 015c FFF7FEFF 		bl	HAL_GPIO_Init
+ 441              	.LVL10:
+ 291:Core/Src/ltdc.c **** 
+ 292:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_8|GPIO_PIN_9;
+ 442              		.loc 1 292 5 view .LVU159
+ 443              		.loc 1 292 25 is_stmt 0 view .LVU160
+ 444 0160 4FF4E063 		mov	r3, #1792
+ 445 0164 0993     		str	r3, [sp, #36]
+ 293:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 294:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+ 446              		.loc 1 294 5 is_stmt 1 view .LVU161
+ 447 0166 09A9     		add	r1, sp, #36
+ 448 0168 4046     		mov	r0, r8
+ 449 016a FFF7FEFF 		bl	HAL_GPIO_Init
+ARM GAS  /tmp/ccjvrTEr.s 			page 14
+
+
+ 450              	.LVL11:
+ 295:Core/Src/ltdc.c **** 
+ 296:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_6;
+ 451              		.loc 1 296 5 view .LVU162
+ 452              		.loc 1 296 25 is_stmt 0 view .LVU163
+ 453 016e 4023     		movs	r3, #64
+ 454 0170 0993     		str	r3, [sp, #36]
+ 297:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 298:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+ 455              		.loc 1 298 5 is_stmt 1 view .LVU164
+ 456 0172 09A9     		add	r1, sp, #36
+ 457 0174 2846     		mov	r0, r5
+ 458 0176 FFF7FEFF 		bl	HAL_GPIO_Init
+ 459              	.LVL12:
+ 299:Core/Src/ltdc.c **** 
+ 300:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_7;
+ 460              		.loc 1 300 5 view .LVU165
+ 461              		.loc 1 300 25 is_stmt 0 view .LVU166
+ 462 017a 8023     		movs	r3, #128
+ 463 017c 0993     		str	r3, [sp, #36]
+ 301:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 302:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+ 464              		.loc 1 302 5 is_stmt 1 view .LVU167
+ 465 017e 09A9     		add	r1, sp, #36
+ 466 0180 2846     		mov	r0, r5
+ 467 0182 FFF7FEFF 		bl	HAL_GPIO_Init
+ 468              	.LVL13:
+ 303:Core/Src/ltdc.c **** 
+ 304:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_3;
+ 469              		.loc 1 304 5 view .LVU168
+ 470              		.loc 1 304 25 is_stmt 0 view .LVU169
+ 471 0186 0823     		movs	r3, #8
+ 472 0188 0993     		str	r3, [sp, #36]
+ 305:Core/Src/ltdc.c ****     //GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
+ 306:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+ 473              		.loc 1 306 5 is_stmt 1 view .LVU170
+ 474 018a 09A9     		add	r1, sp, #36
+ 475 018c 1B48     		ldr	r0, .L12+32
+ 476 018e FFF7FEFF 		bl	HAL_GPIO_Init
+ 477              	.LVL14:
+ 307:Core/Src/ltdc.c **** 
+ 308:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_9;
+ 478              		.loc 1 308 5 view .LVU171
+ 479              		.loc 1 308 25 is_stmt 0 view .LVU172
+ 480 0192 4FF40073 		mov	r3, #512
+ 481 0196 0993     		str	r3, [sp, #36]
+ 309:Core/Src/ltdc.c ****     GPIO_InitStruct.Alternate = GPIO_AF10_LTDC;
+ 482              		.loc 1 309 5 is_stmt 1 view .LVU173
+ 483              		.loc 1 309 31 is_stmt 0 view .LVU174
+ 484 0198 0A23     		movs	r3, #10
+ 485 019a 0D93     		str	r3, [sp, #52]
+ 310:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+ 486              		.loc 1 310 5 is_stmt 1 view .LVU175
+ 487 019c 09A9     		add	r1, sp, #36
+ 488 019e 3846     		mov	r0, r7
+ 489 01a0 FFF7FEFF 		bl	HAL_GPIO_Init
+ 490              	.LVL15:
+ARM GAS  /tmp/ccjvrTEr.s 			page 15
+
+
+ 311:Core/Src/ltdc.c **** 
+ 312:Core/Src/ltdc.c ****     GPIO_InitStruct.Pin = GPIO_PIN_8;
+ 491              		.loc 1 312 5 view .LVU176
+ 492              		.loc 1 312 25 is_stmt 0 view .LVU177
+ 493 01a4 4FF48073 		mov	r3, #256
+ 494 01a8 0993     		str	r3, [sp, #36]
+ 313:Core/Src/ltdc.c ****     GPIO_InitStruct.Alternate = GPIO_AF13_LTDC;
+ 495              		.loc 1 313 5 is_stmt 1 view .LVU178
+ 496              		.loc 1 313 31 is_stmt 0 view .LVU179
+ 497 01aa 0D23     		movs	r3, #13
+ 498 01ac 0D93     		str	r3, [sp, #52]
+ 314:Core/Src/ltdc.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+ 499              		.loc 1 314 5 is_stmt 1 view .LVU180
+ 500 01ae 09A9     		add	r1, sp, #36
+ 501 01b0 3046     		mov	r0, r6
+ 502 01b2 FFF7FEFF 		bl	HAL_GPIO_Init
+ 503              	.LVL16:
+ 315:Core/Src/ltdc.c **** 
+ 316:Core/Src/ltdc.c ****     /* LTDC interrupt Init */
+ 317:Core/Src/ltdc.c ****     HAL_NVIC_SetPriority(LTDC_IRQn, 0, 0);
+ 504              		.loc 1 317 5 view .LVU181
+ 505 01b6 2246     		mov	r2, r4
+ 506 01b8 2146     		mov	r1, r4
+ 507 01ba 5820     		movs	r0, #88
+ 508 01bc FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 509              	.LVL17:
+ 318:Core/Src/ltdc.c ****     HAL_NVIC_EnableIRQ(LTDC_IRQn);
+ 510              		.loc 1 318 5 view .LVU182
+ 511 01c0 5820     		movs	r0, #88
+ 512 01c2 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 513              	.LVL18:
+ 319:Core/Src/ltdc.c ****     HAL_NVIC_SetPriority(LTDC_ER_IRQn, 0, 0);
+ 514              		.loc 1 319 5 view .LVU183
+ 515 01c6 2246     		mov	r2, r4
+ 516 01c8 2146     		mov	r1, r4
+ 517 01ca 5920     		movs	r0, #89
+ 518 01cc FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 519              	.LVL19:
+ 320:Core/Src/ltdc.c ****     HAL_NVIC_EnableIRQ(LTDC_ER_IRQn);
+ 520              		.loc 1 320 5 view .LVU184
+ 521 01d0 5920     		movs	r0, #89
+ 522 01d2 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 523              	.LVL20:
+ 321:Core/Src/ltdc.c ****   /* USER CODE BEGIN LTDC_MspInit 1 */
+ 322:Core/Src/ltdc.c **** 
+ 323:Core/Src/ltdc.c ****   /* USER CODE END LTDC_MspInit 1 */
+ 324:Core/Src/ltdc.c ****   }
+ 325:Core/Src/ltdc.c **** }
+ 524              		.loc 1 325 1 is_stmt 0 view .LVU185
+ 525 01d6 0EB0     		add	sp, sp, #56
+ 526              	.LCFI5:
+ 527              		.cfi_def_cfa_offset 24
+ 528              		@ sp needed
+ 529 01d8 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 530              	.L13:
+ 531              		.align	2
+ 532              	.L12:
+ARM GAS  /tmp/ccjvrTEr.s 			page 16
+
+
+ 533 01dc 00100050 		.word	1342181376
+ 534 01e0 00440258 		.word	1476543488
+ 535 01e4 00200258 		.word	1476534272
+ 536 01e8 001C0258 		.word	1476533248
+ 537 01ec 00180258 		.word	1476532224
+ 538 01f0 00140258 		.word	1476531200
+ 539 01f4 00080258 		.word	1476528128
+ 540 01f8 00000258 		.word	1476526080
+ 541 01fc 000C0258 		.word	1476529152
+ 542 0200 00040258 		.word	1476527104
+ 543              		.cfi_endproc
+ 544              	.LFE329:
+ 546              		.global	hltdc
+ 547              		.section	.bss.hltdc,"aw",%nobits
+ 548              		.align	2
+ 551              	hltdc:
+ 552 0000 00000000 		.space	168
+ 552      00000000 
+ 552      00000000 
+ 552      00000000 
+ 552      00000000 
+ 553              		.global	LTDCSYNC
+ 554              		.section	.rodata.LTDCSYNC,"a"
+ 555              		.align	2
+ 558              	LTDCSYNC:
+ 559 0000 FC00     		.short	252
+ 560 0002 0200     		.short	2
+ 561 0004 0200     		.short	2
+ 562 0006 0800     		.short	8
+ 563 0008 8002     		.short	640
+ 564 000a E001     		.short	480
+ 565 000c 1800     		.short	24
+ 566 000e 2800     		.short	40
+ 567 0010 8000     		.short	128
+ 568 0012 0900     		.short	9
+ 569 0014 0300     		.short	3
+ 570 0016 1C00     		.short	28
+ 571 0018 2700     		.short	39
+ 572 001a A700     		.short	167
+ 573 001c 2703     		.short	807
+ 574 001e 3F03     		.short	831
+ 575 0020 0200     		.short	2
+ 576 0022 1E00     		.short	30
+ 577 0024 FE01     		.short	510
+ 578 0026 0702     		.short	519
+ 579 0028 FC00     		.short	252
+ 580 002a 0200     		.short	2
+ 581 002c 0200     		.short	2
+ 582 002e 0800     		.short	8
+ 583 0030 8002     		.short	640
+ 584 0032 E001     		.short	480
+ 585 0034 1000     		.short	16
+ 586 0036 6000     		.short	96
+ 587 0038 3000     		.short	48
+ 588 003a 0B00     		.short	11
+ 589 003c 0200     		.short	2
+ 590 003e 2000     		.short	32
+ARM GAS  /tmp/ccjvrTEr.s 			page 17
+
+
+ 591 0040 5F00     		.short	95
+ 592 0042 8F00     		.short	143
+ 593 0044 0F03     		.short	783
+ 594 0046 1F03     		.short	799
+ 595 0048 0100     		.short	1
+ 596 004a 2100     		.short	33
+ 597 004c 0102     		.short	513
+ 598 004e 0C02     		.short	524
+ 599 0050 2001     		.short	288
+ 600 0052 0200     		.short	2
+ 601 0054 0200     		.short	2
+ 602 0056 0800     		.short	8
+ 603 0058 8002     		.short	640
+ 604 005a E001     		.short	480
+ 605 005c 2000     		.short	32
+ 606 005e 3000     		.short	48
+ 607 0060 7000     		.short	112
+ 608 0062 0100     		.short	1
+ 609 0064 0300     		.short	3
+ 610 0066 1900     		.short	25
+ 611 0068 2F00     		.short	47
+ 612 006a 9F00     		.short	159
+ 613 006c 1F03     		.short	799
+ 614 006e 3F03     		.short	831
+ 615 0070 0200     		.short	2
+ 616 0072 1B00     		.short	27
+ 617 0074 FB01     		.short	507
+ 618 0076 FC01     		.short	508
+ 619 0078 2701     		.short	295
+ 620 007a 0200     		.short	2
+ 621 007c 0200     		.short	2
+ 622 007e 0800     		.short	8
+ 623 0080 2003     		.short	800
+ 624 0082 5802     		.short	600
+ 625 0084 2800     		.short	40
+ 626 0086 8000     		.short	128
+ 627 0088 5800     		.short	88
+ 628 008a 0100     		.short	1
+ 629 008c 0400     		.short	4
+ 630 008e 1700     		.short	23
+ 631 0090 7F00     		.short	127
+ 632 0092 D700     		.short	215
+ 633 0094 F703     		.short	1015
+ 634 0096 1F04     		.short	1055
+ 635 0098 0300     		.short	3
+ 636 009a 1A00     		.short	26
+ 637 009c 7202     		.short	626
+ 638 009e 7302     		.short	627
+ 639 00a0 9001     		.short	400
+ 640 00a2 0200     		.short	2
+ 641 00a4 0200     		.short	2
+ 642 00a6 0800     		.short	8
+ 643 00a8 2003     		.short	800
+ 644 00aa 5802     		.short	600
+ 645 00ac 3800     		.short	56
+ 646 00ae 7800     		.short	120
+ 647 00b0 4000     		.short	64
+ARM GAS  /tmp/ccjvrTEr.s 			page 18
+
+
+ 648 00b2 2500     		.short	37
+ 649 00b4 0600     		.short	6
+ 650 00b6 1700     		.short	23
+ 651 00b8 7700     		.short	119
+ 652 00ba B700     		.short	183
+ 653 00bc D703     		.short	983
+ 654 00be 0F04     		.short	1039
+ 655 00c0 0500     		.short	5
+ 656 00c2 1C00     		.short	28
+ 657 00c4 7402     		.short	628
+ 658 00c6 9902     		.short	665
+ 659 00c8 8C01     		.short	396
+ 660 00ca 0200     		.short	2
+ 661 00cc 0200     		.short	2
+ 662 00ce 0800     		.short	8
+ 663 00d0 2003     		.short	800
+ 664 00d2 5802     		.short	600
+ 665 00d4 1000     		.short	16
+ 666 00d6 5000     		.short	80
+ 667 00d8 A000     		.short	160
+ 668 00da 0100     		.short	1
+ 669 00dc 0200     		.short	2
+ 670 00de 1500     		.short	21
+ 671 00e0 4F00     		.short	79
+ 672 00e2 EF00     		.short	239
+ 673 00e4 0F04     		.short	1039
+ 674 00e6 1F04     		.short	1055
+ 675 00e8 0100     		.short	1
+ 676 00ea 1600     		.short	22
+ 677 00ec 6E02     		.short	622
+ 678 00ee 6F02     		.short	623
+ 679 00f0 C201     		.short	450
+ 680 00f2 0200     		.short	2
+ 681 00f4 0200     		.short	2
+ 682 00f6 0800     		.short	8
+ 683 00f8 2003     		.short	800
+ 684 00fa 5802     		.short	600
+ 685 00fc 2000     		.short	32
+ 686 00fe 4000     		.short	64
+ 687 0100 9800     		.short	152
+ 688 0102 0100     		.short	1
+ 689 0104 0300     		.short	3
+ 690 0106 1B00     		.short	27
+ 691 0108 3F00     		.short	63
+ 692 010a D700     		.short	215
+ 693 010c F703     		.short	1015
+ 694 010e 1704     		.short	1047
+ 695 0110 0200     		.short	2
+ 696 0112 1D00     		.short	29
+ 697 0114 7502     		.short	629
+ 698 0116 7602     		.short	630
+ 699 0118 0901     		.short	265
+ 700 011a 0400     		.short	4
+ 701 011c 0400     		.short	4
+ 702 011e 0400     		.short	4
+ 703 0120 0004     		.short	1024
+ 704 0122 0003     		.short	768
+ARM GAS  /tmp/ccjvrTEr.s 			page 19
+
+
+ 705 0124 1800     		.short	24
+ 706 0126 8800     		.short	136
+ 707 0128 A000     		.short	160
+ 708 012a 0300     		.short	3
+ 709 012c 0600     		.short	6
+ 710 012e 1D00     		.short	29
+ 711 0130 8700     		.short	135
+ 712 0132 2701     		.short	295
+ 713 0134 2705     		.short	1319
+ 714 0136 3F05     		.short	1343
+ 715 0138 0500     		.short	5
+ 716 013a 2200     		.short	34
+ 717 013c 2203     		.short	802
+ 718 013e 2503     		.short	805
+ 719 0140 2C01     		.short	300
+ 720 0142 0400     		.short	4
+ 721 0144 0400     		.short	4
+ 722 0146 0400     		.short	4
+ 723 0148 0004     		.short	1024
+ 724 014a 0003     		.short	768
+ 725 014c 1800     		.short	24
+ 726 014e 8800     		.short	136
+ 727 0150 9000     		.short	144
+ 728 0152 0300     		.short	3
+ 729 0154 0600     		.short	6
+ 730 0156 1D00     		.short	29
+ 731 0158 8700     		.short	135
+ 732 015a 1701     		.short	279
+ 733 015c 1705     		.short	1303
+ 734 015e 2F05     		.short	1327
+ 735 0160 0500     		.short	5
+ 736 0162 2200     		.short	34
+ 737 0164 2203     		.short	802
+ 738 0166 2503     		.short	805
+ 739 0168 3B01     		.short	315
+ 740 016a 0400     		.short	4
+ 741 016c 0400     		.short	4
+ 742 016e 0400     		.short	4
+ 743 0170 0004     		.short	1024
+ 744 0172 0003     		.short	768
+ 745 0174 1000     		.short	16
+ 746 0176 6000     		.short	96
+ 747 0178 B000     		.short	176
+ 748 017a 0100     		.short	1
+ 749 017c 0300     		.short	3
+ 750 017e 1C00     		.short	28
+ 751 0180 5F00     		.short	95
+ 752 0182 0F01     		.short	271
+ 753 0184 0F05     		.short	1295
+ 754 0186 1F05     		.short	1311
+ 755 0188 0200     		.short	2
+ 756 018a 1E00     		.short	30
+ 757 018c 1E03     		.short	798
+ 758 018e 1F03     		.short	799
+ 759 0190 B001     		.short	432
+ 760 0192 0400     		.short	4
+ 761 0194 0400     		.short	4
+ARM GAS  /tmp/ccjvrTEr.s 			page 20
+
+
+ 762 0196 0400     		.short	4
+ 763 0198 0005     		.short	1280
+ 764 019a 0004     		.short	1024
+ 765 019c 3000     		.short	48
+ 766 019e 7000     		.short	112
+ 767 01a0 F800     		.short	248
+ 768 01a2 0100     		.short	1
+ 769 01a4 0300     		.short	3
+ 770 01a6 2600     		.short	38
+ 771 01a8 6F00     		.short	111
+ 772 01aa 6701     		.short	359
+ 773 01ac 6706     		.short	1639
+ 774 01ae 9706     		.short	1687
+ 775 01b0 0200     		.short	2
+ 776 01b2 2800     		.short	40
+ 777 01b4 2804     		.short	1064
+ 778 01b6 2904     		.short	1065
+ 779 01b8 B001     		.short	432
+ 780 01ba 0400     		.short	4
+ 781 01bc 0400     		.short	4
+ 782 01be 0400     		.short	4
+ 783 01c0 8007     		.short	1920
+ 784 01c2 3804     		.short	1080
+ 785 01c4 8000     		.short	128
+ 786 01c6 D000     		.short	208
+ 787 01c8 5001     		.short	336
+ 788 01ca 0100     		.short	1
+ 789 01cc 0300     		.short	3
+ 790 01ce 2600     		.short	38
+ 791 01d0 6F00     		.short	111
+ 792 01d2 6701     		.short	359
+ 793 01d4 6706     		.short	1639
+ 794 01d6 9706     		.short	1687
+ 795 01d8 0200     		.short	2
+ 796 01da 2800     		.short	40
+ 797 01dc 2804     		.short	1064
+ 798 01de 2904     		.short	1065
+ 799              		.text
+ 800              	.Letext0:
+ 801              		.file 2 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h"
+ 802              		.file 3 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 803              		.file 4 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 804              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 805              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+ 806              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_ltdc.h"
+ 807              		.file 8 "Core/Inc/ltdc.h"
+ 808              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h"
+ARM GAS  /tmp/ccjvrTEr.s 			page 21
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 ltdc.c
+     /tmp/ccjvrTEr.s:20     .text.MX_LTDC_Init:00000000 $t
+     /tmp/ccjvrTEr.s:26     .text.MX_LTDC_Init:00000000 MX_LTDC_Init
+     /tmp/ccjvrTEr.s:176    .text.MX_LTDC_Init:000000a8 $d
+     /tmp/ccjvrTEr.s:551    .bss.hltdc:00000000 hltdc
+     /tmp/ccjvrTEr.s:182    .text.HAL_LTDC_MspInit:00000000 $t
+     /tmp/ccjvrTEr.s:188    .text.HAL_LTDC_MspInit:00000000 HAL_LTDC_MspInit
+     /tmp/ccjvrTEr.s:533    .text.HAL_LTDC_MspInit:000001dc $d
+     /tmp/ccjvrTEr.s:548    .bss.hltdc:00000000 $d
+     /tmp/ccjvrTEr.s:558    .rodata.LTDCSYNC:00000000 LTDCSYNC
+     /tmp/ccjvrTEr.s:555    .rodata.LTDCSYNC:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_LTDC_Init
+HAL_LTDC_ConfigLayer
+HAL_GPIO_Init
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ

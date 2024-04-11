@@ -1,0 +1,2604 @@
+ARM GAS  /tmp/ccADz4v2.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"stm32h7xx_ll_fmc.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c"
+  19              		.section	.text.FMC_NORSRAM_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	FMC_NORSRAM_Init
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	FMC_NORSRAM_Init:
+  27              	.LVL0:
+  28              	.LFB328:
+   1:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+   2:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ******************************************************************************
+   3:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @file    stm32h7xx_ll_fmc.c
+   4:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @author  MCD Application Team
+   5:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief   FMC Low Layer HAL module driver.
+   6:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+   7:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *          This file provides firmware functions to manage the following
+   8:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *          functionalities of the Flexible Memory Controller (FMC) peripheral memories:
+   9:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *           + Initialization/de-initialization functions
+  10:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *           + Peripheral Control functions
+  11:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *           + Peripheral State functions
+  12:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+  13:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   @verbatim
+  14:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+  15:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                         ##### FMC peripheral features #####
+  16:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+  17:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..] The Flexible memory controller (FMC) includes following memory controllers:
+  18:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        (+) The NOR/PSRAM memory controller
+  19:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 	   (+) The NAND memory controller
+  20:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        (+) The Synchronous DRAM (SDRAM) controller
+  21:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  22:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..] The FMC functional block makes the interface with synchronous and asynchronous static
+  23:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        memories and SDRAM memories. Its main purposes are:
+  24:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        (+) to translate AHB transactions into the appropriate external device protocol
+  25:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        (+) to meet the access time requirements of the external memory devices
+  26:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  27:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..] All external memories share the addresses, data and control signals with the controller.
+  28:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        Each external device is accessed by means of a unique Chip Select. The FMC performs
+  29:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        only one access at a time to an external device.
+  30:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****        The main features of the FMC controller are the following:
+ARM GAS  /tmp/ccADz4v2.s 			page 2
+
+
+  31:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         (+) Interface with static-memory mapped devices including:
+  32:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****            (++) Static random access memory (SRAM)
+  33:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****            (++) Read-only memory (ROM)
+  34:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****            (++) NOR Flash memory/OneNAND Flash memory
+  35:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****            (++) PSRAM (4 memory banks)
+  36:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****            (++) Two banks of NAND Flash memory with ECC hardware to check up to 8 Kbytes of
+  37:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 data
+  38:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         (+) Interface with synchronous DRAM (SDRAM) memories
+  39:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         (+) Independent Chip Select control for each memory bank
+  40:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         (+) Independent configuration for each memory bank
+  41:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  42:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   @endverbatim
+  43:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ******************************************************************************
+  44:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @attention
+  45:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+  46:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
+  47:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * All rights reserved.</center></h2>
+  48:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+  49:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * This software component is licensed by ST under BSD 3-Clause license,
+  50:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * the "License"; You may not use this file except in compliance with the
+  51:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * License. You may obtain a copy of the License at:
+  52:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *                       opensource.org/licenses/BSD-3-Clause
+  53:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+  54:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ******************************************************************************
+  55:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+  56:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  57:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Includes ------------------------------------------------------------------*/
+  58:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #include "stm32h7xx_hal.h"
+  59:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  60:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @addtogroup STM32H7xx_HAL_Driver
+  61:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+  62:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+  63:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #if (((defined HAL_NOR_MODULE_ENABLED || defined HAL_SRAM_MODULE_ENABLED)) || defined HAL_NAND_MODU
+  64:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  65:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL  FMC Low Layer
+  66:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief FMC driver modules
+  67:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+  68:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+  69:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 	
+  70:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Private typedef -----------------------------------------------------------*/
+  71:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Private define ------------------------------------------------------------*/
+  72:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  73:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_Private_Constants FMC Low Layer Private Constants
+  74:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+  75:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+  76:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  77:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* ----------------------- FMC registers bit mask --------------------------- */
+  78:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  79:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- BCR Register ---*/
+  80:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* BCR register clear mask */
+  81:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  82:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- BTR Register ---*/
+  83:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* BTR register clear mask */
+  84:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define BTR_CLEAR_MASK    ((uint32_t)(FMC_BTRx_ADDSET | FMC_BTRx_ADDHLD  |\
+  85:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_BTRx_DATAST | FMC_BTRx_BUSTURN |\
+  86:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_BTRx_CLKDIV | FMC_BTRx_DATLAT  |\
+  87:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_BTRx_ACCMOD))
+ARM GAS  /tmp/ccADz4v2.s 			page 3
+
+
+  88:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+  89:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- BWTR Register ---*/
+  90:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* BWTR register clear mask */
+  91:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #if defined(FMC_BWTRx_BUSTURN)
+  92:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define BWTR_CLEAR_MASK   ((uint32_t)(FMC_BWTRx_ADDSET | FMC_BWTRx_ADDHLD  |\
+  93:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_BWTRx_DATAST | FMC_BWTRx_BUSTURN |\
+  94:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_BWTRx_ACCMOD))
+  95:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #else
+  96:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define BWTR_CLEAR_MASK   ((uint32_t)(FMC_BWTRx_ADDSET | FMC_BWTRx_ADDHLD  |\
+  97:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_BWTRx_DATAST | FMC_BWTRx_ACCMOD))
+  98:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #endif /* FMC_BWTRx_BUSTURN */
+  99:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 100:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- PCR Register ---*/
+ 101:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* PCR register clear mask */
+ 102:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define PCR_CLEAR_MASK    ((uint32_t)(FMC_PCR_PWAITEN | FMC_PCR_PBKEN  | \
+ 103:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_PCR_PWID    | FMC_PCR_ECCEN  | \
+ 104:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_PCR_TCLR    | FMC_PCR_TAR    | \
+ 105:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_PCR_ECCPS))
+ 106:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- PMEM Register ---*/
+ 107:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* PMEM register clear mask */
+ 108:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define PMEM_CLEAR_MASK   ((uint32_t)(FMC_PMEM_MEMSET  | FMC_PMEM_MEMWAIT |\
+ 109:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_PMEM_MEMHOLD | FMC_PMEM_MEMHIZ))
+ 110:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 111:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- PATT Register ---*/
+ 112:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* PATT register clear mask */
+ 113:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define PATT_CLEAR_MASK   ((uint32_t)(FMC_PATT_ATTSET  | FMC_PATT_ATTWAIT |\
+ 114:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_PATT_ATTHOLD | FMC_PATT_ATTHIZ))
+ 115:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 116:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 117:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- SDCR Register ---*/
+ 118:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* SDCR register clear mask */
+ 119:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define SDCR_CLEAR_MASK   ((uint32_t)(FMC_SDCRx_NC    | FMC_SDCRx_NR     | \
+ 120:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDCRx_MWID  | FMC_SDCRx_NB     | \
+ 121:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDCRx_CAS   | FMC_SDCRx_WP     | \
+ 122:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDCRx_SDCLK | FMC_SDCRx_RBURST | \
+ 123:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDCRx_RPIPE))
+ 124:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 125:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* --- SDTR Register ---*/
+ 126:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* SDTR register clear mask */
+ 127:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #define SDTR_CLEAR_MASK   ((uint32_t)(FMC_SDTRx_TMRD  | FMC_SDTRx_TXSR   | \
+ 128:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDTRx_TRAS  | FMC_SDTRx_TRC    | \
+ 129:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDTRx_TWR   | FMC_SDTRx_TRP    | \
+ 130:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                       FMC_SDTRx_TRCD))
+ 131:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 132:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 133:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ 134:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 135:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 136:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Private macro -------------------------------------------------------------*/
+ 137:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Private variables ---------------------------------------------------------*/
+ 138:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Private function prototypes -----------------------------------------------*/
+ 139:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /* Exported functions --------------------------------------------------------*/
+ 140:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 141:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_Exported_Functions FMC Low Layer Exported Functions
+ 142:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 143:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 144:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ARM GAS  /tmp/ccADz4v2.s 			page 4
+
+
+ 145:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 146:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_Exported_Functions_NORSRAM FMC Low Layer NOR SRAM Exported Functions
+ 147:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  NORSRAM Controller functions
+ 148:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 149:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   @verbatim
+ 150:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 151:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                    ##### How to use NORSRAM device driver #####
+ 152:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 153:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 154:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 155:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This driver contains a set of APIs to interface with the FMC NORSRAM banks in order
+ 156:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     to run the NORSRAM external devices.
+ 157:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 158:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NORSRAM bank reset using the function FMC_NORSRAM_DeInit()
+ 159:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NORSRAM bank control configuration using the function FMC_NORSRAM_Init()
+ 160:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NORSRAM bank timing configuration using the function FMC_NORSRAM_Timing_Init()
+ 161:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NORSRAM bank extended timing configuration using the function
+ 162:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         FMC_NORSRAM_Extended_Timing_Init()
+ 163:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NORSRAM bank enable/disable write operation using the functions
+ 164:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         FMC_NORSRAM_WriteOperation_Enable()/FMC_NORSRAM_WriteOperation_Disable()
+ 165:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 166:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 167:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 168:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 169:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 170:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_NORSRAM_Exported_Functions_Group1 Initialization and de-initialization functio
+ 171:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief    Initialization and Configuration functions
+ 172:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 173:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   @verbatim
+ 174:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 175:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               ##### Initialization and de_initialization functions #####
+ 176:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 177:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 178:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This section provides functions allowing to:
+ 179:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) Initialize and configure the FMC NORSRAM interface
+ 180:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) De-initialize the FMC NORSRAM interface
+ 181:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) Configure the FMC clock and associated GPIOs
+ 182:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 183:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 184:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 185:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 186:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 187:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 188:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initialize the FMC_NORSRAM device according to the specified
+ 189:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         control parameters in the FMC_NORSRAM_InitTypeDef
+ 190:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NORSRAM device instance
+ 191:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Init Pointer to NORSRAM Initialization structure
+ 192:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 193:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 194:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef  FMC_NORSRAM_Init(FMC_NORSRAM_TypeDef *Device, FMC_NORSRAM_InitTypeDef *Init)
+ 195:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+  29              		.loc 1 195 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              		.loc 1 195 1 is_stmt 0 view .LVU1
+ARM GAS  /tmp/ccADz4v2.s 			page 5
+
+
+  35 0000 30B4     		push	{r4, r5}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 4, -8
+  39              		.cfi_offset 5, -4
+ 196:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   uint32_t flashaccess;
+  40              		.loc 1 196 3 is_stmt 1 view .LVU2
+ 197:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   uint32_t btcr_reg;
+  41              		.loc 1 197 3 view .LVU3
+ 198:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   uint32_t mask;
+  42              		.loc 1 198 3 view .LVU4
+ 199:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 200:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 201:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_DEVICE(Device));
+  43              		.loc 1 201 3 view .LVU5
+ 202:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_BANK(Init->NSBank));
+  44              		.loc 1 202 3 view .LVU6
+ 203:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_MUX(Init->DataAddressMux));
+  45              		.loc 1 203 3 view .LVU7
+ 204:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_MEMORY(Init->MemoryType));
+  46              		.loc 1 204 3 view .LVU8
+ 205:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_MEMORY_WIDTH(Init->MemoryDataWidth));
+  47              		.loc 1 205 3 view .LVU9
+ 206:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_BURSTMODE(Init->BurstAccessMode));
+  48              		.loc 1 206 3 view .LVU10
+ 207:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WAIT_POLARITY(Init->WaitSignalPolarity));
+  49              		.loc 1 207 3 view .LVU11
+ 208:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WAIT_SIGNAL_ACTIVE(Init->WaitSignalActive));
+  50              		.loc 1 208 3 view .LVU12
+ 209:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WRITE_OPERATION(Init->WriteOperation));
+  51              		.loc 1 209 3 view .LVU13
+ 210:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WAITE_SIGNAL(Init->WaitSignal));
+  52              		.loc 1 210 3 view .LVU14
+ 211:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_EXTENDED_MODE(Init->ExtendedMode));
+  53              		.loc 1 211 3 view .LVU15
+ 212:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ASYNWAIT(Init->AsynchronousWait));
+  54              		.loc 1 212 3 view .LVU16
+ 213:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WRITE_BURST(Init->WriteBurst));
+  55              		.loc 1 213 3 view .LVU17
+ 214:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_CONTINOUS_CLOCK(Init->ContinuousClock));
+  56              		.loc 1 214 3 view .LVU18
+ 215:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WRITE_FIFO(Init->WriteFifo));
+  57              		.loc 1 215 3 view .LVU19
+ 216:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_PAGESIZE(Init->PageSize));
+  58              		.loc 1 216 3 view .LVU20
+ 217:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 218:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Disable NORSRAM Device */
+ 219:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   __FMC_NORSRAM_DISABLE(Device, Init->NSBank);
+  59              		.loc 1 219 3 view .LVU21
+  60 0002 0A68     		ldr	r2, [r1]
+  61 0004 50F82230 		ldr	r3, [r0, r2, lsl #2]
+  62 0008 23F00103 		bic	r3, r3, #1
+  63 000c 40F82230 		str	r3, [r0, r2, lsl #2]
+ 220:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 221:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set NORSRAM device control parameters */
+ 222:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (Init->MemoryType == FMC_MEMORY_TYPE_NOR)
+  64              		.loc 1 222 3 view .LVU22
+ARM GAS  /tmp/ccADz4v2.s 			page 6
+
+
+  65              		.loc 1 222 11 is_stmt 0 view .LVU23
+  66 0010 8B68     		ldr	r3, [r1, #8]
+  67              		.loc 1 222 6 view .LVU24
+  68 0012 082B     		cmp	r3, #8
+  69 0014 30D0     		beq	.L7
+ 223:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 224:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     flashaccess = FMC_NORSRAM_FLASH_ACCESS_ENABLE;
+ 225:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 226:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   else
+ 227:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 228:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     flashaccess = FMC_NORSRAM_FLASH_ACCESS_DISABLE;
+  70              		.loc 1 228 17 view .LVU25
+  71 0016 0024     		movs	r4, #0
+  72              	.L2:
+  73              	.LVL1:
+ 229:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 230:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 231:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   btcr_reg = (flashaccess                   | \
+  74              		.loc 1 231 3 is_stmt 1 view .LVU26
+ 232:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->DataAddressMux          | \
+  75              		.loc 1 232 19 is_stmt 0 view .LVU27
+  76 0018 4A68     		ldr	r2, [r1, #4]
+ 231:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->DataAddressMux          | \
+  77              		.loc 1 231 45 view .LVU28
+  78 001a 2243     		orrs	r2, r2, r4
+  79              		.loc 1 232 45 view .LVU29
+  80 001c 1343     		orrs	r3, r3, r2
+ 233:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->MemoryType              | \
+ 234:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->MemoryDataWidth         | \
+  81              		.loc 1 234 19 view .LVU30
+  82 001e CA68     		ldr	r2, [r1, #12]
+ 233:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->MemoryType              | \
+  83              		.loc 1 233 45 view .LVU31
+  84 0020 1343     		orrs	r3, r3, r2
+ 235:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->BurstAccessMode         | \
+  85              		.loc 1 235 19 view .LVU32
+  86 0022 0A69     		ldr	r2, [r1, #16]
+ 234:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->BurstAccessMode         | \
+  87              		.loc 1 234 45 view .LVU33
+  88 0024 1343     		orrs	r3, r3, r2
+ 236:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WaitSignalPolarity      | \
+  89              		.loc 1 236 19 view .LVU34
+  90 0026 4A69     		ldr	r2, [r1, #20]
+ 235:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->BurstAccessMode         | \
+  91              		.loc 1 235 45 view .LVU35
+  92 0028 1343     		orrs	r3, r3, r2
+ 237:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WaitSignalActive        | \
+  93              		.loc 1 237 19 view .LVU36
+  94 002a 8A69     		ldr	r2, [r1, #24]
+ 236:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WaitSignalPolarity      | \
+  95              		.loc 1 236 45 view .LVU37
+  96 002c 1343     		orrs	r3, r3, r2
+ 238:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WriteOperation          | \
+  97              		.loc 1 238 19 view .LVU38
+  98 002e CA69     		ldr	r2, [r1, #28]
+ 237:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WaitSignalActive        | \
+  99              		.loc 1 237 45 view .LVU39
+ARM GAS  /tmp/ccADz4v2.s 			page 7
+
+
+ 100 0030 1343     		orrs	r3, r3, r2
+ 239:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WaitSignal              | \
+ 101              		.loc 1 239 19 view .LVU40
+ 102 0032 0A6A     		ldr	r2, [r1, #32]
+ 238:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WriteOperation          | \
+ 103              		.loc 1 238 45 view .LVU41
+ 104 0034 1343     		orrs	r3, r3, r2
+ 240:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->ExtendedMode            | \
+ 105              		.loc 1 240 19 view .LVU42
+ 106 0036 4A6A     		ldr	r2, [r1, #36]
+ 239:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WaitSignal              | \
+ 107              		.loc 1 239 45 view .LVU43
+ 108 0038 1343     		orrs	r3, r3, r2
+ 241:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->AsynchronousWait        | \
+ 109              		.loc 1 241 19 view .LVU44
+ 110 003a 8A6A     		ldr	r2, [r1, #40]
+ 240:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->ExtendedMode            | \
+ 111              		.loc 1 240 45 view .LVU45
+ 112 003c 1343     		orrs	r3, r3, r2
+ 242:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->WriteBurst);
+ 113              		.loc 1 242 19 view .LVU46
+ 114 003e CA6A     		ldr	r2, [r1, #44]
+ 231:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               Init->DataAddressMux          | \
+ 115              		.loc 1 231 12 view .LVU47
+ 116 0040 1343     		orrs	r3, r3, r2
+ 117              	.LVL2:
+ 243:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 244:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   btcr_reg |= Init->ContinuousClock;
+ 118              		.loc 1 244 3 is_stmt 1 view .LVU48
+ 119              		.loc 1 244 19 is_stmt 0 view .LVU49
+ 120 0042 0A6B     		ldr	r2, [r1, #48]
+ 121              		.loc 1 244 12 view .LVU50
+ 122 0044 1A43     		orrs	r2, r2, r3
+ 123              	.LVL3:
+ 245:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   btcr_reg |= Init->WriteFifo;
+ 124              		.loc 1 245 3 is_stmt 1 view .LVU51
+ 125              		.loc 1 245 19 is_stmt 0 view .LVU52
+ 126 0046 4B6B     		ldr	r3, [r1, #52]
+ 127              		.loc 1 245 12 view .LVU53
+ 128 0048 1A43     		orrs	r2, r2, r3
+ 129              	.LVL4:
+ 246:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   btcr_reg |= Init->PageSize;
+ 130              		.loc 1 246 3 is_stmt 1 view .LVU54
+ 131              		.loc 1 246 19 is_stmt 0 view .LVU55
+ 132 004a 8B6B     		ldr	r3, [r1, #56]
+ 133              		.loc 1 246 12 view .LVU56
+ 134 004c 1A43     		orrs	r2, r2, r3
+ 135              	.LVL5:
+ 247:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 248:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   mask = (FMC_BCRx_MBKEN                |
+ 136              		.loc 1 248 3 is_stmt 1 view .LVU57
+ 249:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_MUXEN                |
+ 250:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_MTYP                 |
+ 251:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_MWID                 |
+ 252:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_FACCEN               |
+ 253:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_BURSTEN              |
+ 254:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_WAITPOL              |
+ARM GAS  /tmp/ccADz4v2.s 			page 8
+
+
+ 255:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_WAITCFG              |
+ 256:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_WREN                 |
+ 257:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_WAITEN               |
+ 258:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_EXTMOD               |
+ 259:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_ASYNCWAIT            |
+ 260:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****           FMC_BCRx_CBURSTRW);
+ 261:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 262:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   mask |= FMC_BCR1_CCLKEN;
+ 137              		.loc 1 262 3 view .LVU58
+ 263:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   mask |= FMC_BCR1_WFDIS;
+ 138              		.loc 1 263 3 view .LVU59
+ 264:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   mask |= FMC_BCRx_CPSIZE;
+ 139              		.loc 1 264 3 view .LVU60
+ 265:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 266:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->BTCR[Init->NSBank], mask, btcr_reg);
+ 140              		.loc 1 266 3 view .LVU61
+ 141 004e 0C68     		ldr	r4, [r1]
+ 142              	.LVL6:
+ 143              		.loc 1 266 3 is_stmt 0 view .LVU62
+ 144 0050 50F82450 		ldr	r5, [r0, r4, lsl #2]
+ 145 0054 0E4B     		ldr	r3, .L9
+ 146 0056 2B40     		ands	r3, r3, r5
+ 147 0058 1343     		orrs	r3, r3, r2
+ 148 005a 40F82430 		str	r3, [r0, r4, lsl #2]
+ 267:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 268:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Configure synchronous mode when Continuous clock is enabled for bank2..4 */
+ 269:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if ((Init->ContinuousClock == FMC_CONTINUOUS_CLOCK_SYNC_ASYNC) && (Init->NSBank != FMC_NORSRAM_BA
+ 149              		.loc 1 269 3 is_stmt 1 view .LVU63
+ 150              		.loc 1 269 12 is_stmt 0 view .LVU64
+ 151 005e 0B6B     		ldr	r3, [r1, #48]
+ 152              		.loc 1 269 6 view .LVU65
+ 153 0060 B3F5801F 		cmp	r3, #1048576
+ 154 0064 0AD0     		beq	.L8
+ 155              	.LVL7:
+ 156              	.L3:
+ 270:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 271:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->BTCR[FMC_NORSRAM_BANK1], FMC_BCR1_CCLKEN, Init->ContinuousClock);
+ 272:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 273:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 274:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (Init->NSBank != FMC_NORSRAM_BANK1)
+ 157              		.loc 1 274 3 is_stmt 1 view .LVU66
+ 158              		.loc 1 274 11 is_stmt 0 view .LVU67
+ 159 0066 0B68     		ldr	r3, [r1]
+ 160              		.loc 1 274 6 view .LVU68
+ 161 0068 1BB1     		cbz	r3, .L4
+ 275:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 276:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     /* Configure Write FIFO mode when Write Fifo is enabled for bank2..4 */
+ 277:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     SET_BIT(Device->BTCR[FMC_NORSRAM_BANK1], (uint32_t)(Init->WriteFifo));
+ 162              		.loc 1 277 5 is_stmt 1 view .LVU69
+ 163 006a 0368     		ldr	r3, [r0]
+ 164 006c 4A6B     		ldr	r2, [r1, #52]
+ 165 006e 1343     		orrs	r3, r3, r2
+ 166 0070 0360     		str	r3, [r0]
+ 167              	.L4:
+ 278:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 279:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 280:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ARM GAS  /tmp/ccADz4v2.s 			page 9
+
+
+ 168              		.loc 1 280 3 view .LVU70
+ 281:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 169              		.loc 1 281 1 is_stmt 0 view .LVU71
+ 170 0072 0020     		movs	r0, #0
+ 171              	.LVL8:
+ 172              		.loc 1 281 1 view .LVU72
+ 173 0074 30BC     		pop	{r4, r5}
+ 174              	.LCFI1:
+ 175              		.cfi_remember_state
+ 176              		.cfi_restore 5
+ 177              		.cfi_restore 4
+ 178              		.cfi_def_cfa_offset 0
+ 179 0076 7047     		bx	lr
+ 180              	.LVL9:
+ 181              	.L7:
+ 182              	.LCFI2:
+ 183              		.cfi_restore_state
+ 224:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 184              		.loc 1 224 17 view .LVU73
+ 185 0078 4024     		movs	r4, #64
+ 186 007a CDE7     		b	.L2
+ 187              	.LVL10:
+ 188              	.L8:
+ 269:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 189              		.loc 1 269 74 discriminator 1 view .LVU74
+ 190 007c 0A68     		ldr	r2, [r1]
+ 191              	.LVL11:
+ 269:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 192              		.loc 1 269 66 discriminator 1 view .LVU75
+ 193 007e 002A     		cmp	r2, #0
+ 194 0080 F1D0     		beq	.L3
+ 271:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 195              		.loc 1 271 5 is_stmt 1 view .LVU76
+ 196 0082 0268     		ldr	r2, [r0]
+ 197 0084 22F48012 		bic	r2, r2, #1048576
+ 198 0088 1343     		orrs	r3, r3, r2
+ 199 008a 0360     		str	r3, [r0]
+ 200 008c EBE7     		b	.L3
+ 201              	.L10:
+ 202 008e 00BF     		.align	2
+ 203              	.L9:
+ 204 0090 8004C0FF 		.word	-4193152
+ 205              		.cfi_endproc
+ 206              	.LFE328:
+ 208              		.section	.text.FMC_NORSRAM_DeInit,"ax",%progbits
+ 209              		.align	1
+ 210              		.global	FMC_NORSRAM_DeInit
+ 211              		.syntax unified
+ 212              		.thumb
+ 213              		.thumb_func
+ 215              	FMC_NORSRAM_DeInit:
+ 216              	.LVL12:
+ 217              	.LFB329:
+ 282:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 283:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 284:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  DeInitialize the FMC_NORSRAM peripheral
+ 285:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NORSRAM device instance
+ARM GAS  /tmp/ccADz4v2.s 			page 10
+
+
+ 286:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  ExDevice Pointer to NORSRAM extended mode device instance
+ 287:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NORSRAM bank number
+ 288:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 289:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 290:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NORSRAM_DeInit(FMC_NORSRAM_TypeDef *Device, FMC_NORSRAM_EXTENDED_TypeDef *ExD
+ 291:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 218              		.loc 1 291 1 view -0
+ 219              		.cfi_startproc
+ 220              		@ args = 0, pretend = 0, frame = 0
+ 221              		@ frame_needed = 0, uses_anonymous_args = 0
+ 222              		@ link register save eliminated.
+ 292:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 293:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_DEVICE(Device));
+ 223              		.loc 1 293 3 view .LVU78
+ 294:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_EXTENDED_DEVICE(ExDevice));
+ 224              		.loc 1 294 3 view .LVU79
+ 295:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_BANK(Bank));
+ 225              		.loc 1 295 3 view .LVU80
+ 296:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 297:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Disable the FMC_NORSRAM device */
+ 298:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   __FMC_NORSRAM_DISABLE(Device, Bank);
+ 226              		.loc 1 298 3 view .LVU81
+ 227 0000 50F82230 		ldr	r3, [r0, r2, lsl #2]
+ 228 0004 23F00103 		bic	r3, r3, #1
+ 229 0008 40F82230 		str	r3, [r0, r2, lsl #2]
+ 299:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 300:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* De-initialize the FMC_NORSRAM device */
+ 301:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* FMC_NORSRAM_BANK1 */
+ 302:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (Bank == FMC_NORSRAM_BANK1)
+ 230              		.loc 1 302 3 view .LVU82
+ 231              		.loc 1 302 6 is_stmt 0 view .LVU83
+ 232 000c 6AB9     		cbnz	r2, .L12
+ 303:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 304:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     Device->BTCR[Bank] = 0x000030DBU;
+ 233              		.loc 1 304 5 is_stmt 1 view .LVU84
+ 234              		.loc 1 304 24 is_stmt 0 view .LVU85
+ 235 000e 43F2DB03 		movw	r3, #12507
+ 236 0012 40F82230 		str	r3, [r0, r2, lsl #2]
+ 237              	.L13:
+ 305:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 306:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* FMC_NORSRAM_BANK2, FMC_NORSRAM_BANK3 or FMC_NORSRAM_BANK4 */
+ 307:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   else
+ 308:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 309:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     Device->BTCR[Bank] = 0x000030D2U;
+ 310:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 311:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 312:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   Device->BTCR[Bank + 1U] = 0x0FFFFFFFU;
+ 238              		.loc 1 312 3 is_stmt 1 view .LVU86
+ 239              		.loc 1 312 21 is_stmt 0 view .LVU87
+ 240 0016 02F1010C 		add	ip, r2, #1
+ 241              		.loc 1 312 27 view .LVU88
+ 242 001a 6FF07043 		mvn	r3, #-268435456
+ 243 001e 40F82C30 		str	r3, [r0, ip, lsl #2]
+ 313:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ExDevice->BWTR[Bank]   = 0x0FFFFFFFU;
+ 244              		.loc 1 313 3 is_stmt 1 view .LVU89
+ 245              		.loc 1 313 26 is_stmt 0 view .LVU90
+ 246 0022 41F82230 		str	r3, [r1, r2, lsl #2]
+ARM GAS  /tmp/ccADz4v2.s 			page 11
+
+
+ 314:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 315:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 247              		.loc 1 315 3 is_stmt 1 view .LVU91
+ 316:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 248              		.loc 1 316 1 is_stmt 0 view .LVU92
+ 249 0026 0020     		movs	r0, #0
+ 250              	.LVL13:
+ 251              		.loc 1 316 1 view .LVU93
+ 252 0028 7047     		bx	lr
+ 253              	.LVL14:
+ 254              	.L12:
+ 309:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 255              		.loc 1 309 5 is_stmt 1 view .LVU94
+ 309:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 256              		.loc 1 309 24 is_stmt 0 view .LVU95
+ 257 002a 43F2D203 		movw	r3, #12498
+ 258 002e 40F82230 		str	r3, [r0, r2, lsl #2]
+ 259 0032 F0E7     		b	.L13
+ 260              		.cfi_endproc
+ 261              	.LFE329:
+ 263              		.section	.text.FMC_NORSRAM_Timing_Init,"ax",%progbits
+ 264              		.align	1
+ 265              		.global	FMC_NORSRAM_Timing_Init
+ 266              		.syntax unified
+ 267              		.thumb
+ 268              		.thumb_func
+ 270              	FMC_NORSRAM_Timing_Init:
+ 271              	.LVL15:
+ 272              	.LFB330:
+ 317:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 318:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 319:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initialize the FMC_NORSRAM Timing according to the specified
+ 320:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         parameters in the FMC_NORSRAM_TimingTypeDef
+ 321:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NORSRAM device instance
+ 322:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timing Pointer to NORSRAM Timing structure
+ 323:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NORSRAM bank number
+ 324:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 325:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 326:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NORSRAM_Timing_Init(FMC_NORSRAM_TypeDef *Device, FMC_NORSRAM_TimingTypeDef *T
+ 327:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 273              		.loc 1 327 1 is_stmt 1 view -0
+ 274              		.cfi_startproc
+ 275              		@ args = 0, pretend = 0, frame = 0
+ 276              		@ frame_needed = 0, uses_anonymous_args = 0
+ 277              		.loc 1 327 1 is_stmt 0 view .LVU97
+ 278 0000 10B5     		push	{r4, lr}
+ 279              	.LCFI3:
+ 280              		.cfi_def_cfa_offset 8
+ 281              		.cfi_offset 4, -8
+ 282              		.cfi_offset 14, -4
+ 328:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   uint32_t tmpr;
+ 283              		.loc 1 328 3 is_stmt 1 view .LVU98
+ 329:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 330:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 331:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_DEVICE(Device));
+ 284              		.loc 1 331 3 view .LVU99
+ 332:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ADDRESS_SETUP_TIME(Timing->AddressSetupTime));
+ARM GAS  /tmp/ccADz4v2.s 			page 12
+
+
+ 285              		.loc 1 332 3 view .LVU100
+ 333:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ADDRESS_HOLD_TIME(Timing->AddressHoldTime));
+ 286              		.loc 1 333 3 view .LVU101
+ 334:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_DATASETUP_TIME(Timing->DataSetupTime));
+ 287              		.loc 1 334 3 view .LVU102
+ 335:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_TURNAROUND_TIME(Timing->BusTurnAroundDuration));
+ 288              		.loc 1 335 3 view .LVU103
+ 336:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_CLK_DIV(Timing->CLKDivision));
+ 289              		.loc 1 336 3 view .LVU104
+ 337:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_DATA_LATENCY(Timing->DataLatency));
+ 290              		.loc 1 337 3 view .LVU105
+ 338:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ACCESS_MODE(Timing->AccessMode));
+ 291              		.loc 1 338 3 view .LVU106
+ 339:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_BANK(Bank));
+ 292              		.loc 1 339 3 view .LVU107
+ 340:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 341:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set FMC_NORSRAM device timing parameters */
+ 342:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->BTCR[Bank + 1U], BTR_CLEAR_MASK, (Timing->AddressSetupTime                    
+ 293              		.loc 1 342 3 view .LVU108
+ 294 0002 0132     		adds	r2, r2, #1
+ 295              	.LVL16:
+ 296              		.loc 1 342 3 is_stmt 0 view .LVU109
+ 297 0004 50F82230 		ldr	r3, [r0, r2, lsl #2]
+ 298 0008 03F0404C 		and	ip, r3, #-1073741824
+ 299 000c 0B68     		ldr	r3, [r1]
+ 300 000e 4C68     		ldr	r4, [r1, #4]
+ 301 0010 43EA0413 		orr	r3, r3, r4, lsl #4
+ 302 0014 8C68     		ldr	r4, [r1, #8]
+ 303 0016 43EA0423 		orr	r3, r3, r4, lsl #8
+ 304 001a CC68     		ldr	r4, [r1, #12]
+ 305 001c 43EA0443 		orr	r3, r3, r4, lsl #16
+ 306 0020 0C69     		ldr	r4, [r1, #16]
+ 307 0022 04F1FF3E 		add	lr, r4, #-1
+ 308 0026 43EA0E53 		orr	r3, r3, lr, lsl #20
+ 309 002a 4C69     		ldr	r4, [r1, #20]
+ 310 002c A4F1020E 		sub	lr, r4, #2
+ 311 0030 43EA0E63 		orr	r3, r3, lr, lsl #24
+ 312 0034 8C69     		ldr	r4, [r1, #24]
+ 313 0036 2343     		orrs	r3, r3, r4
+ 314 0038 4CEA0303 		orr	r3, ip, r3
+ 315 003c 40F82230 		str	r3, [r0, r2, lsl #2]
+ 343:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                       ((Timing->AddressHoldTime)        << FMC_BTRx
+ 344:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                       ((Timing->DataSetupTime)          << FMC_BTRx
+ 345:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                       ((Timing->BusTurnAroundDuration)  << FMC_BTRx
+ 346:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                       (((Timing->CLKDivision) - 1U)     << FMC_BTRx
+ 347:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                       (((Timing->DataLatency) - 2U)     << FMC_BTRx
+ 348:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                       (Timing->AccessMode)));
+ 349:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 350:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Configure Clock division value (in NORSRAM bank 1) when continuous clock is enabled */
+ 351:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (HAL_IS_BIT_SET(Device->BTCR[FMC_NORSRAM_BANK1], FMC_BCR1_CCLKEN))
+ 316              		.loc 1 351 3 is_stmt 1 view .LVU110
+ 317              		.loc 1 351 7 is_stmt 0 view .LVU111
+ 318 0040 0368     		ldr	r3, [r0]
+ 319              		.loc 1 351 6 view .LVU112
+ 320 0042 13F4801F 		tst	r3, #1048576
+ 321 0046 0BD0     		beq	.L15
+ 352:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ARM GAS  /tmp/ccADz4v2.s 			page 13
+
+
+ 353:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     tmpr = (uint32_t)(Device->BTCR[FMC_NORSRAM_BANK1 + 1U] & ~(((uint32_t)0x0F) << FMC_BTRx_CLKDIV_
+ 322              		.loc 1 353 5 is_stmt 1 view .LVU113
+ 323              		.loc 1 353 35 is_stmt 0 view .LVU114
+ 324 0048 4268     		ldr	r2, [r0, #4]
+ 325              	.LVL17:
+ 326              		.loc 1 353 10 view .LVU115
+ 327 004a 22F47002 		bic	r2, r2, #15728640
+ 328              	.LVL18:
+ 354:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     tmpr |= (uint32_t)(((Timing->CLKDivision) - 1U) << FMC_BTRx_CLKDIV_Pos);
+ 329              		.loc 1 354 5 is_stmt 1 view .LVU116
+ 330              		.loc 1 354 32 is_stmt 0 view .LVU117
+ 331 004e 0B69     		ldr	r3, [r1, #16]
+ 332              		.loc 1 354 47 view .LVU118
+ 333 0050 013B     		subs	r3, r3, #1
+ 334              		.loc 1 354 10 view .LVU119
+ 335 0052 42EA0352 		orr	r2, r2, r3, lsl #20
+ 336              	.LVL19:
+ 355:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->BTCR[FMC_NORSRAM_BANK1 + 1U], FMC_BTRx_CLKDIV, tmpr);
+ 337              		.loc 1 355 5 is_stmt 1 view .LVU120
+ 338 0056 4368     		ldr	r3, [r0, #4]
+ 339 0058 23F47003 		bic	r3, r3, #15728640
+ 340 005c 1343     		orrs	r3, r3, r2
+ 341 005e 4360     		str	r3, [r0, #4]
+ 342              	.LVL20:
+ 343              	.L15:
+ 356:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 357:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 358:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 344              		.loc 1 358 3 view .LVU121
+ 359:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 345              		.loc 1 359 1 is_stmt 0 view .LVU122
+ 346 0060 0020     		movs	r0, #0
+ 347              	.LVL21:
+ 348              		.loc 1 359 1 view .LVU123
+ 349 0062 10BD     		pop	{r4, pc}
+ 350              		.cfi_endproc
+ 351              	.LFE330:
+ 353              		.section	.text.FMC_NORSRAM_Extended_Timing_Init,"ax",%progbits
+ 354              		.align	1
+ 355              		.global	FMC_NORSRAM_Extended_Timing_Init
+ 356              		.syntax unified
+ 357              		.thumb
+ 358              		.thumb_func
+ 360              	FMC_NORSRAM_Extended_Timing_Init:
+ 361              	.LVL22:
+ 362              	.LFB331:
+ 360:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 361:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 362:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initialize the FMC_NORSRAM Extended mode Timing according to the specified
+ 363:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         parameters in the FMC_NORSRAM_TimingTypeDef
+ 364:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NORSRAM device instance
+ 365:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timing Pointer to NORSRAM Timing structure
+ 366:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NORSRAM bank number
+ 367:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  ExtendedMode FMC Extended Mode
+ 368:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *          This parameter can be one of the following values:
+ 369:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *            @arg FMC_EXTENDED_MODE_DISABLE
+ 370:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *            @arg FMC_EXTENDED_MODE_ENABLE
+ARM GAS  /tmp/ccADz4v2.s 			page 14
+
+
+ 371:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 372:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 373:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NORSRAM_Extended_Timing_Init(FMC_NORSRAM_EXTENDED_TypeDef *Device, FMC_NORSRA
+ 374:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 363              		.loc 1 374 1 is_stmt 1 view -0
+ 364              		.cfi_startproc
+ 365              		@ args = 0, pretend = 0, frame = 0
+ 366              		@ frame_needed = 0, uses_anonymous_args = 0
+ 367              		@ link register save eliminated.
+ 375:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 376:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_EXTENDED_MODE(ExtendedMode));
+ 368              		.loc 1 376 3 view .LVU125
+ 377:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 378:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set NORSRAM device timing register for write configuration, if extended mode is used */
+ 379:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (ExtendedMode == FMC_EXTENDED_MODE_ENABLE)
+ 369              		.loc 1 379 3 view .LVU126
+ 370              		.loc 1 379 6 is_stmt 0 view .LVU127
+ 371 0000 B3F5804F 		cmp	r3, #16384
+ 372 0004 05D0     		beq	.L24
+ 380:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 381:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     /* Check the parameters */
+ 382:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_NORSRAM_EXTENDED_DEVICE(Device));
+ 383:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_ADDRESS_SETUP_TIME(Timing->AddressSetupTime));
+ 384:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_ADDRESS_HOLD_TIME(Timing->AddressHoldTime));
+ 385:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_DATASETUP_TIME(Timing->DataSetupTime));
+ 386:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #if defined(FMC_BWTRx_BUSTURN)
+ 387:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_TURNAROUND_TIME(Timing->BusTurnAroundDuration));
+ 388:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #endif /* FMC_BWTRx_BUSTURN */
+ 389:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_ACCESS_MODE(Timing->AccessMode));
+ 390:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_NORSRAM_BANK(Bank));
+ 391:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 392:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     /* Set NORSRAM device timing register for write configuration, if extended mode is used */
+ 393:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->BWTR[Bank], BWTR_CLEAR_MASK, (Timing->AddressSetupTime                      
+ 394:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      ((Timing->AddressHoldTime)        << FMC_BWTRx
+ 395:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      ((Timing->DataSetupTime)          << FMC_BWTRx
+ 396:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #if defined(FMC_BWTRx_BUSTURN)
+ 397:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      Timing->AccessMode                            
+ 398:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      ((Timing->BusTurnAroundDuration)  << FMC_BWTRx
+ 399:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #else
+ 400:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      Timing->AccessMode));
+ 401:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #endif /* FMC_BWTRx_BUSTURN */
+ 402:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 403:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   else
+ 404:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 405:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     Device->BWTR[Bank] = 0x0FFFFFFFU;
+ 373              		.loc 1 405 5 is_stmt 1 view .LVU128
+ 374              		.loc 1 405 24 is_stmt 0 view .LVU129
+ 375 0006 6FF07043 		mvn	r3, #-268435456
+ 376              	.LVL23:
+ 377              		.loc 1 405 24 view .LVU130
+ 378 000a 40F82230 		str	r3, [r0, r2, lsl #2]
+ 406:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 407:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 408:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 379              		.loc 1 408 3 is_stmt 1 view .LVU131
+ 409:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 380              		.loc 1 409 1 is_stmt 0 view .LVU132
+ARM GAS  /tmp/ccADz4v2.s 			page 15
+
+
+ 381 000e 0020     		movs	r0, #0
+ 382              	.LVL24:
+ 383              		.loc 1 409 1 view .LVU133
+ 384 0010 7047     		bx	lr
+ 385              	.LVL25:
+ 386              	.L24:
+ 374:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 387              		.loc 1 374 1 view .LVU134
+ 388 0012 30B4     		push	{r4, r5}
+ 389              	.LCFI4:
+ 390              		.cfi_def_cfa_offset 8
+ 391              		.cfi_offset 4, -8
+ 392              		.cfi_offset 5, -4
+ 382:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_ADDRESS_SETUP_TIME(Timing->AddressSetupTime));
+ 393              		.loc 1 382 5 is_stmt 1 view .LVU135
+ 383:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_ADDRESS_HOLD_TIME(Timing->AddressHoldTime));
+ 394              		.loc 1 383 5 view .LVU136
+ 384:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_DATASETUP_TIME(Timing->DataSetupTime));
+ 395              		.loc 1 384 5 view .LVU137
+ 385:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #if defined(FMC_BWTRx_BUSTURN)
+ 396              		.loc 1 385 5 view .LVU138
+ 387:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** #endif /* FMC_BWTRx_BUSTURN */
+ 397              		.loc 1 387 5 view .LVU139
+ 389:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     assert_param(IS_FMC_NORSRAM_BANK(Bank));
+ 398              		.loc 1 389 5 view .LVU140
+ 390:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 399              		.loc 1 390 5 view .LVU141
+ 393:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      ((Timing->AddressHoldTime)        << FMC_BWTRx
+ 400              		.loc 1 393 5 view .LVU142
+ 401 0014 50F82230 		ldr	r3, [r0, r2, lsl #2]
+ 402              	.LVL26:
+ 393:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      ((Timing->AddressHoldTime)        << FMC_BWTRx
+ 403              		.loc 1 393 5 is_stmt 0 view .LVU143
+ 404 0018 094C     		ldr	r4, .L25
+ 405 001a 1C40     		ands	r4, r4, r3
+ 406 001c 0B68     		ldr	r3, [r1]
+ 407 001e 4D68     		ldr	r5, [r1, #4]
+ 408 0020 43EA0513 		orr	r3, r3, r5, lsl #4
+ 409 0024 8D68     		ldr	r5, [r1, #8]
+ 410 0026 43EA0523 		orr	r3, r3, r5, lsl #8
+ 411 002a 8D69     		ldr	r5, [r1, #24]
+ 412 002c 2B43     		orrs	r3, r3, r5
+ 413 002e C968     		ldr	r1, [r1, #12]
+ 414              	.LVL27:
+ 393:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                                      ((Timing->AddressHoldTime)        << FMC_BWTRx
+ 415              		.loc 1 393 5 view .LVU144
+ 416 0030 43EA0143 		orr	r3, r3, r1, lsl #16
+ 417 0034 1C43     		orrs	r4, r4, r3
+ 418 0036 40F82240 		str	r4, [r0, r2, lsl #2]
+ 408:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 419              		.loc 1 408 3 is_stmt 1 view .LVU145
+ 420              		.loc 1 409 1 is_stmt 0 view .LVU146
+ 421 003a 0020     		movs	r0, #0
+ 422              	.LVL28:
+ 423              		.loc 1 409 1 view .LVU147
+ 424 003c 30BC     		pop	{r4, r5}
+ 425              	.LCFI5:
+ARM GAS  /tmp/ccADz4v2.s 			page 16
+
+
+ 426              		.cfi_restore 5
+ 427              		.cfi_restore 4
+ 428              		.cfi_def_cfa_offset 0
+ 429 003e 7047     		bx	lr
+ 430              	.L26:
+ 431              		.align	2
+ 432              	.L25:
+ 433 0040 0000F0CF 		.word	-806354944
+ 434              		.cfi_endproc
+ 435              	.LFE331:
+ 437              		.section	.text.FMC_NORSRAM_WriteOperation_Enable,"ax",%progbits
+ 438              		.align	1
+ 439              		.global	FMC_NORSRAM_WriteOperation_Enable
+ 440              		.syntax unified
+ 441              		.thumb
+ 442              		.thumb_func
+ 444              	FMC_NORSRAM_WriteOperation_Enable:
+ 445              	.LVL29:
+ 446              	.LFB332:
+ 410:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 411:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ 412:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 413:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 414:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @addtogroup FMC_LL_NORSRAM_Private_Functions_Group2
+ 415:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****  *  @brief   management functions
+ 416:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****  *
+ 417:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @verbatim
+ 418:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 419:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                       ##### FMC_NORSRAM Control functions #####
+ 420:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 421:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 422:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This subsection provides a set of functions allowing to control dynamically
+ 423:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     the FMC NORSRAM interface.
+ 424:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 425:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 426:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 427:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 428:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 429:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 430:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Enables dynamically FMC_NORSRAM write operation.
+ 431:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NORSRAM device instance
+ 432:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NORSRAM bank number
+ 433:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 434:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 435:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NORSRAM_WriteOperation_Enable(FMC_NORSRAM_TypeDef *Device, uint32_t Bank)
+ 436:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 447              		.loc 1 436 1 is_stmt 1 view -0
+ 448              		.cfi_startproc
+ 449              		@ args = 0, pretend = 0, frame = 0
+ 450              		@ frame_needed = 0, uses_anonymous_args = 0
+ 451              		@ link register save eliminated.
+ 437:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 438:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_DEVICE(Device));
+ 452              		.loc 1 438 3 view .LVU149
+ 439:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_BANK(Bank));
+ 453              		.loc 1 439 3 view .LVU150
+ 440:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ARM GAS  /tmp/ccADz4v2.s 			page 17
+
+
+ 441:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Enable write operation */
+ 442:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   SET_BIT(Device->BTCR[Bank], FMC_WRITE_OPERATION_ENABLE);
+ 454              		.loc 1 442 3 view .LVU151
+ 455 0000 50F82130 		ldr	r3, [r0, r1, lsl #2]
+ 456 0004 43F48053 		orr	r3, r3, #4096
+ 457 0008 40F82130 		str	r3, [r0, r1, lsl #2]
+ 443:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 444:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 458              		.loc 1 444 3 view .LVU152
+ 445:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 459              		.loc 1 445 1 is_stmt 0 view .LVU153
+ 460 000c 0020     		movs	r0, #0
+ 461              	.LVL30:
+ 462              		.loc 1 445 1 view .LVU154
+ 463 000e 7047     		bx	lr
+ 464              		.cfi_endproc
+ 465              	.LFE332:
+ 467              		.section	.text.FMC_NORSRAM_WriteOperation_Disable,"ax",%progbits
+ 468              		.align	1
+ 469              		.global	FMC_NORSRAM_WriteOperation_Disable
+ 470              		.syntax unified
+ 471              		.thumb
+ 472              		.thumb_func
+ 474              	FMC_NORSRAM_WriteOperation_Disable:
+ 475              	.LVL31:
+ 476              	.LFB333:
+ 446:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 447:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 448:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Disables dynamically FMC_NORSRAM write operation.
+ 449:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NORSRAM device instance
+ 450:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NORSRAM bank number
+ 451:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 452:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 453:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NORSRAM_WriteOperation_Disable(FMC_NORSRAM_TypeDef *Device, uint32_t Bank)
+ 454:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 477              		.loc 1 454 1 is_stmt 1 view -0
+ 478              		.cfi_startproc
+ 479              		@ args = 0, pretend = 0, frame = 0
+ 480              		@ frame_needed = 0, uses_anonymous_args = 0
+ 481              		@ link register save eliminated.
+ 455:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 456:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_DEVICE(Device));
+ 482              		.loc 1 456 3 view .LVU156
+ 457:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NORSRAM_BANK(Bank));
+ 483              		.loc 1 457 3 view .LVU157
+ 458:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 459:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Disable write operation */
+ 460:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   CLEAR_BIT(Device->BTCR[Bank], FMC_WRITE_OPERATION_ENABLE);
+ 484              		.loc 1 460 3 view .LVU158
+ 485 0000 50F82130 		ldr	r3, [r0, r1, lsl #2]
+ 486 0004 23F48053 		bic	r3, r3, #4096
+ 487 0008 40F82130 		str	r3, [r0, r1, lsl #2]
+ 461:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 462:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 488              		.loc 1 462 3 view .LVU159
+ 463:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 489              		.loc 1 463 1 is_stmt 0 view .LVU160
+ARM GAS  /tmp/ccADz4v2.s 			page 18
+
+
+ 490 000c 0020     		movs	r0, #0
+ 491              	.LVL32:
+ 492              		.loc 1 463 1 view .LVU161
+ 493 000e 7047     		bx	lr
+ 494              		.cfi_endproc
+ 495              	.LFE333:
+ 497              		.section	.text.FMC_NAND_Init,"ax",%progbits
+ 498              		.align	1
+ 499              		.global	FMC_NAND_Init
+ 500              		.syntax unified
+ 501              		.thumb
+ 502              		.thumb_func
+ 504              	FMC_NAND_Init:
+ 505              	.LVL33:
+ 506              	.LFB334:
+ 464:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 465:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 466:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ 467:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 468:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 469:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 470:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ 471:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 472:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 473:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 474:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_Exported_Functions_NAND FMC Low Layer NAND Exported Functions
+ 475:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief    NAND Controller functions
+ 476:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 477:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   @verbatim
+ 478:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 479:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                     ##### How to use NAND device driver #####
+ 480:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 481:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 482:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This driver contains a set of APIs to interface with the FMC NAND banks in order
+ 483:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     to run the NAND external devices.
+ 484:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 485:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NAND bank reset using the function FMC_NAND_DeInit()
+ 486:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NAND bank control configuration using the function FMC_NAND_Init()
+ 487:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NAND bank common space timing configuration using the function
+ 488:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         FMC_NAND_CommonSpace_Timing_Init()
+ 489:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NAND bank attribute space timing configuration using the function
+ 490:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         FMC_NAND_AttributeSpace_Timing_Init()
+ 491:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NAND bank enable/disable ECC correction feature using the functions
+ 492:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         FMC_NAND_ECC_Enable()/FMC_NAND_ECC_Disable()
+ 493:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC NAND bank get ECC correction code using the function FMC_NAND_GetECC()
+ 494:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 495:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 496:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 497:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 498:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 499:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_NAND_Exported_Functions_Group1 Initialization and de-initialization functions
+ 500:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****  *  @brief    Initialization and Configuration functions
+ 501:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****  *
+ 502:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @verbatim
+ 503:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 504:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               ##### Initialization and de_initialization functions #####
+ 505:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ARM GAS  /tmp/ccADz4v2.s 			page 19
+
+
+ 506:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 507:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This section provides functions allowing to:
+ 508:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) Initialize and configure the FMC NAND interface
+ 509:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) De-initialize the FMC NAND interface
+ 510:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) Configure the FMC clock and associated GPIOs
+ 511:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 512:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 513:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 514:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 515:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 516:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 517:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initializes the FMC_NAND device according to the specified
+ 518:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         control parameters in the FMC_NAND_HandleTypeDef
+ 519:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 520:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Init Pointer to NAND Initialization structure
+ 521:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 522:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 523:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_Init(FMC_NAND_TypeDef *Device, FMC_NAND_InitTypeDef *Init)
+ 524:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 507              		.loc 1 524 1 is_stmt 1 view -0
+ 508              		.cfi_startproc
+ 509              		@ args = 0, pretend = 0, frame = 0
+ 510              		@ frame_needed = 0, uses_anonymous_args = 0
+ 511              		@ link register save eliminated.
+ 512              		.loc 1 524 1 is_stmt 0 view .LVU163
+ 513 0000 10B4     		push	{r4}
+ 514              	.LCFI6:
+ 515              		.cfi_def_cfa_offset 4
+ 516              		.cfi_offset 4, -4
+ 525:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 526:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 517              		.loc 1 526 3 is_stmt 1 view .LVU164
+ 527:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Init->NandBank));
+ 518              		.loc 1 527 3 view .LVU165
+ 528:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WAIT_FEATURE(Init->Waitfeature));
+ 519              		.loc 1 528 3 view .LVU166
+ 529:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_MEMORY_WIDTH(Init->MemoryDataWidth));
+ 520              		.loc 1 529 3 view .LVU167
+ 530:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ECC_STATE(Init->EccComputation));
+ 521              		.loc 1 530 3 view .LVU168
+ 531:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ECCPAGE_SIZE(Init->ECCPageSize));
+ 522              		.loc 1 531 3 view .LVU169
+ 532:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_TCLR_TIME(Init->TCLRSetupTime));
+ 523              		.loc 1 532 3 view .LVU170
+ 533:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_TAR_TIME(Init->TARSetupTime));
+ 524              		.loc 1 533 3 view .LVU171
+ 534:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 535:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* NAND bank 3 registers configuration */
+ 536:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->PCR, PCR_CLEAR_MASK, (Init->Waitfeature                            |
+ 525              		.loc 1 536 3 view .LVU172
+ 526 0002 0368     		ldr	r3, [r0]
+ 527 0004 0B4A     		ldr	r2, .L31
+ 528 0006 1A40     		ands	r2, r2, r3
+ 529 0008 4B68     		ldr	r3, [r1, #4]
+ 530 000a 8C68     		ldr	r4, [r1, #8]
+ 531 000c 2343     		orrs	r3, r3, r4
+ 532 000e CC68     		ldr	r4, [r1, #12]
+ARM GAS  /tmp/ccADz4v2.s 			page 20
+
+
+ 533 0010 2343     		orrs	r3, r3, r4
+ 534 0012 0C69     		ldr	r4, [r1, #16]
+ 535 0014 2343     		orrs	r3, r3, r4
+ 536 0016 4C69     		ldr	r4, [r1, #20]
+ 537 0018 43EA4423 		orr	r3, r3, r4, lsl #9
+ 538 001c 8969     		ldr	r1, [r1, #24]
+ 539              	.LVL34:
+ 540              		.loc 1 536 3 is_stmt 0 view .LVU173
+ 541 001e 43EA4133 		orr	r3, r3, r1, lsl #13
+ 542 0022 1A43     		orrs	r2, r2, r3
+ 543 0024 42F00802 		orr	r2, r2, #8
+ 544 0028 0260     		str	r2, [r0]
+ 537:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                            FMC_PCR_MEMORY_TYPE_NAND                     |
+ 538:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                            Init->MemoryDataWidth                        |
+ 539:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                            Init->EccComputation                         |
+ 540:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                            Init->ECCPageSize                            |
+ 541:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                            ((Init->TCLRSetupTime) << FMC_PCR_TCLR_Pos)  |
+ 542:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                            ((Init->TARSetupTime)  << FMC_PCR_TAR_Pos)));
+ 543:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 544:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 545              		.loc 1 544 3 is_stmt 1 view .LVU174
+ 545:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 546              		.loc 1 545 1 is_stmt 0 view .LVU175
+ 547 002a 0020     		movs	r0, #0
+ 548              	.LVL35:
+ 549              		.loc 1 545 1 view .LVU176
+ 550 002c 5DF8044B 		ldr	r4, [sp], #4
+ 551              	.LCFI7:
+ 552              		.cfi_restore 4
+ 553              		.cfi_def_cfa_offset 0
+ 554 0030 7047     		bx	lr
+ 555              	.L32:
+ 556 0032 00BF     		.align	2
+ 557              	.L31:
+ 558 0034 8901F0FF 		.word	-1048183
+ 559              		.cfi_endproc
+ 560              	.LFE334:
+ 562              		.section	.text.FMC_NAND_CommonSpace_Timing_Init,"ax",%progbits
+ 563              		.align	1
+ 564              		.global	FMC_NAND_CommonSpace_Timing_Init
+ 565              		.syntax unified
+ 566              		.thumb
+ 567              		.thumb_func
+ 569              	FMC_NAND_CommonSpace_Timing_Init:
+ 570              	.LVL36:
+ 571              	.LFB335:
+ 546:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 547:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 548:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initializes the FMC_NAND Common space Timing according to the specified
+ 549:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         parameters in the FMC_NAND_PCC_TimingTypeDef
+ 550:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 551:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timing Pointer to NAND timing structure
+ 552:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NAND bank number
+ 553:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 554:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 555:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_CommonSpace_Timing_Init(FMC_NAND_TypeDef *Device, FMC_NAND_PCC_TimingTyp
+ 556:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ARM GAS  /tmp/ccADz4v2.s 			page 21
+
+
+ 572              		.loc 1 556 1 is_stmt 1 view -0
+ 573              		.cfi_startproc
+ 574              		@ args = 0, pretend = 0, frame = 0
+ 575              		@ frame_needed = 0, uses_anonymous_args = 0
+ 576              		@ link register save eliminated.
+ 557:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 558:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 577              		.loc 1 558 3 view .LVU178
+ 559:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SETUP_TIME(Timing->SetupTime));
+ 578              		.loc 1 559 3 view .LVU179
+ 560:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WAIT_TIME(Timing->WaitSetupTime));
+ 579              		.loc 1 560 3 view .LVU180
+ 561:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_HOLD_TIME(Timing->HoldSetupTime));
+ 580              		.loc 1 561 3 view .LVU181
+ 562:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_HIZ_TIME(Timing->HiZSetupTime));
+ 581              		.loc 1 562 3 view .LVU182
+ 563:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Bank));
+ 582              		.loc 1 563 3 view .LVU183
+ 564:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 565:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning if no assert_param check */
+ 566:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Bank);
+ 583              		.loc 1 566 3 view .LVU184
+ 567:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 568:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* NAND bank 3 registers configuration */
+ 569:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->PMEM, PMEM_CLEAR_MASK, (Timing->SetupTime                                 |
+ 584              		.loc 1 569 3 view .LVU185
+ 585 0000 8368     		ldr	r3, [r0, #8]
+ 586 0002 0B68     		ldr	r3, [r1]
+ 587 0004 4A68     		ldr	r2, [r1, #4]
+ 588              	.LVL37:
+ 589              		.loc 1 569 3 is_stmt 0 view .LVU186
+ 590 0006 43EA0223 		orr	r3, r3, r2, lsl #8
+ 591 000a 8A68     		ldr	r2, [r1, #8]
+ 592 000c 43EA0243 		orr	r3, r3, r2, lsl #16
+ 593 0010 CA68     		ldr	r2, [r1, #12]
+ 594 0012 43EA0263 		orr	r3, r3, r2, lsl #24
+ 595 0016 8360     		str	r3, [r0, #8]
+ 570:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                              ((Timing->WaitSetupTime) << FMC_PMEM_MEMWAIT_Pos) |
+ 571:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                              ((Timing->HoldSetupTime) << FMC_PMEM_MEMHOLD_Pos) |
+ 572:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                              ((Timing->HiZSetupTime)  << FMC_PMEM_MEMHIZ_Pos)));
+ 573:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 574:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 596              		.loc 1 574 3 is_stmt 1 view .LVU187
+ 575:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 597              		.loc 1 575 1 is_stmt 0 view .LVU188
+ 598 0018 0020     		movs	r0, #0
+ 599              	.LVL38:
+ 600              		.loc 1 575 1 view .LVU189
+ 601 001a 7047     		bx	lr
+ 602              		.cfi_endproc
+ 603              	.LFE335:
+ 605              		.section	.text.FMC_NAND_AttributeSpace_Timing_Init,"ax",%progbits
+ 606              		.align	1
+ 607              		.global	FMC_NAND_AttributeSpace_Timing_Init
+ 608              		.syntax unified
+ 609              		.thumb
+ 610              		.thumb_func
+ARM GAS  /tmp/ccADz4v2.s 			page 22
+
+
+ 612              	FMC_NAND_AttributeSpace_Timing_Init:
+ 613              	.LVL39:
+ 614              	.LFB336:
+ 576:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 577:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 578:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initializes the FMC_NAND Attribute space Timing according to the specified
+ 579:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         parameters in the FMC_NAND_PCC_TimingTypeDef
+ 580:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 581:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timing Pointer to NAND timing structure
+ 582:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NAND bank number
+ 583:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 584:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 585:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_AttributeSpace_Timing_Init(FMC_NAND_TypeDef *Device, FMC_NAND_PCC_Timing
+ 586:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 615              		.loc 1 586 1 is_stmt 1 view -0
+ 616              		.cfi_startproc
+ 617              		@ args = 0, pretend = 0, frame = 0
+ 618              		@ frame_needed = 0, uses_anonymous_args = 0
+ 619              		@ link register save eliminated.
+ 587:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 588:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 620              		.loc 1 588 3 view .LVU191
+ 589:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SETUP_TIME(Timing->SetupTime));
+ 621              		.loc 1 589 3 view .LVU192
+ 590:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WAIT_TIME(Timing->WaitSetupTime));
+ 622              		.loc 1 590 3 view .LVU193
+ 591:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_HOLD_TIME(Timing->HoldSetupTime));
+ 623              		.loc 1 591 3 view .LVU194
+ 592:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_HIZ_TIME(Timing->HiZSetupTime));
+ 624              		.loc 1 592 3 view .LVU195
+ 593:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Bank));
+ 625              		.loc 1 593 3 view .LVU196
+ 594:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 595:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning if no assert_param check */
+ 596:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Bank);
+ 626              		.loc 1 596 3 view .LVU197
+ 597:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 598:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* NAND bank 3 registers configuration */
+ 599:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->PATT, PATT_CLEAR_MASK, (Timing->SetupTime                                 |
+ 627              		.loc 1 599 3 view .LVU198
+ 628 0000 C368     		ldr	r3, [r0, #12]
+ 629 0002 0B68     		ldr	r3, [r1]
+ 630 0004 4A68     		ldr	r2, [r1, #4]
+ 631              	.LVL40:
+ 632              		.loc 1 599 3 is_stmt 0 view .LVU199
+ 633 0006 43EA0223 		orr	r3, r3, r2, lsl #8
+ 634 000a 8A68     		ldr	r2, [r1, #8]
+ 635 000c 43EA0243 		orr	r3, r3, r2, lsl #16
+ 636 0010 CA68     		ldr	r2, [r1, #12]
+ 637 0012 43EA0263 		orr	r3, r3, r2, lsl #24
+ 638 0016 C360     		str	r3, [r0, #12]
+ 600:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                              ((Timing->WaitSetupTime) << FMC_PATT_ATTWAIT_Pos) |
+ 601:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                              ((Timing->HoldSetupTime) << FMC_PATT_ATTHOLD_Pos) |
+ 602:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                                              ((Timing->HiZSetupTime)  << FMC_PATT_ATTHIZ_Pos)));
+ 603:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 604:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 639              		.loc 1 604 3 is_stmt 1 view .LVU200
+ARM GAS  /tmp/ccADz4v2.s 			page 23
+
+
+ 605:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 640              		.loc 1 605 1 is_stmt 0 view .LVU201
+ 641 0018 0020     		movs	r0, #0
+ 642              	.LVL41:
+ 643              		.loc 1 605 1 view .LVU202
+ 644 001a 7047     		bx	lr
+ 645              		.cfi_endproc
+ 646              	.LFE336:
+ 648              		.section	.text.FMC_NAND_DeInit,"ax",%progbits
+ 649              		.align	1
+ 650              		.global	FMC_NAND_DeInit
+ 651              		.syntax unified
+ 652              		.thumb
+ 653              		.thumb_func
+ 655              	FMC_NAND_DeInit:
+ 656              	.LVL42:
+ 657              	.LFB337:
+ 606:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 607:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 608:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  DeInitializes the FMC_NAND device
+ 609:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 610:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NAND bank number
+ 611:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 612:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 613:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_DeInit(FMC_NAND_TypeDef *Device, uint32_t Bank)
+ 614:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 658              		.loc 1 614 1 is_stmt 1 view -0
+ 659              		.cfi_startproc
+ 660              		@ args = 0, pretend = 0, frame = 0
+ 661              		@ frame_needed = 0, uses_anonymous_args = 0
+ 662              		@ link register save eliminated.
+ 615:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 616:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 663              		.loc 1 616 3 view .LVU204
+ 617:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Bank));
+ 664              		.loc 1 617 3 view .LVU205
+ 618:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 619:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Disable the NAND Bank */
+ 620:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   __FMC_NAND_DISABLE(Device, Bank);
+ 665              		.loc 1 620 3 view .LVU206
+ 666 0000 0368     		ldr	r3, [r0]
+ 667 0002 23F00403 		bic	r3, r3, #4
+ 668 0006 0360     		str	r3, [r0]
+ 621:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 622:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* De-initialize the NAND Bank */
+ 623:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning if no assert_param check */
+ 624:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Bank);
+ 669              		.loc 1 624 3 view .LVU207
+ 625:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 626:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set the FMC_NAND_BANK3 registers to their reset values */
+ 627:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   WRITE_REG(Device->PCR,  0x00000018U);
+ 670              		.loc 1 627 3 view .LVU208
+ 671 0008 1823     		movs	r3, #24
+ 672 000a 0360     		str	r3, [r0]
+ 628:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   WRITE_REG(Device->SR,   0x00000040U);
+ 673              		.loc 1 628 3 view .LVU209
+ 674 000c 4023     		movs	r3, #64
+ARM GAS  /tmp/ccADz4v2.s 			page 24
+
+
+ 675 000e 4360     		str	r3, [r0, #4]
+ 629:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   WRITE_REG(Device->PMEM, 0xFCFCFCFCU);
+ 676              		.loc 1 629 3 view .LVU210
+ 677 0010 4FF0FC33 		mov	r3, #-50529028
+ 678 0014 8360     		str	r3, [r0, #8]
+ 630:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   WRITE_REG(Device->PATT, 0xFCFCFCFCU);
+ 679              		.loc 1 630 3 view .LVU211
+ 680 0016 C360     		str	r3, [r0, #12]
+ 631:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 632:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 681              		.loc 1 632 3 view .LVU212
+ 633:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 682              		.loc 1 633 1 is_stmt 0 view .LVU213
+ 683 0018 0020     		movs	r0, #0
+ 684              	.LVL43:
+ 685              		.loc 1 633 1 view .LVU214
+ 686 001a 7047     		bx	lr
+ 687              		.cfi_endproc
+ 688              	.LFE337:
+ 690              		.section	.text.FMC_NAND_ECC_Enable,"ax",%progbits
+ 691              		.align	1
+ 692              		.global	FMC_NAND_ECC_Enable
+ 693              		.syntax unified
+ 694              		.thumb
+ 695              		.thumb_func
+ 697              	FMC_NAND_ECC_Enable:
+ 698              	.LVL44:
+ 699              	.LFB338:
+ 634:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 635:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 636:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ 637:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 638:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 639:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup HAL_FMC_NAND_Group2 Peripheral Control functions
+ 640:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *  @brief   management functions
+ 641:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 642:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @verbatim
+ 643:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 644:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                        ##### FMC_NAND Control functions #####
+ 645:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 646:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 647:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This subsection provides a set of functions allowing to control dynamically
+ 648:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     the FMC NAND interface.
+ 649:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 650:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 651:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 652:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 653:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 654:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 655:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 656:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Enables dynamically FMC_NAND ECC feature.
+ 657:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 658:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NAND bank number
+ 659:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 660:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 661:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_ECC_Enable(FMC_NAND_TypeDef *Device, uint32_t Bank)
+ 662:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ARM GAS  /tmp/ccADz4v2.s 			page 25
+
+
+ 700              		.loc 1 662 1 is_stmt 1 view -0
+ 701              		.cfi_startproc
+ 702              		@ args = 0, pretend = 0, frame = 0
+ 703              		@ frame_needed = 0, uses_anonymous_args = 0
+ 704              		@ link register save eliminated.
+ 663:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 664:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 705              		.loc 1 664 3 view .LVU216
+ 665:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Bank));
+ 706              		.loc 1 665 3 view .LVU217
+ 666:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 667:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Enable ECC feature */
+ 668:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning if no assert_param check */
+ 669:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Bank);
+ 707              		.loc 1 669 3 view .LVU218
+ 670:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 671:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   SET_BIT(Device->PCR, FMC_PCR_ECCEN);
+ 708              		.loc 1 671 3 view .LVU219
+ 709 0000 0368     		ldr	r3, [r0]
+ 710 0002 43F04003 		orr	r3, r3, #64
+ 711 0006 0360     		str	r3, [r0]
+ 672:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 673:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 712              		.loc 1 673 3 view .LVU220
+ 674:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 713              		.loc 1 674 1 is_stmt 0 view .LVU221
+ 714 0008 0020     		movs	r0, #0
+ 715              	.LVL45:
+ 716              		.loc 1 674 1 view .LVU222
+ 717 000a 7047     		bx	lr
+ 718              		.cfi_endproc
+ 719              	.LFE338:
+ 721              		.section	.text.FMC_NAND_ECC_Disable,"ax",%progbits
+ 722              		.align	1
+ 723              		.global	FMC_NAND_ECC_Disable
+ 724              		.syntax unified
+ 725              		.thumb
+ 726              		.thumb_func
+ 728              	FMC_NAND_ECC_Disable:
+ 729              	.LVL46:
+ 730              	.LFB339:
+ 675:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 676:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 677:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 678:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Disables dynamically FMC_NAND ECC feature.
+ 679:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 680:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NAND bank number
+ 681:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 682:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 683:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_ECC_Disable(FMC_NAND_TypeDef *Device, uint32_t Bank)
+ 684:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 731              		.loc 1 684 1 is_stmt 1 view -0
+ 732              		.cfi_startproc
+ 733              		@ args = 0, pretend = 0, frame = 0
+ 734              		@ frame_needed = 0, uses_anonymous_args = 0
+ 735              		@ link register save eliminated.
+ 685:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ARM GAS  /tmp/ccADz4v2.s 			page 26
+
+
+ 686:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 736              		.loc 1 686 3 view .LVU224
+ 687:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Bank));
+ 737              		.loc 1 687 3 view .LVU225
+ 688:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 689:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Disable ECC feature */
+ 690:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning if no assert_param check */
+ 691:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Bank);
+ 738              		.loc 1 691 3 view .LVU226
+ 692:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 693:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   CLEAR_BIT(Device->PCR, FMC_PCR_ECCEN);
+ 739              		.loc 1 693 3 view .LVU227
+ 740 0000 0368     		ldr	r3, [r0]
+ 741 0002 23F04003 		bic	r3, r3, #64
+ 742 0006 0360     		str	r3, [r0]
+ 694:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 695:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 743              		.loc 1 695 3 view .LVU228
+ 696:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 744              		.loc 1 696 1 is_stmt 0 view .LVU229
+ 745 0008 0020     		movs	r0, #0
+ 746              	.LVL47:
+ 747              		.loc 1 696 1 view .LVU230
+ 748 000a 7047     		bx	lr
+ 749              		.cfi_endproc
+ 750              	.LFE339:
+ 752              		.section	.text.FMC_NAND_GetECC,"ax",%progbits
+ 753              		.align	1
+ 754              		.global	FMC_NAND_GetECC
+ 755              		.syntax unified
+ 756              		.thumb
+ 757              		.thumb_func
+ 759              	FMC_NAND_GetECC:
+ 760              	.LVL48:
+ 761              	.LFB340:
+ 697:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 698:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 699:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Disables dynamically FMC_NAND ECC feature.
+ 700:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to NAND device instance
+ 701:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  ECCval Pointer to ECC value
+ 702:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank NAND bank number
+ 703:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timeout Timeout wait value
+ 704:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 705:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 706:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_NAND_GetECC(FMC_NAND_TypeDef *Device, uint32_t *ECCval, uint32_t Bank, uint32
+ 707:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 762              		.loc 1 707 1 is_stmt 1 view -0
+ 763              		.cfi_startproc
+ 764              		@ args = 0, pretend = 0, frame = 0
+ 765              		@ frame_needed = 0, uses_anonymous_args = 0
+ 766              		.loc 1 707 1 is_stmt 0 view .LVU232
+ 767 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 768              	.LCFI8:
+ 769              		.cfi_def_cfa_offset 24
+ 770              		.cfi_offset 3, -24
+ 771              		.cfi_offset 4, -20
+ 772              		.cfi_offset 5, -16
+ARM GAS  /tmp/ccADz4v2.s 			page 27
+
+
+ 773              		.cfi_offset 6, -12
+ 774              		.cfi_offset 7, -8
+ 775              		.cfi_offset 14, -4
+ 776 0002 0446     		mov	r4, r0
+ 777 0004 0E46     		mov	r6, r1
+ 778 0006 1D46     		mov	r5, r3
+ 708:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   uint32_t tickstart;
+ 779              		.loc 1 708 3 is_stmt 1 view .LVU233
+ 709:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 710:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 711:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_DEVICE(Device));
+ 780              		.loc 1 711 3 view .LVU234
+ 712:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_NAND_BANK(Bank));
+ 781              		.loc 1 712 3 view .LVU235
+ 713:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 714:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Get tick */
+ 715:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   tickstart = HAL_GetTick();
+ 782              		.loc 1 715 3 view .LVU236
+ 783              		.loc 1 715 15 is_stmt 0 view .LVU237
+ 784 0008 FFF7FEFF 		bl	HAL_GetTick
+ 785              	.LVL49:
+ 786              		.loc 1 715 15 view .LVU238
+ 787 000c 0746     		mov	r7, r0
+ 788              	.LVL50:
+ 716:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 717:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Wait until FIFO is empty */
+ 718:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   while (__FMC_NAND_GET_FLAG(Device, Bank, FMC_FLAG_FEMPT) == RESET)
+ 789              		.loc 1 718 3 is_stmt 1 view .LVU239
+ 790              	.L40:
+ 791              		.loc 1 718 60 view .LVU240
+ 792              		.loc 1 718 10 is_stmt 0 view .LVU241
+ 793 000e 6268     		ldr	r2, [r4, #4]
+ 794              		.loc 1 718 60 view .LVU242
+ 795 0010 12F0400F 		tst	r2, #64
+ 796 0014 0BD1     		bne	.L46
+ 719:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 720:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     /* Check for the Timeout */
+ 721:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     if (Timeout != HAL_MAX_DELAY)
+ 797              		.loc 1 721 5 is_stmt 1 view .LVU243
+ 798              		.loc 1 721 8 is_stmt 0 view .LVU244
+ 799 0016 B5F1FF3F 		cmp	r5, #-1
+ 800 001a F8D0     		beq	.L40
+ 722:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     {
+ 723:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****       if (((HAL_GetTick() - tickstart) > Timeout) || (Timeout == 0U))
+ 801              		.loc 1 723 7 is_stmt 1 view .LVU245
+ 802              		.loc 1 723 13 is_stmt 0 view .LVU246
+ 803 001c FFF7FEFF 		bl	HAL_GetTick
+ 804              	.LVL51:
+ 805              		.loc 1 723 27 view .LVU247
+ 806 0020 C01B     		subs	r0, r0, r7
+ 807              		.loc 1 723 10 view .LVU248
+ 808 0022 A842     		cmp	r0, r5
+ 809 0024 07D8     		bhi	.L43
+ 810              		.loc 1 723 51 discriminator 1 view .LVU249
+ 811 0026 002D     		cmp	r5, #0
+ 812 0028 F1D1     		bne	.L40
+ 724:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****       {
+ARM GAS  /tmp/ccADz4v2.s 			page 28
+
+
+ 725:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         return HAL_TIMEOUT;
+ 813              		.loc 1 725 16 view .LVU250
+ 814 002a 0320     		movs	r0, #3
+ 815 002c 02E0     		b	.L41
+ 816              	.L46:
+ 726:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****       }
+ 727:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     }
+ 728:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 729:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 730:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning if no assert_param check */
+ 731:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Bank);
+ 817              		.loc 1 731 3 is_stmt 1 view .LVU251
+ 732:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 733:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Get the ECCR register value */
+ 734:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *ECCval = (uint32_t)Device->ECCR;
+ 818              		.loc 1 734 3 view .LVU252
+ 819              		.loc 1 734 29 is_stmt 0 view .LVU253
+ 820 002e 6369     		ldr	r3, [r4, #20]
+ 821              		.loc 1 734 11 view .LVU254
+ 822 0030 3360     		str	r3, [r6]
+ 735:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 736:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 823              		.loc 1 736 3 is_stmt 1 view .LVU255
+ 824              		.loc 1 736 10 is_stmt 0 view .LVU256
+ 825 0032 0020     		movs	r0, #0
+ 826              	.L41:
+ 737:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 827              		.loc 1 737 1 view .LVU257
+ 828 0034 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 829              	.LVL52:
+ 830              	.L43:
+ 725:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****       }
+ 831              		.loc 1 725 16 view .LVU258
+ 832 0036 0320     		movs	r0, #3
+ 833 0038 FCE7     		b	.L41
+ 834              		.cfi_endproc
+ 835              	.LFE340:
+ 837              		.section	.text.FMC_SDRAM_Init,"ax",%progbits
+ 838              		.align	1
+ 839              		.global	FMC_SDRAM_Init
+ 840              		.syntax unified
+ 841              		.thumb
+ 842              		.thumb_func
+ 844              	FMC_SDRAM_Init:
+ 845              	.LVL53:
+ 846              	.LFB341:
+ 738:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 739:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 740:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ 741:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 742:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 743:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 744:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 745:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @defgroup FMC_LL_SDRAM
+ 746:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief    SDRAM Controller functions
+ 747:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 748:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   @verbatim
+ARM GAS  /tmp/ccADz4v2.s 			page 29
+
+
+ 749:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 750:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                      ##### How to use SDRAM device driver #####
+ 751:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 752:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 753:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This driver contains a set of APIs to interface with the FMC SDRAM banks in order
+ 754:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     to run the SDRAM external devices.
+ 755:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 756:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC SDRAM bank reset using the function FMC_SDRAM_DeInit()
+ 757:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC SDRAM bank control configuration using the function FMC_SDRAM_Init()
+ 758:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC SDRAM bank timing configuration using the function FMC_SDRAM_Timing_Init()
+ 759:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC SDRAM bank enable/disable write operation using the functions
+ 760:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****         FMC_SDRAM_WriteOperation_Enable()/FMC_SDRAM_WriteOperation_Disable()
+ 761:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) FMC SDRAM bank send command using the function FMC_SDRAM_SendCommand()
+ 762:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 763:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 764:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 765:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 766:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 767:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @addtogroup FMC_LL_SDRAM_Private_Functions_Group1
+ 768:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *  @brief    Initialization and Configuration functions
+ 769:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 770:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @verbatim
+ 771:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 772:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****               ##### Initialization and de_initialization functions #####
+ 773:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 774:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 775:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This section provides functions allowing to:
+ 776:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) Initialize and configure the FMC SDRAM interface
+ 777:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) De-initialize the FMC SDRAM interface
+ 778:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     (+) Configure the FMC clock and associated GPIOs
+ 779:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 780:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 781:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 782:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 783:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 784:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 785:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initializes the FMC_SDRAM device according to the specified
+ 786:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         control parameters in the FMC_SDRAM_InitTypeDef
+ 787:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+ 788:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Init Pointer to SDRAM Initialization structure
+ 789:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 790:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 791:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_Init(FMC_SDRAM_TypeDef *Device, FMC_SDRAM_InitTypeDef *Init)
+ 792:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 847              		.loc 1 792 1 is_stmt 1 view -0
+ 848              		.cfi_startproc
+ 849              		@ args = 0, pretend = 0, frame = 0
+ 850              		@ frame_needed = 0, uses_anonymous_args = 0
+ 851              		@ link register save eliminated.
+ 852              		.loc 1 792 1 is_stmt 0 view .LVU260
+ 853 0000 10B4     		push	{r4}
+ 854              	.LCFI9:
+ 855              		.cfi_def_cfa_offset 4
+ 856              		.cfi_offset 4, -4
+ 793:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 794:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 857              		.loc 1 794 3 is_stmt 1 view .LVU261
+ARM GAS  /tmp/ccADz4v2.s 			page 30
+
+
+ 795:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_BANK(Init->SDBank));
+ 858              		.loc 1 795 3 view .LVU262
+ 796:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_COLUMNBITS_NUMBER(Init->ColumnBitsNumber));
+ 859              		.loc 1 796 3 view .LVU263
+ 797:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ROWBITS_NUMBER(Init->RowBitsNumber));
+ 860              		.loc 1 797 3 view .LVU264
+ 798:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDMEMORY_WIDTH(Init->MemoryDataWidth));
+ 861              		.loc 1 798 3 view .LVU265
+ 799:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_INTERNALBANK_NUMBER(Init->InternalBankNumber));
+ 862              		.loc 1 799 3 view .LVU266
+ 800:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_CAS_LATENCY(Init->CASLatency));
+ 863              		.loc 1 800 3 view .LVU267
+ 801:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WRITE_PROTECTION(Init->WriteProtection));
+ 864              		.loc 1 801 3 view .LVU268
+ 802:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDCLOCK_PERIOD(Init->SDClockPeriod));
+ 865              		.loc 1 802 3 view .LVU269
+ 803:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_READ_BURST(Init->ReadBurst));
+ 866              		.loc 1 803 3 view .LVU270
+ 804:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_READPIPE_DELAY(Init->ReadPipeDelay));
+ 867              		.loc 1 804 3 view .LVU271
+ 805:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 806:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set SDRAM bank configuration parameters */
+ 807:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (Init->SDBank == FMC_SDRAM_BANK1)
+ 868              		.loc 1 807 3 view .LVU272
+ 869              		.loc 1 807 11 is_stmt 0 view .LVU273
+ 870 0002 0B68     		ldr	r3, [r1]
+ 871              		.loc 1 807 6 view .LVU274
+ 872 0004 CBB9     		cbnz	r3, .L48
+ 808:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 809:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->SDCR[FMC_SDRAM_BANK1],
+ 873              		.loc 1 809 5 is_stmt 1 view .LVU275
+ 874 0006 0368     		ldr	r3, [r0]
+ 875 0008 194A     		ldr	r2, .L51
+ 876 000a 1A40     		ands	r2, r2, r3
+ 877 000c 4B68     		ldr	r3, [r1, #4]
+ 878 000e 8C68     		ldr	r4, [r1, #8]
+ 879 0010 2343     		orrs	r3, r3, r4
+ 880 0012 CC68     		ldr	r4, [r1, #12]
+ 881 0014 2343     		orrs	r3, r3, r4
+ 882 0016 0C69     		ldr	r4, [r1, #16]
+ 883 0018 2343     		orrs	r3, r3, r4
+ 884 001a 4C69     		ldr	r4, [r1, #20]
+ 885 001c 2343     		orrs	r3, r3, r4
+ 886 001e 8C69     		ldr	r4, [r1, #24]
+ 887 0020 2343     		orrs	r3, r3, r4
+ 888 0022 CC69     		ldr	r4, [r1, #28]
+ 889 0024 2343     		orrs	r3, r3, r4
+ 890 0026 0C6A     		ldr	r4, [r1, #32]
+ 891 0028 2343     		orrs	r3, r3, r4
+ 892 002a 496A     		ldr	r1, [r1, #36]
+ 893              	.LVL54:
+ 894              		.loc 1 809 5 is_stmt 0 view .LVU276
+ 895 002c 0B43     		orrs	r3, r3, r1
+ 896 002e 1A43     		orrs	r2, r2, r3
+ 897 0030 0260     		str	r2, [r0]
+ 898              	.L49:
+ 810:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDCR_CLEAR_MASK,
+ARM GAS  /tmp/ccADz4v2.s 			page 31
+
+
+ 811:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (Init->ColumnBitsNumber   |
+ 812:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->RowBitsNumber      |
+ 813:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->MemoryDataWidth    |
+ 814:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->InternalBankNumber |
+ 815:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->CASLatency         |
+ 816:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->WriteProtection    |
+ 817:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->SDClockPeriod      |
+ 818:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->ReadBurst          |
+ 819:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->ReadPipeDelay));
+ 820:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 821:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   else /* FMC_Bank2_SDRAM */
+ 822:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 823:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->SDCR[FMC_SDRAM_BANK1],
+ 824:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDCRx_SDCLK           |
+ 825:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDCRx_RBURST          |
+ 826:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDCRx_RPIPE,
+ 827:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (Init->SDClockPeriod      |
+ 828:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->ReadBurst          |
+ 829:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->ReadPipeDelay));
+ 830:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 831:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->SDCR[FMC_SDRAM_BANK2],
+ 832:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDCR_CLEAR_MASK,
+ 833:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (Init->ColumnBitsNumber   |
+ 834:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->RowBitsNumber      |
+ 835:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->MemoryDataWidth    |
+ 836:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->InternalBankNumber |
+ 837:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->CASLatency         |
+ 838:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 Init->WriteProtection));
+ 839:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 840:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 841:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 899              		.loc 1 841 3 is_stmt 1 view .LVU277
+ 842:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 900              		.loc 1 842 1 is_stmt 0 view .LVU278
+ 901 0032 0020     		movs	r0, #0
+ 902              	.LVL55:
+ 903              		.loc 1 842 1 view .LVU279
+ 904 0034 5DF8044B 		ldr	r4, [sp], #4
+ 905              	.LCFI10:
+ 906              		.cfi_remember_state
+ 907              		.cfi_restore 4
+ 908              		.cfi_def_cfa_offset 0
+ 909 0038 7047     		bx	lr
+ 910              	.LVL56:
+ 911              	.L48:
+ 912              	.LCFI11:
+ 913              		.cfi_restore_state
+ 823:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDCRx_SDCLK           |
+ 914              		.loc 1 823 5 is_stmt 1 view .LVU280
+ 915 003a 0368     		ldr	r3, [r0]
+ 916 003c 23F4F843 		bic	r3, r3, #31744
+ 917 0040 CA69     		ldr	r2, [r1, #28]
+ 918 0042 0C6A     		ldr	r4, [r1, #32]
+ 919 0044 2243     		orrs	r2, r2, r4
+ 920 0046 4C6A     		ldr	r4, [r1, #36]
+ 921 0048 2243     		orrs	r2, r2, r4
+ 922 004a 1343     		orrs	r3, r3, r2
+ARM GAS  /tmp/ccADz4v2.s 			page 32
+
+
+ 923 004c 0360     		str	r3, [r0]
+ 831:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDCR_CLEAR_MASK,
+ 924              		.loc 1 831 5 view .LVU281
+ 925 004e 4368     		ldr	r3, [r0, #4]
+ 926 0050 074A     		ldr	r2, .L51
+ 927 0052 1A40     		ands	r2, r2, r3
+ 928 0054 4B68     		ldr	r3, [r1, #4]
+ 929 0056 8C68     		ldr	r4, [r1, #8]
+ 930 0058 2343     		orrs	r3, r3, r4
+ 931 005a CC68     		ldr	r4, [r1, #12]
+ 932 005c 2343     		orrs	r3, r3, r4
+ 933 005e 0C69     		ldr	r4, [r1, #16]
+ 934 0060 2343     		orrs	r3, r3, r4
+ 935 0062 4C69     		ldr	r4, [r1, #20]
+ 936 0064 2343     		orrs	r3, r3, r4
+ 937 0066 8969     		ldr	r1, [r1, #24]
+ 938              	.LVL57:
+ 831:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDCR_CLEAR_MASK,
+ 939              		.loc 1 831 5 is_stmt 0 view .LVU282
+ 940 0068 0B43     		orrs	r3, r3, r1
+ 941 006a 1A43     		orrs	r2, r2, r3
+ 942 006c 4260     		str	r2, [r0, #4]
+ 943 006e E0E7     		b	.L49
+ 944              	.L52:
+ 945              		.align	2
+ 946              	.L51:
+ 947 0070 0080FFFF 		.word	-32768
+ 948              		.cfi_endproc
+ 949              	.LFE341:
+ 951              		.section	.text.FMC_SDRAM_Timing_Init,"ax",%progbits
+ 952              		.align	1
+ 953              		.global	FMC_SDRAM_Timing_Init
+ 954              		.syntax unified
+ 955              		.thumb
+ 956              		.thumb_func
+ 958              	FMC_SDRAM_Timing_Init:
+ 959              	.LVL58:
+ 960              	.LFB342:
+ 843:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 844:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 845:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 846:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Initializes the FMC_SDRAM device timing according to the specified
+ 847:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         parameters in the FMC_SDRAM_TimingTypeDef
+ 848:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+ 849:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timing Pointer to SDRAM Timing structure
+ 850:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank SDRAM bank number
+ 851:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 852:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 853:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_Timing_Init(FMC_SDRAM_TypeDef *Device, FMC_SDRAM_TimingTypeDef *Timing,
+ 854:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 961              		.loc 1 854 1 is_stmt 1 view -0
+ 962              		.cfi_startproc
+ 963              		@ args = 0, pretend = 0, frame = 0
+ 964              		@ frame_needed = 0, uses_anonymous_args = 0
+ 965              		@ link register save eliminated.
+ 966              		.loc 1 854 1 is_stmt 0 view .LVU284
+ 967 0000 10B4     		push	{r4}
+ARM GAS  /tmp/ccADz4v2.s 			page 33
+
+
+ 968              	.LCFI12:
+ 969              		.cfi_def_cfa_offset 4
+ 970              		.cfi_offset 4, -4
+ 855:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 856:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 971              		.loc 1 856 3 is_stmt 1 view .LVU285
+ 857:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_LOADTOACTIVE_DELAY(Timing->LoadToActiveDelay));
+ 972              		.loc 1 857 3 view .LVU286
+ 858:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_EXITSELFREFRESH_DELAY(Timing->ExitSelfRefreshDelay));
+ 973              		.loc 1 858 3 view .LVU287
+ 859:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SELFREFRESH_TIME(Timing->SelfRefreshTime));
+ 974              		.loc 1 859 3 view .LVU288
+ 860:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_ROWCYCLE_DELAY(Timing->RowCycleDelay));
+ 975              		.loc 1 860 3 view .LVU289
+ 861:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_WRITE_RECOVERY_TIME(Timing->WriteRecoveryTime));
+ 976              		.loc 1 861 3 view .LVU290
+ 862:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_RP_DELAY(Timing->RPDelay));
+ 977              		.loc 1 862 3 view .LVU291
+ 863:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_RCD_DELAY(Timing->RCDDelay));
+ 978              		.loc 1 863 3 view .LVU292
+ 864:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_BANK(Bank));
+ 979              		.loc 1 864 3 view .LVU293
+ 865:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 866:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set SDRAM device timing parameters */
+ 867:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (Bank == FMC_SDRAM_BANK1)
+ 980              		.loc 1 867 3 view .LVU294
+ 981              		.loc 1 867 6 is_stmt 0 view .LVU295
+ 982 0002 3ABB     		cbnz	r2, .L54
+ 868:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 869:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->SDTR[FMC_SDRAM_BANK1],
+ 983              		.loc 1 869 5 is_stmt 1 view .LVU296
+ 984 0004 8268     		ldr	r2, [r0, #8]
+ 985              	.LVL59:
+ 986              		.loc 1 869 5 is_stmt 0 view .LVU297
+ 987 0006 02F07042 		and	r2, r2, #-268435456
+ 988 000a 0B68     		ldr	r3, [r1]
+ 989 000c 013B     		subs	r3, r3, #1
+ 990 000e 4C68     		ldr	r4, [r1, #4]
+ 991 0010 04F1FF3C 		add	ip, r4, #-1
+ 992 0014 43EA0C13 		orr	r3, r3, ip, lsl #4
+ 993 0018 8C68     		ldr	r4, [r1, #8]
+ 994 001a 04F1FF3C 		add	ip, r4, #-1
+ 995 001e 43EA0C23 		orr	r3, r3, ip, lsl #8
+ 996 0022 CC68     		ldr	r4, [r1, #12]
+ 997 0024 04F1FF3C 		add	ip, r4, #-1
+ 998 0028 43EA0C33 		orr	r3, r3, ip, lsl #12
+ 999 002c 0C69     		ldr	r4, [r1, #16]
+ 1000 002e 04F1FF3C 		add	ip, r4, #-1
+ 1001 0032 43EA0C43 		orr	r3, r3, ip, lsl #16
+ 1002 0036 4C69     		ldr	r4, [r1, #20]
+ 1003 0038 04F1FF3C 		add	ip, r4, #-1
+ 1004 003c 43EA0C53 		orr	r3, r3, ip, lsl #20
+ 1005 0040 8969     		ldr	r1, [r1, #24]
+ 1006              	.LVL60:
+ 1007              		.loc 1 869 5 view .LVU298
+ 1008 0042 0139     		subs	r1, r1, #1
+ 1009 0044 43EA0163 		orr	r3, r3, r1, lsl #24
+ARM GAS  /tmp/ccADz4v2.s 			page 34
+
+
+ 1010 0048 1343     		orrs	r3, r3, r2
+ 1011 004a 8360     		str	r3, [r0, #8]
+ 1012              	.L55:
+ 870:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDTR_CLEAR_MASK,
+ 871:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (((Timing->LoadToActiveDelay) - 1U)                                      |
+ 872:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->ExitSelfRefreshDelay) - 1U) << FMC_SDTRx_TXSR_Pos) |
+ 873:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->SelfRefreshTime) - 1U)      << FMC_SDTRx_TRAS_Pos) |
+ 874:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->RowCycleDelay) - 1U)        << FMC_SDTRx_TRC_Pos)  |
+ 875:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->WriteRecoveryTime) - 1U)    << FMC_SDTRx_TWR_Pos)  |
+ 876:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->RPDelay) - 1U)              << FMC_SDTRx_TRP_Pos)  |
+ 877:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->RCDDelay) - 1U)             << FMC_SDTRx_TRCD_Pos)));
+ 878:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 879:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   else /* FMC_Bank2_SDRAM */
+ 880:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+ 881:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->SDTR[FMC_SDRAM_BANK1],
+ 882:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDTRx_TRC |
+ 883:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDTRx_TRP,
+ 884:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (((Timing->RowCycleDelay) - 1U)         << FMC_SDTRx_TRC_Pos)  |
+ 885:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (((Timing->RPDelay) - 1U)               << FMC_SDTRx_TRP_Pos));
+ 886:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 887:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     MODIFY_REG(Device->SDTR[FMC_SDRAM_BANK2],
+ 888:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDTR_CLEAR_MASK,
+ 889:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                (((Timing->LoadToActiveDelay) - 1U)                                      |
+ 890:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->ExitSelfRefreshDelay) - 1U) << FMC_SDTRx_TXSR_Pos) |
+ 891:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->SelfRefreshTime) - 1U)      << FMC_SDTRx_TRAS_Pos) |
+ 892:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->WriteRecoveryTime) - 1U)    << FMC_SDTRx_TWR_Pos)  |
+ 893:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                 (((Timing->RCDDelay) - 1U)             << FMC_SDTRx_TRCD_Pos)));
+ 894:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+ 895:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 896:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1013              		.loc 1 896 3 is_stmt 1 view .LVU299
+ 897:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1014              		.loc 1 897 1 is_stmt 0 view .LVU300
+ 1015 004c 0020     		movs	r0, #0
+ 1016              	.LVL61:
+ 1017              		.loc 1 897 1 view .LVU301
+ 1018 004e 5DF8044B 		ldr	r4, [sp], #4
+ 1019              	.LCFI13:
+ 1020              		.cfi_remember_state
+ 1021              		.cfi_restore 4
+ 1022              		.cfi_def_cfa_offset 0
+ 1023 0052 7047     		bx	lr
+ 1024              	.LVL62:
+ 1025              	.L54:
+ 1026              	.LCFI14:
+ 1027              		.cfi_restore_state
+ 881:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDTRx_TRC |
+ 1028              		.loc 1 881 5 is_stmt 1 view .LVU302
+ 1029 0054 8368     		ldr	r3, [r0, #8]
+ 1030 0056 134A     		ldr	r2, .L57
+ 1031              	.LVL63:
+ 881:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                FMC_SDTRx_TRC |
+ 1032              		.loc 1 881 5 is_stmt 0 view .LVU303
+ 1033 0058 1A40     		ands	r2, r2, r3
+ 1034 005a CB68     		ldr	r3, [r1, #12]
+ 1035 005c 03F1FF3C 		add	ip, r3, #-1
+ 1036 0060 4B69     		ldr	r3, [r1, #20]
+ARM GAS  /tmp/ccADz4v2.s 			page 35
+
+
+ 1037 0062 013B     		subs	r3, r3, #1
+ 1038 0064 1B05     		lsls	r3, r3, #20
+ 1039 0066 43EA0C33 		orr	r3, r3, ip, lsl #12
+ 1040 006a 1A43     		orrs	r2, r2, r3
+ 1041 006c 8260     		str	r2, [r0, #8]
+ 887:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDTR_CLEAR_MASK,
+ 1042              		.loc 1 887 5 is_stmt 1 view .LVU304
+ 1043 006e C268     		ldr	r2, [r0, #12]
+ 1044 0070 02F07042 		and	r2, r2, #-268435456
+ 1045 0074 0B68     		ldr	r3, [r1]
+ 1046 0076 013B     		subs	r3, r3, #1
+ 1047 0078 4C68     		ldr	r4, [r1, #4]
+ 1048 007a 04F1FF3C 		add	ip, r4, #-1
+ 1049 007e 43EA0C13 		orr	r3, r3, ip, lsl #4
+ 1050 0082 8C68     		ldr	r4, [r1, #8]
+ 1051 0084 04F1FF3C 		add	ip, r4, #-1
+ 1052 0088 43EA0C23 		orr	r3, r3, ip, lsl #8
+ 1053 008c 0C69     		ldr	r4, [r1, #16]
+ 1054 008e 04F1FF3C 		add	ip, r4, #-1
+ 1055 0092 43EA0C43 		orr	r3, r3, ip, lsl #16
+ 1056 0096 8969     		ldr	r1, [r1, #24]
+ 1057              	.LVL64:
+ 887:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                SDTR_CLEAR_MASK,
+ 1058              		.loc 1 887 5 is_stmt 0 view .LVU305
+ 1059 0098 0139     		subs	r1, r1, #1
+ 1060 009a 43EA0163 		orr	r3, r3, r1, lsl #24
+ 1061 009e 1343     		orrs	r3, r3, r2
+ 1062 00a0 C360     		str	r3, [r0, #12]
+ 1063 00a2 D3E7     		b	.L55
+ 1064              	.L58:
+ 1065              		.align	2
+ 1066              	.L57:
+ 1067 00a4 FF0F0FFF 		.word	-15790081
+ 1068              		.cfi_endproc
+ 1069              	.LFE342:
+ 1071              		.section	.text.FMC_SDRAM_DeInit,"ax",%progbits
+ 1072              		.align	1
+ 1073              		.global	FMC_SDRAM_DeInit
+ 1074              		.syntax unified
+ 1075              		.thumb
+ 1076              		.thumb_func
+ 1078              	FMC_SDRAM_DeInit:
+ 1079              	.LVL65:
+ 1080              	.LFB343:
+ 898:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 899:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 900:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  DeInitializes the FMC_SDRAM peripheral
+ 901:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+ 902:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 903:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 904:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_DeInit(FMC_SDRAM_TypeDef *Device, uint32_t Bank)
+ 905:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1081              		.loc 1 905 1 is_stmt 1 view -0
+ 1082              		.cfi_startproc
+ 1083              		@ args = 0, pretend = 0, frame = 0
+ 1084              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1085              		@ link register save eliminated.
+ARM GAS  /tmp/ccADz4v2.s 			page 36
+
+
+ 1086              		.loc 1 905 1 is_stmt 0 view .LVU307
+ 1087 0000 0346     		mov	r3, r0
+ 906:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 907:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1088              		.loc 1 907 3 is_stmt 1 view .LVU308
+ 908:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_BANK(Bank));
+ 1089              		.loc 1 908 3 view .LVU309
+ 909:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 910:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* De-initialize the SDRAM device */
+ 911:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   Device->SDCR[Bank] = 0x000002D0U;
+ 1090              		.loc 1 911 3 view .LVU310
+ 1091              		.loc 1 911 22 is_stmt 0 view .LVU311
+ 1092 0002 4FF43472 		mov	r2, #720
+ 1093 0006 40F82120 		str	r2, [r0, r1, lsl #2]
+ 912:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   Device->SDTR[Bank] = 0x0FFFFFFFU;
+ 1094              		.loc 1 912 3 is_stmt 1 view .LVU312
+ 1095              		.loc 1 912 22 is_stmt 0 view .LVU313
+ 1096 000a 0231     		adds	r1, r1, #2
+ 1097              	.LVL66:
+ 1098              		.loc 1 912 22 view .LVU314
+ 1099 000c 6FF07042 		mvn	r2, #-268435456
+ 1100 0010 40F82120 		str	r2, [r0, r1, lsl #2]
+ 913:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   Device->SDCMR      = 0x00000000U;
+ 1101              		.loc 1 913 3 is_stmt 1 view .LVU315
+ 1102              		.loc 1 913 22 is_stmt 0 view .LVU316
+ 1103 0014 0020     		movs	r0, #0
+ 1104              	.LVL67:
+ 1105              		.loc 1 913 22 view .LVU317
+ 1106 0016 1861     		str	r0, [r3, #16]
+ 914:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   Device->SDRTR      = 0x00000000U;
+ 1107              		.loc 1 914 3 is_stmt 1 view .LVU318
+ 1108              		.loc 1 914 22 is_stmt 0 view .LVU319
+ 1109 0018 5861     		str	r0, [r3, #20]
+ 915:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   Device->SDSR       = 0x00000000U;
+ 1110              		.loc 1 915 3 is_stmt 1 view .LVU320
+ 1111              		.loc 1 915 22 is_stmt 0 view .LVU321
+ 1112 001a 9861     		str	r0, [r3, #24]
+ 916:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 917:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1113              		.loc 1 917 3 is_stmt 1 view .LVU322
+ 918:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1114              		.loc 1 918 1 is_stmt 0 view .LVU323
+ 1115 001c 7047     		bx	lr
+ 1116              		.cfi_endproc
+ 1117              	.LFE343:
+ 1119              		.section	.text.FMC_SDRAM_WriteProtection_Enable,"ax",%progbits
+ 1120              		.align	1
+ 1121              		.global	FMC_SDRAM_WriteProtection_Enable
+ 1122              		.syntax unified
+ 1123              		.thumb
+ 1124              		.thumb_func
+ 1126              	FMC_SDRAM_WriteProtection_Enable:
+ 1127              	.LVL68:
+ 1128              	.LFB344:
+ 919:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 920:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 921:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @}
+ARM GAS  /tmp/ccADz4v2.s 			page 37
+
+
+ 922:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 923:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 924:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /** @addtogroup FMC_LL_SDRAMPrivate_Functions_Group2
+ 925:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *  @brief   management functions
+ 926:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *
+ 927:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @verbatim
+ 928:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 929:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                       ##### FMC_SDRAM Control functions #####
+ 930:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   ==============================================================================
+ 931:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   [..]
+ 932:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     This subsection provides a set of functions allowing to control dynamically
+ 933:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     the FMC SDRAM interface.
+ 934:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 935:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** @endverbatim
+ 936:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @{
+ 937:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 938:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 939:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 940:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Enables dynamically FMC_SDRAM write protection.
+ 941:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+ 942:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank SDRAM bank number
+ 943:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 944:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 945:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_WriteProtection_Enable(FMC_SDRAM_TypeDef *Device, uint32_t Bank)
+ 946:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1129              		.loc 1 946 1 is_stmt 1 view -0
+ 1130              		.cfi_startproc
+ 1131              		@ args = 0, pretend = 0, frame = 0
+ 1132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1133              		@ link register save eliminated.
+ 947:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 948:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1134              		.loc 1 948 3 view .LVU325
+ 949:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_BANK(Bank));
+ 1135              		.loc 1 949 3 view .LVU326
+ 950:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 951:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Enable write protection */
+ 952:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   SET_BIT(Device->SDCR[Bank], FMC_SDRAM_WRITE_PROTECTION_ENABLE);
+ 1136              		.loc 1 952 3 view .LVU327
+ 1137 0000 50F82130 		ldr	r3, [r0, r1, lsl #2]
+ 1138 0004 43F40073 		orr	r3, r3, #512
+ 1139 0008 40F82130 		str	r3, [r0, r1, lsl #2]
+ 953:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 954:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1140              		.loc 1 954 3 view .LVU328
+ 955:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1141              		.loc 1 955 1 is_stmt 0 view .LVU329
+ 1142 000c 0020     		movs	r0, #0
+ 1143              	.LVL69:
+ 1144              		.loc 1 955 1 view .LVU330
+ 1145 000e 7047     		bx	lr
+ 1146              		.cfi_endproc
+ 1147              	.LFE344:
+ 1149              		.section	.text.FMC_SDRAM_WriteProtection_Disable,"ax",%progbits
+ 1150              		.align	1
+ 1151              		.global	FMC_SDRAM_WriteProtection_Disable
+ 1152              		.syntax unified
+ARM GAS  /tmp/ccADz4v2.s 			page 38
+
+
+ 1153              		.thumb
+ 1154              		.thumb_func
+ 1156              	FMC_SDRAM_WriteProtection_Disable:
+ 1157              	.LVL70:
+ 1158              	.LFB345:
+ 956:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 957:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 958:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Disables dynamically FMC_SDRAM write protection.
+ 959:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  hsdram FMC_SDRAM handle
+ 960:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL status
+ 961:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 962:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_WriteProtection_Disable(FMC_SDRAM_TypeDef *Device, uint32_t Bank)
+ 963:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1159              		.loc 1 963 1 is_stmt 1 view -0
+ 1160              		.cfi_startproc
+ 1161              		@ args = 0, pretend = 0, frame = 0
+ 1162              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1163              		@ link register save eliminated.
+ 964:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 965:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1164              		.loc 1 965 3 view .LVU332
+ 966:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_BANK(Bank));
+ 1165              		.loc 1 966 3 view .LVU333
+ 967:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 968:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Disable write protection */
+ 969:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   CLEAR_BIT(Device->SDCR[Bank], FMC_SDRAM_WRITE_PROTECTION_ENABLE);
+ 1166              		.loc 1 969 3 view .LVU334
+ 1167 0000 50F82130 		ldr	r3, [r0, r1, lsl #2]
+ 1168 0004 23F40073 		bic	r3, r3, #512
+ 1169 0008 40F82130 		str	r3, [r0, r1, lsl #2]
+ 970:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 971:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1170              		.loc 1 971 3 view .LVU335
+ 972:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1171              		.loc 1 972 1 is_stmt 0 view .LVU336
+ 1172 000c 0020     		movs	r0, #0
+ 1173              	.LVL71:
+ 1174              		.loc 1 972 1 view .LVU337
+ 1175 000e 7047     		bx	lr
+ 1176              		.cfi_endproc
+ 1177              	.LFE345:
+ 1179              		.section	.text.FMC_SDRAM_SendCommand,"ax",%progbits
+ 1180              		.align	1
+ 1181              		.global	FMC_SDRAM_SendCommand
+ 1182              		.syntax unified
+ 1183              		.thumb
+ 1184              		.thumb_func
+ 1186              	FMC_SDRAM_SendCommand:
+ 1187              	.LVL72:
+ 1188              	.LFB346:
+ 973:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 974:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+ 975:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Send Command to the FMC SDRAM bank
+ 976:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+ 977:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Command Pointer to SDRAM command structure
+ 978:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timing Pointer to SDRAM Timing structure
+ 979:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Timeout Timeout wait value
+ARM GAS  /tmp/ccADz4v2.s 			page 39
+
+
+ 980:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL state
+ 981:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+ 982:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_SendCommand(FMC_SDRAM_TypeDef *Device, FMC_SDRAM_CommandTypeDef *Comman
+ 983:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1189              		.loc 1 983 1 is_stmt 1 view -0
+ 1190              		.cfi_startproc
+ 1191              		@ args = 0, pretend = 0, frame = 0
+ 1192              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1193              		@ link register save eliminated.
+ 1194              		.loc 1 983 1 is_stmt 0 view .LVU339
+ 1195 0000 10B4     		push	{r4}
+ 1196              	.LCFI15:
+ 1197              		.cfi_def_cfa_offset 4
+ 1198              		.cfi_offset 4, -4
+ 984:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+ 985:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1199              		.loc 1 985 3 is_stmt 1 view .LVU340
+ 986:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_COMMAND_MODE(Command->CommandMode));
+ 1200              		.loc 1 986 3 view .LVU341
+ 987:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_COMMAND_TARGET(Command->CommandTarget));
+ 1201              		.loc 1 987 3 view .LVU342
+ 988:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_AUTOREFRESH_NUMBER(Command->AutoRefreshNumber));
+ 1202              		.loc 1 988 3 view .LVU343
+ 989:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_MODE_REGISTER(Command->ModeRegisterDefinition));
+ 1203              		.loc 1 989 3 view .LVU344
+ 990:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+ 991:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set command register */
+ 992:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   SET_BIT(Device->SDCMR, ((Command->CommandMode)                                                 |
+ 1204              		.loc 1 992 3 view .LVU345
+ 1205 0002 0269     		ldr	r2, [r0, #16]
+ 1206              	.LVL73:
+ 1207              		.loc 1 992 3 is_stmt 0 view .LVU346
+ 1208 0004 0B68     		ldr	r3, [r1]
+ 1209 0006 4C68     		ldr	r4, [r1, #4]
+ 1210 0008 2343     		orrs	r3, r3, r4
+ 1211 000a 8C68     		ldr	r4, [r1, #8]
+ 1212 000c 04F1FF3C 		add	ip, r4, #-1
+ 1213 0010 43EA4C13 		orr	r3, r3, ip, lsl #5
+ 1214 0014 C968     		ldr	r1, [r1, #12]
+ 1215              	.LVL74:
+ 1216              		.loc 1 992 3 view .LVU347
+ 1217 0016 43EA4123 		orr	r3, r3, r1, lsl #9
+ 1218 001a 1343     		orrs	r3, r3, r2
+ 1219 001c 0361     		str	r3, [r0, #16]
+ 993:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                           (Command->CommandTarget)                                               |
+ 994:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                           (((Command->AutoRefreshNumber) - 1U) << FMC_SDCMR_NRFS_Pos)   |
+ 995:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****                           ((Command->ModeRegisterDefinition)   << FMC_SDCMR_MRD_Pos)));
+ 996:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Prevent unused argument(s) compilation warning */
+ 997:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   UNUSED(Timeout);
+ 1220              		.loc 1 997 3 is_stmt 1 view .LVU348
+ 998:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1221              		.loc 1 998 3 view .LVU349
+ 999:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1222              		.loc 1 999 1 is_stmt 0 view .LVU350
+ 1223 001e 0020     		movs	r0, #0
+ 1224              	.LVL75:
+ 1225              		.loc 1 999 1 view .LVU351
+ARM GAS  /tmp/ccADz4v2.s 			page 40
+
+
+ 1226 0020 5DF8044B 		ldr	r4, [sp], #4
+ 1227              	.LCFI16:
+ 1228              		.cfi_restore 4
+ 1229              		.cfi_def_cfa_offset 0
+ 1230 0024 7047     		bx	lr
+ 1231              		.cfi_endproc
+ 1232              	.LFE346:
+ 1234              		.section	.text.FMC_SDRAM_ProgramRefreshRate,"ax",%progbits
+ 1235              		.align	1
+ 1236              		.global	FMC_SDRAM_ProgramRefreshRate
+ 1237              		.syntax unified
+ 1238              		.thumb
+ 1239              		.thumb_func
+ 1241              	FMC_SDRAM_ProgramRefreshRate:
+ 1242              	.LVL76:
+ 1243              	.LFB347:
+1000:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1001:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+1002:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Program the SDRAM Memory Refresh rate.
+1003:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+1004:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  RefreshRate The SDRAM refresh rate value.
+1005:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval HAL state
+1006:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+1007:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_ProgramRefreshRate(FMC_SDRAM_TypeDef *Device, uint32_t RefreshRate)
+1008:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1244              		.loc 1 1008 1 is_stmt 1 view -0
+ 1245              		.cfi_startproc
+ 1246              		@ args = 0, pretend = 0, frame = 0
+ 1247              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1248              		@ link register save eliminated.
+1009:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+1010:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1249              		.loc 1 1010 3 view .LVU353
+1011:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_REFRESH_RATE(RefreshRate));
+ 1250              		.loc 1 1011 3 view .LVU354
+1012:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1013:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set the refresh rate in command register */
+1014:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->SDRTR, FMC_SDRTR_COUNT, (RefreshRate << FMC_SDRTR_COUNT_Pos));
+ 1251              		.loc 1 1014 3 view .LVU355
+ 1252 0000 4269     		ldr	r2, [r0, #20]
+ 1253 0002 034B     		ldr	r3, .L65
+ 1254 0004 1340     		ands	r3, r3, r2
+ 1255 0006 43EA4103 		orr	r3, r3, r1, lsl #1
+ 1256 000a 4361     		str	r3, [r0, #20]
+1015:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1016:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1257              		.loc 1 1016 3 view .LVU356
+1017:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1258              		.loc 1 1017 1 is_stmt 0 view .LVU357
+ 1259 000c 0020     		movs	r0, #0
+ 1260              	.LVL77:
+ 1261              		.loc 1 1017 1 view .LVU358
+ 1262 000e 7047     		bx	lr
+ 1263              	.L66:
+ 1264              		.align	2
+ 1265              	.L65:
+ 1266 0010 01C0FFFF 		.word	-16383
+ARM GAS  /tmp/ccADz4v2.s 			page 41
+
+
+ 1267              		.cfi_endproc
+ 1268              	.LFE347:
+ 1270              		.section	.text.FMC_SDRAM_SetAutoRefreshNumber,"ax",%progbits
+ 1271              		.align	1
+ 1272              		.global	FMC_SDRAM_SetAutoRefreshNumber
+ 1273              		.syntax unified
+ 1274              		.thumb
+ 1275              		.thumb_func
+ 1277              	FMC_SDRAM_SetAutoRefreshNumber:
+ 1278              	.LVL78:
+ 1279              	.LFB348:
+1018:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1019:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+1020:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Set the Number of consecutive SDRAM Memory auto Refresh commands.
+1021:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+1022:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  AutoRefreshNumber Specifies the auto Refresh number.
+1023:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval None
+1024:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+1025:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** HAL_StatusTypeDef FMC_SDRAM_SetAutoRefreshNumber(FMC_SDRAM_TypeDef *Device, uint32_t AutoRefreshNum
+1026:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1280              		.loc 1 1026 1 is_stmt 1 view -0
+ 1281              		.cfi_startproc
+ 1282              		@ args = 0, pretend = 0, frame = 0
+ 1283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1284              		@ link register save eliminated.
+1027:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+1028:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1285              		.loc 1 1028 3 view .LVU360
+1029:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_AUTOREFRESH_NUMBER(AutoRefreshNumber));
+ 1286              		.loc 1 1029 3 view .LVU361
+1030:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1031:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Set the Auto-refresh number in command register */
+1032:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   MODIFY_REG(Device->SDCMR, FMC_SDCMR_NRFS, ((AutoRefreshNumber - 1U) << FMC_SDCMR_NRFS_Pos));
+ 1287              		.loc 1 1032 3 view .LVU362
+ 1288 0000 0369     		ldr	r3, [r0, #16]
+ 1289 0002 23F4F073 		bic	r3, r3, #480
+ 1290 0006 0139     		subs	r1, r1, #1
+ 1291              	.LVL79:
+ 1292              		.loc 1 1032 3 is_stmt 0 view .LVU363
+ 1293 0008 43EA4113 		orr	r3, r3, r1, lsl #5
+ 1294 000c 0361     		str	r3, [r0, #16]
+1033:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1034:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return HAL_OK;
+ 1295              		.loc 1 1034 3 is_stmt 1 view .LVU364
+1035:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1296              		.loc 1 1035 1 is_stmt 0 view .LVU365
+ 1297 000e 0020     		movs	r0, #0
+ 1298              	.LVL80:
+ 1299              		.loc 1 1035 1 view .LVU366
+ 1300 0010 7047     		bx	lr
+ 1301              		.cfi_endproc
+ 1302              	.LFE348:
+ 1304              		.section	.text.FMC_SDRAM_GetModeStatus,"ax",%progbits
+ 1305              		.align	1
+ 1306              		.global	FMC_SDRAM_GetModeStatus
+ 1307              		.syntax unified
+ 1308              		.thumb
+ARM GAS  /tmp/ccADz4v2.s 			page 42
+
+
+ 1309              		.thumb_func
+ 1311              	FMC_SDRAM_GetModeStatus:
+ 1312              	.LVL81:
+ 1313              	.LFB349:
+1036:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1037:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** /**
+1038:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @brief  Returns the indicated FMC SDRAM bank mode status.
+1039:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Device Pointer to SDRAM device instance
+1040:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @param  Bank Defines the FMC SDRAM bank. This parameter can be
+1041:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *                     FMC_Bank1_SDRAM or FMC_Bank2_SDRAM.
+1042:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   * @retval The FMC SDRAM bank mode status, could be on of the following values:
+1043:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         FMC_SDRAM_NORMAL_MODE, FMC_SDRAM_SELF_REFRESH_MODE or
+1044:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   *         FMC_SDRAM_POWER_DOWN_MODE.
+1045:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   */
+1046:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** uint32_t FMC_SDRAM_GetModeStatus(FMC_SDRAM_TypeDef *Device, uint32_t Bank)
+1047:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** {
+ 1314              		.loc 1 1047 1 is_stmt 1 view -0
+ 1315              		.cfi_startproc
+ 1316              		@ args = 0, pretend = 0, frame = 0
+ 1317              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1318              		@ link register save eliminated.
+1048:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   uint32_t tmpreg;
+ 1319              		.loc 1 1048 3 view .LVU368
+1049:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1050:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Check the parameters */
+1051:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_DEVICE(Device));
+ 1320              		.loc 1 1051 3 view .LVU369
+1052:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   assert_param(IS_FMC_SDRAM_BANK(Bank));
+ 1321              		.loc 1 1052 3 view .LVU370
+1053:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1054:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Get the corresponding bank mode */
+1055:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   if (Bank == FMC_SDRAM_BANK1)
+ 1322              		.loc 1 1055 3 view .LVU371
+ 1323              		.loc 1 1055 6 is_stmt 0 view .LVU372
+ 1324 0000 19B9     		cbnz	r1, .L69
+1056:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+1057:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     tmpreg = (uint32_t)(Device->SDSR & FMC_SDSR_MODES1);
+ 1325              		.loc 1 1057 5 is_stmt 1 view .LVU373
+ 1326              		.loc 1 1057 31 is_stmt 0 view .LVU374
+ 1327 0002 8069     		ldr	r0, [r0, #24]
+ 1328              	.LVL82:
+ 1329              		.loc 1 1057 12 view .LVU375
+ 1330 0004 00F00600 		and	r0, r0, #6
+ 1331              	.LVL83:
+ 1332              		.loc 1 1057 12 view .LVU376
+ 1333 0008 7047     		bx	lr
+ 1334              	.LVL84:
+ 1335              	.L69:
+1058:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+1059:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   else
+1060:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   {
+1061:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****     tmpreg = ((uint32_t)(Device->SDSR & FMC_SDSR_MODES2) >> 2U);
+ 1336              		.loc 1 1061 5 is_stmt 1 view .LVU377
+ 1337              		.loc 1 1061 32 is_stmt 0 view .LVU378
+ 1338 000a 8069     		ldr	r0, [r0, #24]
+ 1339              	.LVL85:
+ 1340              		.loc 1 1061 58 view .LVU379
+ARM GAS  /tmp/ccADz4v2.s 			page 43
+
+
+ 1341 000c 8008     		lsrs	r0, r0, #2
+ 1342              		.loc 1 1061 12 view .LVU380
+ 1343 000e 00F00600 		and	r0, r0, #6
+ 1344              	.LVL86:
+1062:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   }
+1063:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** 
+1064:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   /* Return the mode status */
+1065:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c ****   return tmpreg;
+ 1345              		.loc 1 1065 3 is_stmt 1 view .LVU381
+1066:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_fmc.c **** }
+ 1346              		.loc 1 1066 1 is_stmt 0 view .LVU382
+ 1347 0012 7047     		bx	lr
+ 1348              		.cfi_endproc
+ 1349              	.LFE349:
+ 1351              		.text
+ 1352              	.Letext0:
+ 1353              		.file 2 "/home/jyko/Embedded/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 1354              		.file 3 "/home/jyko/Embedded/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 1355              		.file 4 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h"
+ 1356              		.file 5 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h"
+ 1357              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 1358              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_fmc.h"
+ 1359              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+ARM GAS  /tmp/ccADz4v2.s 			page 44
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 stm32h7xx_ll_fmc.c
+     /tmp/ccADz4v2.s:20     .text.FMC_NORSRAM_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:26     .text.FMC_NORSRAM_Init:0000000000000000 FMC_NORSRAM_Init
+     /tmp/ccADz4v2.s:204    .text.FMC_NORSRAM_Init:0000000000000090 $d
+     /tmp/ccADz4v2.s:209    .text.FMC_NORSRAM_DeInit:0000000000000000 $t
+     /tmp/ccADz4v2.s:215    .text.FMC_NORSRAM_DeInit:0000000000000000 FMC_NORSRAM_DeInit
+     /tmp/ccADz4v2.s:264    .text.FMC_NORSRAM_Timing_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:270    .text.FMC_NORSRAM_Timing_Init:0000000000000000 FMC_NORSRAM_Timing_Init
+     /tmp/ccADz4v2.s:354    .text.FMC_NORSRAM_Extended_Timing_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:360    .text.FMC_NORSRAM_Extended_Timing_Init:0000000000000000 FMC_NORSRAM_Extended_Timing_Init
+     /tmp/ccADz4v2.s:433    .text.FMC_NORSRAM_Extended_Timing_Init:0000000000000040 $d
+     /tmp/ccADz4v2.s:438    .text.FMC_NORSRAM_WriteOperation_Enable:0000000000000000 $t
+     /tmp/ccADz4v2.s:444    .text.FMC_NORSRAM_WriteOperation_Enable:0000000000000000 FMC_NORSRAM_WriteOperation_Enable
+     /tmp/ccADz4v2.s:468    .text.FMC_NORSRAM_WriteOperation_Disable:0000000000000000 $t
+     /tmp/ccADz4v2.s:474    .text.FMC_NORSRAM_WriteOperation_Disable:0000000000000000 FMC_NORSRAM_WriteOperation_Disable
+     /tmp/ccADz4v2.s:498    .text.FMC_NAND_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:504    .text.FMC_NAND_Init:0000000000000000 FMC_NAND_Init
+     /tmp/ccADz4v2.s:558    .text.FMC_NAND_Init:0000000000000034 $d
+     /tmp/ccADz4v2.s:563    .text.FMC_NAND_CommonSpace_Timing_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:569    .text.FMC_NAND_CommonSpace_Timing_Init:0000000000000000 FMC_NAND_CommonSpace_Timing_Init
+     /tmp/ccADz4v2.s:606    .text.FMC_NAND_AttributeSpace_Timing_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:612    .text.FMC_NAND_AttributeSpace_Timing_Init:0000000000000000 FMC_NAND_AttributeSpace_Timing_Init
+     /tmp/ccADz4v2.s:649    .text.FMC_NAND_DeInit:0000000000000000 $t
+     /tmp/ccADz4v2.s:655    .text.FMC_NAND_DeInit:0000000000000000 FMC_NAND_DeInit
+     /tmp/ccADz4v2.s:691    .text.FMC_NAND_ECC_Enable:0000000000000000 $t
+     /tmp/ccADz4v2.s:697    .text.FMC_NAND_ECC_Enable:0000000000000000 FMC_NAND_ECC_Enable
+     /tmp/ccADz4v2.s:722    .text.FMC_NAND_ECC_Disable:0000000000000000 $t
+     /tmp/ccADz4v2.s:728    .text.FMC_NAND_ECC_Disable:0000000000000000 FMC_NAND_ECC_Disable
+     /tmp/ccADz4v2.s:753    .text.FMC_NAND_GetECC:0000000000000000 $t
+     /tmp/ccADz4v2.s:759    .text.FMC_NAND_GetECC:0000000000000000 FMC_NAND_GetECC
+     /tmp/ccADz4v2.s:838    .text.FMC_SDRAM_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:844    .text.FMC_SDRAM_Init:0000000000000000 FMC_SDRAM_Init
+     /tmp/ccADz4v2.s:947    .text.FMC_SDRAM_Init:0000000000000070 $d
+     /tmp/ccADz4v2.s:952    .text.FMC_SDRAM_Timing_Init:0000000000000000 $t
+     /tmp/ccADz4v2.s:958    .text.FMC_SDRAM_Timing_Init:0000000000000000 FMC_SDRAM_Timing_Init
+     /tmp/ccADz4v2.s:1067   .text.FMC_SDRAM_Timing_Init:00000000000000a4 $d
+     /tmp/ccADz4v2.s:1072   .text.FMC_SDRAM_DeInit:0000000000000000 $t
+     /tmp/ccADz4v2.s:1078   .text.FMC_SDRAM_DeInit:0000000000000000 FMC_SDRAM_DeInit
+     /tmp/ccADz4v2.s:1120   .text.FMC_SDRAM_WriteProtection_Enable:0000000000000000 $t
+     /tmp/ccADz4v2.s:1126   .text.FMC_SDRAM_WriteProtection_Enable:0000000000000000 FMC_SDRAM_WriteProtection_Enable
+     /tmp/ccADz4v2.s:1150   .text.FMC_SDRAM_WriteProtection_Disable:0000000000000000 $t
+     /tmp/ccADz4v2.s:1156   .text.FMC_SDRAM_WriteProtection_Disable:0000000000000000 FMC_SDRAM_WriteProtection_Disable
+     /tmp/ccADz4v2.s:1180   .text.FMC_SDRAM_SendCommand:0000000000000000 $t
+     /tmp/ccADz4v2.s:1186   .text.FMC_SDRAM_SendCommand:0000000000000000 FMC_SDRAM_SendCommand
+     /tmp/ccADz4v2.s:1235   .text.FMC_SDRAM_ProgramRefreshRate:0000000000000000 $t
+     /tmp/ccADz4v2.s:1241   .text.FMC_SDRAM_ProgramRefreshRate:0000000000000000 FMC_SDRAM_ProgramRefreshRate
+     /tmp/ccADz4v2.s:1266   .text.FMC_SDRAM_ProgramRefreshRate:0000000000000010 $d
+     /tmp/ccADz4v2.s:1271   .text.FMC_SDRAM_SetAutoRefreshNumber:0000000000000000 $t
+     /tmp/ccADz4v2.s:1277   .text.FMC_SDRAM_SetAutoRefreshNumber:0000000000000000 FMC_SDRAM_SetAutoRefreshNumber
+     /tmp/ccADz4v2.s:1305   .text.FMC_SDRAM_GetModeStatus:0000000000000000 $t
+     /tmp/ccADz4v2.s:1311   .text.FMC_SDRAM_GetModeStatus:0000000000000000 FMC_SDRAM_GetModeStatus
+
+UNDEFINED SYMBOLS
+HAL_GetTick

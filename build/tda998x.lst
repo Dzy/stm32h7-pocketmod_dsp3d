@@ -1,0 +1,1959 @@
+ARM GAS  /tmp/ccoWwH9k.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"tda998x.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/tda998x.c"
+  19              		.section	.text.tda19988_testmode,"ax",%progbits
+  20              		.align	1
+  21              		.global	tda19988_testmode
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	tda19988_testmode:
+  27              	.LFB328:
+   1:Core/Src/tda998x.c **** #include <stdint.h>
+   2:Core/Src/tda998x.c **** #include "i2c.h"
+   3:Core/Src/tda998x.c **** #include "ltdc.h"
+   4:Core/Src/tda998x.c **** 
+   5:Core/Src/tda998x.c **** extern LTDC_HandleTypeDef hltdc;
+   6:Core/Src/tda998x.c **** extern const LTDCSYNC_t LTDCSYNC[];
+   7:Core/Src/tda998x.c **** 
+   8:Core/Src/tda998x.c **** #define REG(page, addr) (((page) << 8) | (addr))
+   9:Core/Src/tda998x.c **** #define REG2ADDR(reg)   ((reg) & 0xff)
+  10:Core/Src/tda998x.c **** #define REG2PAGE(reg)   (((reg) >> 8) & 0xff)
+  11:Core/Src/tda998x.c **** 
+  12:Core/Src/tda998x.c **** #define BIT(x) 1<<x
+  13:Core/Src/tda998x.c **** 
+  14:Core/Src/tda998x.c **** #define REG_CURPAGE               0xff                /* write */
+  15:Core/Src/tda998x.c **** 
+  16:Core/Src/tda998x.c **** #define I2C_ADDRESS_TDA19988_CEC     (0x34)<<1
+  17:Core/Src/tda998x.c **** #define I2C_ADDRESS_TDA19988_HDMI    (0x70)<<1
+  18:Core/Src/tda998x.c **** #define I2C_ADDRESS_TDA (0x70<<1)
+  19:Core/Src/tda998x.c **** 
+  20:Core/Src/tda998x.c **** /* Page 00h: General Control */
+  21:Core/Src/tda998x.c **** #define REG_VERSION_LSB           REG(0x00, 0x00)     /* read */
+  22:Core/Src/tda998x.c **** #define REG_MAIN_CNTRL0           REG(0x00, 0x01)     /* read/write */
+  23:Core/Src/tda998x.c **** # define MAIN_CNTRL0_SR           (1 << 0)
+  24:Core/Src/tda998x.c **** # define MAIN_CNTRL0_DECS         (1 << 1)
+  25:Core/Src/tda998x.c **** # define MAIN_CNTRL0_DEHS         (1 << 2)
+  26:Core/Src/tda998x.c **** # define MAIN_CNTRL0_CECS         (1 << 3)
+  27:Core/Src/tda998x.c **** # define MAIN_CNTRL0_CEHS         (1 << 4)
+  28:Core/Src/tda998x.c **** # define MAIN_CNTRL0_SCALER       (1 << 7)
+  29:Core/Src/tda998x.c **** 
+  30:Core/Src/tda998x.c **** #define REG_VERSION_MSB           REG(0x00, 0x02)     /* read */
+  31:Core/Src/tda998x.c **** #define REG_SOFTRESET             REG(0x00, 0x0a)     /* write */
+ARM GAS  /tmp/ccoWwH9k.s 			page 2
+
+
+  32:Core/Src/tda998x.c **** # define SOFTRESET_AUDIO          (1 << 0)
+  33:Core/Src/tda998x.c **** # define SOFTRESET_I2C_MASTER     (1 << 1)
+  34:Core/Src/tda998x.c **** 
+  35:Core/Src/tda998x.c **** #define REG_DDC_DISABLE           REG(0x00, 0x0b)     /* read/write */
+  36:Core/Src/tda998x.c **** #define REG_CCLK_ON               REG(0x00, 0x0c)     /* read/write */
+  37:Core/Src/tda998x.c **** #define REG_I2C_MASTER            REG(0x00, 0x0d)     /* read/write */
+  38:Core/Src/tda998x.c **** # define I2C_MASTER_DIS_MM        (1 << 0)
+  39:Core/Src/tda998x.c **** # define I2C_MASTER_DIS_FILT      (1 << 1)
+  40:Core/Src/tda998x.c **** # define I2C_MASTER_APP_STRT_LAT  (1 << 2)
+  41:Core/Src/tda998x.c **** 
+  42:Core/Src/tda998x.c **** #define REG_FEAT_POWERDOWN        REG(0x00, 0x0e)     /* read/write */
+  43:Core/Src/tda998x.c **** # define FEAT_POWERDOWN_PREFILT   BIT(0)
+  44:Core/Src/tda998x.c **** # define FEAT_POWERDOWN_CSC       BIT(1)
+  45:Core/Src/tda998x.c **** # define FEAT_POWERDOWN_SPDIF     (1 << 3)
+  46:Core/Src/tda998x.c **** 
+  47:Core/Src/tda998x.c **** #define REG_INT_FLAGS_0           REG(0x00, 0x0f)     /* read/write */
+  48:Core/Src/tda998x.c **** #define REG_INT_FLAGS_1           REG(0x00, 0x10)     /* read/write */
+  49:Core/Src/tda998x.c **** #define REG_INT_FLAGS_2           REG(0x00, 0x11)     /* read/write */
+  50:Core/Src/tda998x.c **** # define INT_FLAGS_2_EDID_BLK_RD  (1 << 1)
+  51:Core/Src/tda998x.c **** 
+  52:Core/Src/tda998x.c **** #define REG_ENA_ACLK              REG(0x00, 0x16)     /* read/write */
+  53:Core/Src/tda998x.c **** #define REG_ENA_VP_0              REG(0x00, 0x18)     /* read/write */
+  54:Core/Src/tda998x.c **** #define REG_ENA_VP_1              REG(0x00, 0x19)     /* read/write */
+  55:Core/Src/tda998x.c **** #define REG_ENA_VP_2              REG(0x00, 0x1a)     /* read/write */
+  56:Core/Src/tda998x.c **** #define REG_ENA_AP                REG(0x00, 0x1e)     /* read/write */
+  57:Core/Src/tda998x.c **** #define REG_VIP_CNTRL_0           REG(0x00, 0x20)     /* write */
+  58:Core/Src/tda998x.c **** # define VIP_CNTRL_0_MIRR_A       (1 << 7)
+  59:Core/Src/tda998x.c **** # define VIP_CNTRL_0_SWAP_A(x)    (((x) & 7) << 4)
+  60:Core/Src/tda998x.c **** # define VIP_CNTRL_0_MIRR_B       (1 << 3)
+  61:Core/Src/tda998x.c **** # define VIP_CNTRL_0_SWAP_B(x)    (((x) & 7) << 0)
+  62:Core/Src/tda998x.c **** 
+  63:Core/Src/tda998x.c **** #define REG_VIP_CNTRL_1           REG(0x00, 0x21)     /* write */
+  64:Core/Src/tda998x.c **** # define VIP_CNTRL_1_MIRR_C       (1 << 7)
+  65:Core/Src/tda998x.c **** # define VIP_CNTRL_1_SWAP_C(x)    (((x) & 7) << 4)
+  66:Core/Src/tda998x.c **** # define VIP_CNTRL_1_MIRR_D       (1 << 3)
+  67:Core/Src/tda998x.c **** # define VIP_CNTRL_1_SWAP_D(x)    (((x) & 7) << 0)
+  68:Core/Src/tda998x.c **** 
+  69:Core/Src/tda998x.c **** #define REG_VIP_CNTRL_2           REG(0x00, 0x22)     /* write */
+  70:Core/Src/tda998x.c **** # define VIP_CNTRL_2_MIRR_E       (1 << 7)
+  71:Core/Src/tda998x.c **** # define VIP_CNTRL_2_SWAP_E(x)    (((x) & 7) << 4)
+  72:Core/Src/tda998x.c **** # define VIP_CNTRL_2_MIRR_F       (1 << 3)
+  73:Core/Src/tda998x.c **** # define VIP_CNTRL_2_SWAP_F(x)    (((x) & 7) << 0)
+  74:Core/Src/tda998x.c **** 
+  75:Core/Src/tda998x.c **** #define REG_VIP_CNTRL_3           REG(0x00, 0x23)     /* write */
+  76:Core/Src/tda998x.c **** # define VIP_CNTRL_3_X_TGL        (1 << 0)
+  77:Core/Src/tda998x.c **** # define VIP_CNTRL_3_H_TGL        (1 << 1)
+  78:Core/Src/tda998x.c **** # define VIP_CNTRL_3_V_TGL        (1 << 2)
+  79:Core/Src/tda998x.c **** # define VIP_CNTRL_3_EMB          (1 << 3)
+  80:Core/Src/tda998x.c **** # define VIP_CNTRL_3_SYNC_DE      (1 << 4)
+  81:Core/Src/tda998x.c **** # define VIP_CNTRL_3_SYNC_HS      (1 << 5)
+  82:Core/Src/tda998x.c **** //# define VIP_CNTRL_3_DE_INT       (1 << 6)
+  83:Core/Src/tda998x.c **** # define VIP_CNTRL_3_EDGE         (1 << 7)
+  84:Core/Src/tda998x.c **** 
+  85:Core/Src/tda998x.c **** #define REG_VIP_CNTRL_4           REG(0x00, 0x24)     /* write */
+  86:Core/Src/tda998x.c **** # define VIP_CNTRL_4_BLC(x)       (((x) & 3) << 0)
+  87:Core/Src/tda998x.c **** # define VIP_CNTRL_4_BLANKIT(x)   (((x) & 3) << 2)
+  88:Core/Src/tda998x.c **** # define VIP_CNTRL_4_CCIR656      (1 << 4)
+ARM GAS  /tmp/ccoWwH9k.s 			page 3
+
+
+  89:Core/Src/tda998x.c **** # define VIP_CNTRL_4_656_ALT      (1 << 5)
+  90:Core/Src/tda998x.c **** # define VIP_CNTRL_4_TST_656      (1 << 6)
+  91:Core/Src/tda998x.c **** # define VIP_CNTRL_4_TST_PAT      (1 << 7)
+  92:Core/Src/tda998x.c **** 
+  93:Core/Src/tda998x.c **** #define REG_VIP_CNTRL_5           REG(0x00, 0x25)     /* write */
+  94:Core/Src/tda998x.c **** # define VIP_CNTRL_5_CKCASE       (1 << 0)
+  95:Core/Src/tda998x.c **** # define VIP_CNTRL_5_SP_CNT(x)    (((x) & 3) << 1)
+  96:Core/Src/tda998x.c **** 
+  97:Core/Src/tda998x.c **** #define REG_MUX_AP                REG(0x00, 0x26)     /* read/write */
+  98:Core/Src/tda998x.c **** # define MUX_AP_SELECT_I2S    0x64
+  99:Core/Src/tda998x.c **** # define MUX_AP_SELECT_SPDIF      0x40
+ 100:Core/Src/tda998x.c **** 
+ 101:Core/Src/tda998x.c **** #define REG_MUX_VP_VIP_OUT        REG(0x00, 0x27)     /* read/write */
+ 102:Core/Src/tda998x.c **** #define REG_MAT_CONTRL            REG(0x00, 0x80)     /* write */
+ 103:Core/Src/tda998x.c **** # define MAT_CONTRL_MAT_SC(x)     (((x) & 3) << 0)
+ 104:Core/Src/tda998x.c **** # define MAT_CONTRL_MAT_BP        (1 << 2)
+ 105:Core/Src/tda998x.c **** 
+ 106:Core/Src/tda998x.c **** #define REG_VIDFORMAT             REG(0x00, 0xa0)     /* write */
+ 107:Core/Src/tda998x.c **** #define REG_REFPIX_MSB            REG(0x00, 0xa1)     /* write */
+ 108:Core/Src/tda998x.c **** #define REG_REFPIX_LSB            REG(0x00, 0xa2)     /* write */
+ 109:Core/Src/tda998x.c **** #define REG_REFLINE_MSB           REG(0x00, 0xa3)     /* write */
+ 110:Core/Src/tda998x.c **** #define REG_REFLINE_LSB           REG(0x00, 0xa4)     /* write */
+ 111:Core/Src/tda998x.c **** #define REG_NPIX_MSB              REG(0x00, 0xa5)     /* write */
+ 112:Core/Src/tda998x.c **** #define REG_NPIX_LSB              REG(0x00, 0xa6)     /* write */
+ 113:Core/Src/tda998x.c **** #define REG_NLINE_MSB             REG(0x00, 0xa7)     /* write */
+ 114:Core/Src/tda998x.c **** #define REG_NLINE_LSB             REG(0x00, 0xa8)     /* write */
+ 115:Core/Src/tda998x.c **** #define REG_VS_LINE_STRT_1_MSB    REG(0x00, 0xa9)     /* write */
+ 116:Core/Src/tda998x.c **** #define REG_VS_LINE_STRT_1_LSB    REG(0x00, 0xaa)     /* write */
+ 117:Core/Src/tda998x.c **** #define REG_VS_PIX_STRT_1_MSB     REG(0x00, 0xab)     /* write */
+ 118:Core/Src/tda998x.c **** #define REG_VS_PIX_STRT_1_LSB     REG(0x00, 0xac)     /* write */
+ 119:Core/Src/tda998x.c **** #define REG_VS_LINE_END_1_MSB     REG(0x00, 0xad)     /* write */
+ 120:Core/Src/tda998x.c **** #define REG_VS_LINE_END_1_LSB     REG(0x00, 0xae)     /* write */
+ 121:Core/Src/tda998x.c **** #define REG_VS_PIX_END_1_MSB      REG(0x00, 0xaf)     /* write */
+ 122:Core/Src/tda998x.c **** #define REG_VS_PIX_END_1_LSB      REG(0x00, 0xb0)     /* write */
+ 123:Core/Src/tda998x.c **** #define REG_VS_LINE_STRT_2_MSB    REG(0x00, 0xb1)     /* write */
+ 124:Core/Src/tda998x.c **** #define REG_VS_LINE_STRT_2_LSB    REG(0x00, 0xb2)     /* write */
+ 125:Core/Src/tda998x.c **** #define REG_VS_PIX_STRT_2_MSB     REG(0x00, 0xb3)     /* write */
+ 126:Core/Src/tda998x.c **** #define REG_VS_PIX_STRT_2_LSB     REG(0x00, 0xb4)     /* write */
+ 127:Core/Src/tda998x.c **** #define REG_VS_LINE_END_2_MSB     REG(0x00, 0xb5)     /* write */
+ 128:Core/Src/tda998x.c **** #define REG_VS_LINE_END_2_LSB     REG(0x00, 0xb6)     /* write */
+ 129:Core/Src/tda998x.c **** #define REG_VS_PIX_END_2_MSB      REG(0x00, 0xb7)     /* write */
+ 130:Core/Src/tda998x.c **** #define REG_VS_PIX_END_2_LSB      REG(0x00, 0xb8)     /* write */
+ 131:Core/Src/tda998x.c **** #define REG_HS_PIX_START_MSB      REG(0x00, 0xb9)     /* write */
+ 132:Core/Src/tda998x.c **** #define REG_HS_PIX_START_LSB      REG(0x00, 0xba)     /* write */
+ 133:Core/Src/tda998x.c **** #define REG_HS_PIX_STOP_MSB       REG(0x00, 0xbb)     /* write */
+ 134:Core/Src/tda998x.c **** #define REG_HS_PIX_STOP_LSB       REG(0x00, 0xbc)     /* write */
+ 135:Core/Src/tda998x.c **** #define REG_VWIN_START_1_MSB      REG(0x00, 0xbd)     /* write */
+ 136:Core/Src/tda998x.c **** #define REG_VWIN_START_1_LSB      REG(0x00, 0xbe)     /* write */
+ 137:Core/Src/tda998x.c **** #define REG_VWIN_END_1_MSB        REG(0x00, 0xbf)     /* write */
+ 138:Core/Src/tda998x.c **** #define REG_VWIN_END_1_LSB        REG(0x00, 0xc0)     /* write */
+ 139:Core/Src/tda998x.c **** #define REG_VWIN_START_2_MSB      REG(0x00, 0xc1)     /* write */
+ 140:Core/Src/tda998x.c **** #define REG_VWIN_START_2_LSB      REG(0x00, 0xc2)     /* write */
+ 141:Core/Src/tda998x.c **** #define REG_VWIN_END_2_MSB        REG(0x00, 0xc3)     /* write */
+ 142:Core/Src/tda998x.c **** #define REG_VWIN_END_2_LSB        REG(0x00, 0xc4)     /* write */
+ 143:Core/Src/tda998x.c **** #define REG_DE_START_MSB          REG(0x00, 0xc5)     /* write */
+ 144:Core/Src/tda998x.c **** #define REG_DE_START_LSB          REG(0x00, 0xc6)     /* write */
+ 145:Core/Src/tda998x.c **** #define REG_DE_STOP_MSB           REG(0x00, 0xc7)     /* write */
+ARM GAS  /tmp/ccoWwH9k.s 			page 4
+
+
+ 146:Core/Src/tda998x.c **** #define REG_DE_STOP_LSB           REG(0x00, 0xc8)     /* write */
+ 147:Core/Src/tda998x.c **** #define REG_TBG_CNTRL_0           REG(0x00, 0xca)     /* write */
+ 148:Core/Src/tda998x.c **** # define TBG_CNTRL_0_TOP_TGL      (1 << 0)
+ 149:Core/Src/tda998x.c **** # define TBG_CNTRL_0_TOP_SEL      (1 << 1)
+ 150:Core/Src/tda998x.c **** # define TBG_CNTRL_0_DE_EXT       (1 << 2)
+ 151:Core/Src/tda998x.c **** # define TBG_CNTRL_0_TOP_EXT      (1 << 3)
+ 152:Core/Src/tda998x.c **** # define TBG_CNTRL_0_FRAME_DIS    (1 << 5)
+ 153:Core/Src/tda998x.c **** # define TBG_CNTRL_0_SYNC_MTHD    (1 << 6)
+ 154:Core/Src/tda998x.c **** # define TBG_CNTRL_0_SYNC_ONCE    (1 << 7)
+ 155:Core/Src/tda998x.c **** 
+ 156:Core/Src/tda998x.c **** #define REG_TBG_CNTRL_1           REG(0x00, 0xcb)     /* write */
+ 157:Core/Src/tda998x.c **** # define TBG_CNTRL_1_H_TGL        (1 << 0)
+ 158:Core/Src/tda998x.c **** # define TBG_CNTRL_1_V_TGL        (1 << 1)
+ 159:Core/Src/tda998x.c **** # define TBG_CNTRL_1_TGL_EN       (1 << 2)
+ 160:Core/Src/tda998x.c **** # define TBG_CNTRL_1_X_EXT        (1 << 3)
+ 161:Core/Src/tda998x.c **** # define TBG_CNTRL_1_H_EXT        (1 << 4)
+ 162:Core/Src/tda998x.c **** # define TBG_CNTRL_1_V_EXT        (1 << 5)
+ 163:Core/Src/tda998x.c **** # define TBG_CNTRL_1_DWIN_DIS     (1 << 6)
+ 164:Core/Src/tda998x.c **** 
+ 165:Core/Src/tda998x.c **** #define REG_ENABLE_SPACE          REG(0x00, 0xd6)     /* write */
+ 166:Core/Src/tda998x.c **** #define REG_HVF_CNTRL_0           REG(0x00, 0xe4)     /* write */
+ 167:Core/Src/tda998x.c **** # define HVF_CNTRL_0_SM           (1 << 7)
+ 168:Core/Src/tda998x.c **** # define HVF_CNTRL_0_RWB          (1 << 6)
+ 169:Core/Src/tda998x.c **** # define HVF_CNTRL_0_PREFIL(x)    (((x) & 3) << 2)
+ 170:Core/Src/tda998x.c **** # define HVF_CNTRL_0_INTPOL(x)    (((x) & 3) << 0)
+ 171:Core/Src/tda998x.c **** 
+ 172:Core/Src/tda998x.c **** #define REG_HVF_CNTRL_1           REG(0x00, 0xe5)     /* write */
+ 173:Core/Src/tda998x.c **** # define HVF_CNTRL_1_FOR          (1 << 0)
+ 174:Core/Src/tda998x.c **** # define HVF_CNTRL_1_YUVBLK       (1 << 1)
+ 175:Core/Src/tda998x.c **** # define HVF_CNTRL_1_VQR(x)       (((x) & 3) << 2)
+ 176:Core/Src/tda998x.c **** # define HVF_CNTRL_1_PAD(x)       (((x) & 3) << 4)
+ 177:Core/Src/tda998x.c **** # define HVF_CNTRL_1_SEMI_PLANAR  (1 << 6)
+ 178:Core/Src/tda998x.c **** 
+ 179:Core/Src/tda998x.c **** #define REG_RPT_CNTRL             REG(0x00, 0xf0)     /* write */
+ 180:Core/Src/tda998x.c **** # define RPT_CNTRL_REPEAT(x)      ((x) & 15)
+ 181:Core/Src/tda998x.c **** 
+ 182:Core/Src/tda998x.c **** #define REG_I2S_FORMAT            REG(0x00, 0xfc)     /* read/write */
+ 183:Core/Src/tda998x.c **** # define I2S_FORMAT_PHILIPS       (0 << 0)
+ 184:Core/Src/tda998x.c **** # define I2S_FORMAT_LEFT_J        (2 << 0)
+ 185:Core/Src/tda998x.c **** # define I2S_FORMAT_RIGHT_J       (3 << 0)
+ 186:Core/Src/tda998x.c **** 
+ 187:Core/Src/tda998x.c **** #define REG_AIP_CLKSEL            REG(0x00, 0xfd)     /* write */
+ 188:Core/Src/tda998x.c **** # define AIP_CLKSEL_AIP_SPDIF     (0 << 3)
+ 189:Core/Src/tda998x.c **** # define AIP_CLKSEL_AIP_I2S   (1 << 3)
+ 190:Core/Src/tda998x.c **** # define AIP_CLKSEL_FS_ACLK   (0 << 0)
+ 191:Core/Src/tda998x.c **** # define AIP_CLKSEL_FS_MCLK   (1 << 0)
+ 192:Core/Src/tda998x.c **** # define AIP_CLKSEL_FS_FS64SPDIF  (2 << 0)
+ 193:Core/Src/tda998x.c **** 
+ 194:Core/Src/tda998x.c **** /* Page 02h: PLL settings */
+ 195:Core/Src/tda998x.c **** #define REG_PLL_SERIAL_1          REG(0x02, 0x00)     /* read/write */
+ 196:Core/Src/tda998x.c **** # define PLL_SERIAL_1_SRL_FDN     (1 << 0)
+ 197:Core/Src/tda998x.c **** # define PLL_SERIAL_1_SRL_IZ(x)   (((x) & 3) << 1)
+ 198:Core/Src/tda998x.c **** # define PLL_SERIAL_1_SRL_MAN_IZ  (1 << 6)
+ 199:Core/Src/tda998x.c **** 
+ 200:Core/Src/tda998x.c **** #define REG_PLL_SERIAL_2          REG(0x02, 0x01)     /* read/write */
+ 201:Core/Src/tda998x.c **** # define PLL_SERIAL_2_SRL_NOSC(x) ((x) << 0)
+ 202:Core/Src/tda998x.c **** # define PLL_SERIAL_2_SRL_PR(x)   (((x) & 0xf) << 4)
+ARM GAS  /tmp/ccoWwH9k.s 			page 5
+
+
+ 203:Core/Src/tda998x.c **** 
+ 204:Core/Src/tda998x.c **** #define REG_PLL_SERIAL_3          REG(0x02, 0x02)     /* read/write */
+ 205:Core/Src/tda998x.c **** # define PLL_SERIAL_3_SRL_CCIR    (1 << 0)
+ 206:Core/Src/tda998x.c **** # define PLL_SERIAL_3_SRL_DE      (1 << 2)
+ 207:Core/Src/tda998x.c **** # define PLL_SERIAL_3_SRL_PXIN_SEL (1 << 4)
+ 208:Core/Src/tda998x.c **** 
+ 209:Core/Src/tda998x.c **** #define REG_SERIALIZER            REG(0x02, 0x03)     /* read/write */
+ 210:Core/Src/tda998x.c **** #define REG_BUFFER_OUT            REG(0x02, 0x04)     /* read/write */
+ 211:Core/Src/tda998x.c **** #define REG_PLL_SCG1              REG(0x02, 0x05)     /* read/write */
+ 212:Core/Src/tda998x.c **** #define REG_PLL_SCG2              REG(0x02, 0x06)     /* read/write */
+ 213:Core/Src/tda998x.c **** #define REG_PLL_SCGN1             REG(0x02, 0x07)     /* read/write */
+ 214:Core/Src/tda998x.c **** #define REG_PLL_SCGN2             REG(0x02, 0x08)     /* read/write */
+ 215:Core/Src/tda998x.c **** #define REG_PLL_SCGR1             REG(0x02, 0x09)     /* read/write */
+ 216:Core/Src/tda998x.c **** #define REG_PLL_SCGR2             REG(0x02, 0x0a)     /* read/write */
+ 217:Core/Src/tda998x.c **** #define REG_AUDIO_DIV             REG(0x02, 0x0e)     /* read/write */
+ 218:Core/Src/tda998x.c **** # define AUDIO_DIV_SERCLK_1       0
+ 219:Core/Src/tda998x.c **** # define AUDIO_DIV_SERCLK_2       1
+ 220:Core/Src/tda998x.c **** # define AUDIO_DIV_SERCLK_4       2
+ 221:Core/Src/tda998x.c **** # define AUDIO_DIV_SERCLK_8       3
+ 222:Core/Src/tda998x.c **** # define AUDIO_DIV_SERCLK_16      4
+ 223:Core/Src/tda998x.c **** # define AUDIO_DIV_SERCLK_32      5
+ 224:Core/Src/tda998x.c **** 
+ 225:Core/Src/tda998x.c **** #define REG_SEL_CLK               REG(0x02, 0x11)     /* read/write */
+ 226:Core/Src/tda998x.c **** # define SEL_CLK_SEL_CLK1         (1 << 0)
+ 227:Core/Src/tda998x.c **** # define SEL_CLK_SEL_VRF_CLK(x)   (((x) & 3) << 1)
+ 228:Core/Src/tda998x.c **** # define SEL_CLK_ENA_SC_CLK       (1 << 3)
+ 229:Core/Src/tda998x.c **** 
+ 230:Core/Src/tda998x.c **** #define REG_ANA_GENERAL           REG(0x02, 0x12)     /* read/write */
+ 231:Core/Src/tda998x.c **** 
+ 232:Core/Src/tda998x.c **** /* Page 09h: EDID Control */
+ 233:Core/Src/tda998x.c **** #define REG_EDID_DATA_0           REG(0x09, 0x00)     /* read */
+ 234:Core/Src/tda998x.c **** /* next 127 successive registers are the EDID block */
+ 235:Core/Src/tda998x.c **** #define REG_EDID_CTRL             REG(0x09, 0xfa)     /* read/write */
+ 236:Core/Src/tda998x.c **** #define REG_DDC_ADDR              REG(0x09, 0xfb)     /* read/write */
+ 237:Core/Src/tda998x.c **** #define REG_DDC_OFFS              REG(0x09, 0xfc)     /* read/write */
+ 238:Core/Src/tda998x.c **** #define REG_DDC_SEGM_ADDR         REG(0x09, 0xfd)     /* read/write */
+ 239:Core/Src/tda998x.c **** #define REG_DDC_SEGM              REG(0x09, 0xfe)     /* read/write */
+ 240:Core/Src/tda998x.c **** 
+ 241:Core/Src/tda998x.c **** /* Page 10h: information frames and packets */
+ 242:Core/Src/tda998x.c **** #define REG_IF1_HB0               REG(0x10, 0x20)     /* read/write */
+ 243:Core/Src/tda998x.c **** #define REG_IF2_HB0               REG(0x10, 0x40)     /* read/write */
+ 244:Core/Src/tda998x.c **** #define REG_IF3_HB0               REG(0x10, 0x60)     /* read/write */
+ 245:Core/Src/tda998x.c **** #define REG_IF4_HB0               REG(0x10, 0x80)     /* read/write */
+ 246:Core/Src/tda998x.c **** #define REG_IF5_HB0               REG(0x10, 0xa0)     /* read/write */
+ 247:Core/Src/tda998x.c **** 
+ 248:Core/Src/tda998x.c **** /* Page 11h: audio settings and content info packets */
+ 249:Core/Src/tda998x.c **** #define REG_AIP_CNTRL_0           REG(0x11, 0x00)     /* read/write */
+ 250:Core/Src/tda998x.c **** # define AIP_CNTRL_0_RST_FIFO     (1 << 0)
+ 251:Core/Src/tda998x.c **** # define AIP_CNTRL_0_SWAP         (1 << 1)
+ 252:Core/Src/tda998x.c **** # define AIP_CNTRL_0_LAYOUT       (1 << 2)
+ 253:Core/Src/tda998x.c **** # define AIP_CNTRL_0_ACR_MAN      (1 << 5)
+ 254:Core/Src/tda998x.c **** # define AIP_CNTRL_0_RST_CTS      (1 << 6)
+ 255:Core/Src/tda998x.c **** 
+ 256:Core/Src/tda998x.c **** #define REG_CA_I2S                REG(0x11, 0x01)     /* read/write */
+ 257:Core/Src/tda998x.c **** # define CA_I2S_CA_I2S(x)         (((x) & 31) << 0)
+ 258:Core/Src/tda998x.c **** # define CA_I2S_HBR_CHSTAT        (1 << 6)
+ 259:Core/Src/tda998x.c **** 
+ARM GAS  /tmp/ccoWwH9k.s 			page 6
+
+
+ 260:Core/Src/tda998x.c **** #define REG_LATENCY_RD            REG(0x11, 0x04)     /* read/write */
+ 261:Core/Src/tda998x.c **** #define REG_ACR_CTS_0             REG(0x11, 0x05)     /* read/write */
+ 262:Core/Src/tda998x.c **** #define REG_ACR_CTS_1             REG(0x11, 0x06)     /* read/write */
+ 263:Core/Src/tda998x.c **** #define REG_ACR_CTS_2             REG(0x11, 0x07)     /* read/write */
+ 264:Core/Src/tda998x.c **** #define REG_ACR_N_0               REG(0x11, 0x08)     /* read/write */
+ 265:Core/Src/tda998x.c **** #define REG_ACR_N_1               REG(0x11, 0x09)     /* read/write */
+ 266:Core/Src/tda998x.c **** #define REG_ACR_N_2               REG(0x11, 0x0a)     /* read/write */
+ 267:Core/Src/tda998x.c **** #define REG_CTS_N                 REG(0x11, 0x0c)     /* read/write */
+ 268:Core/Src/tda998x.c **** # define CTS_N_K(x)               (((x) & 7) << 0)
+ 269:Core/Src/tda998x.c **** # define CTS_N_M(x)               (((x) & 3) << 4)
+ 270:Core/Src/tda998x.c **** 
+ 271:Core/Src/tda998x.c **** #define REG_ENC_CNTRL             REG(0x11, 0x0d)     /* read/write */
+ 272:Core/Src/tda998x.c **** # define ENC_CNTRL_RST_ENC        (1 << 0)
+ 273:Core/Src/tda998x.c **** # define ENC_CNTRL_RST_SEL        (1 << 1)
+ 274:Core/Src/tda998x.c **** # define ENC_CNTRL_CTL_CODE(x)    (((x) & 3) << 2)
+ 275:Core/Src/tda998x.c **** 
+ 276:Core/Src/tda998x.c **** #define REG_DIP_FLAGS             REG(0x11, 0x0e)     /* read/write */
+ 277:Core/Src/tda998x.c **** # define DIP_FLAGS_ACR            (1 << 0)
+ 278:Core/Src/tda998x.c **** # define DIP_FLAGS_GC             (1 << 1)
+ 279:Core/Src/tda998x.c **** 
+ 280:Core/Src/tda998x.c **** #define REG_DIP_IF_FLAGS          REG(0x11, 0x0f)     /* read/write */
+ 281:Core/Src/tda998x.c **** # define DIP_IF_FLAGS_IF1         (1 << 1)
+ 282:Core/Src/tda998x.c **** # define DIP_IF_FLAGS_IF2         (1 << 2)
+ 283:Core/Src/tda998x.c **** # define DIP_IF_FLAGS_IF3         (1 << 3)
+ 284:Core/Src/tda998x.c **** # define DIP_IF_FLAGS_IF4         (1 << 4)
+ 285:Core/Src/tda998x.c **** # define DIP_IF_FLAGS_IF5         (1 << 5)
+ 286:Core/Src/tda998x.c **** 
+ 287:Core/Src/tda998x.c **** #define REG_CH_STAT_B(x)          REG(0x11, 0x14 + (x)) /* read/write */
+ 288:Core/Src/tda998x.c **** 
+ 289:Core/Src/tda998x.c **** /* Page 12h: HDCP and OTP */
+ 290:Core/Src/tda998x.c **** #define REG_TX3                   REG(0x12, 0x9a)     /* read/write */
+ 291:Core/Src/tda998x.c **** #define REG_TX4                   REG(0x12, 0x9b)     /* read/write */
+ 292:Core/Src/tda998x.c **** # define TX4_PD_RAM               (1 << 1)
+ 293:Core/Src/tda998x.c **** #define REG_TX33                  REG(0x12, 0xb8)     /* read/write */
+ 294:Core/Src/tda998x.c **** # define TX33_HDMI                (1 << 1)
+ 295:Core/Src/tda998x.c **** 
+ 296:Core/Src/tda998x.c **** /* Page 13h: Gamut related metadata packets */
+ 297:Core/Src/tda998x.c **** 
+ 298:Core/Src/tda998x.c **** /* CEC registers: (not paged)
+ 299:Core/Src/tda998x.c ****  */
+ 300:Core/Src/tda998x.c **** #define REG_CEC_INTSTATUS     0xee            /* read */
+ 301:Core/Src/tda998x.c **** # define CEC_INTSTATUS_CEC    (1 << 0)
+ 302:Core/Src/tda998x.c **** # define CEC_INTSTATUS_HDMI   (1 << 1)
+ 303:Core/Src/tda998x.c **** #define REG_CEC_CAL_XOSC_CTRL1    0xf2
+ 304:Core/Src/tda998x.c **** # define CEC_CAL_XOSC_CTRL1_ENA_CAL BIT(0)
+ 305:Core/Src/tda998x.c **** #define REG_CEC_DES_FREQ2         0xf5
+ 306:Core/Src/tda998x.c **** # define CEC_DES_FREQ2_DIS_AUTOCAL BIT(7)
+ 307:Core/Src/tda998x.c **** #define REG_CEC_CLK               0xf6
+ 308:Core/Src/tda998x.c **** # define CEC_CLK_FRO              0x11
+ 309:Core/Src/tda998x.c **** #define REG_CEC_FRO_IM_CLK_CTRL   0xfb                /* read/write */
+ 310:Core/Src/tda998x.c **** # define CEC_FRO_IM_CLK_CTRL_GHOST_DIS (1 << 7)
+ 311:Core/Src/tda998x.c **** # define CEC_FRO_IM_CLK_CTRL_ENA_OTP   (1 << 6)
+ 312:Core/Src/tda998x.c **** # define CEC_FRO_IM_CLK_CTRL_IMCLK_SEL (1 << 1)
+ 313:Core/Src/tda998x.c **** # define CEC_FRO_IM_CLK_CTRL_FRO_DIV   (1 << 0)
+ 314:Core/Src/tda998x.c **** #define REG_CEC_RXSHPDINTENA      0xfc            /* read/write */
+ 315:Core/Src/tda998x.c **** #define REG_CEC_RXSHPDINT     0xfd            /* read */
+ 316:Core/Src/tda998x.c **** # define CEC_RXSHPDINT_RXSENS     BIT(0)
+ARM GAS  /tmp/ccoWwH9k.s 			page 7
+
+
+ 317:Core/Src/tda998x.c **** # define CEC_RXSHPDINT_HPD        BIT(1)
+ 318:Core/Src/tda998x.c **** #define REG_CEC_RXSHPDLEV         0xfe                /* read */
+ 319:Core/Src/tda998x.c **** # define CEC_RXSHPDLEV_RXSENS     (1 << 0)
+ 320:Core/Src/tda998x.c **** # define CEC_RXSHPDLEV_HPD        (1 << 1)
+ 321:Core/Src/tda998x.c **** 
+ 322:Core/Src/tda998x.c **** #define REG_CEC_ENAMODS           0xff                /* read/write */
+ 323:Core/Src/tda998x.c **** # define CEC_ENAMODS_EN_CEC_CLK   (1 << 7)
+ 324:Core/Src/tda998x.c **** # define CEC_ENAMODS_DIS_FRO      (1 << 6)
+ 325:Core/Src/tda998x.c **** # define CEC_ENAMODS_DIS_CCLK     (1 << 5)
+ 326:Core/Src/tda998x.c **** # define CEC_ENAMODS_EN_RXSENS    (1 << 2)
+ 327:Core/Src/tda998x.c **** # define CEC_ENAMODS_EN_HDMI      (1 << 1)
+ 328:Core/Src/tda998x.c **** # define CEC_ENAMODS_EN_CEC       (1 << 0)
+ 329:Core/Src/tda998x.c **** 
+ 330:Core/Src/tda998x.c **** void tda19988_testmode( void ) {
+  28              		.loc 1 330 32 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 70B5     		push	{r4, r5, r6, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 16
+  35              		.cfi_offset 4, -16
+  36              		.cfi_offset 5, -12
+  37              		.cfi_offset 6, -8
+  38              		.cfi_offset 14, -4
+  39 0002 84B0     		sub	sp, sp, #16
+  40              	.LCFI1:
+  41              		.cfi_def_cfa_offset 32
+ 331:Core/Src/tda998x.c **** 
+ 332:Core/Src/tda998x.c ****     uint8_t master_test[3];
+  42              		.loc 1 332 5 view .LVU1
+ 333:Core/Src/tda998x.c **** 
+ 334:Core/Src/tda998x.c ****     master_test[0] = 0xFF;
+  43              		.loc 1 334 5 view .LVU2
+  44              		.loc 1 334 20 is_stmt 0 view .LVU3
+  45 0004 FF26     		movs	r6, #255
+  46 0006 8DF80C60 		strb	r6, [sp, #12]
+ 335:Core/Src/tda998x.c ****     master_test[1] = 0x87;
+  47              		.loc 1 335 5 is_stmt 1 view .LVU4
+  48              		.loc 1 335 20 is_stmt 0 view .LVU5
+  49 000a 8723     		movs	r3, #135
+  50 000c 8DF80D30 		strb	r3, [sp, #13]
+ 336:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_CEC, &master_test, 2, 1000);
+  51              		.loc 1 336 5 is_stmt 1 view .LVU6
+  52 0010 1E4C     		ldr	r4, .L3
+  53 0012 4FF47A75 		mov	r5, #1000
+  54 0016 0095     		str	r5, [sp]
+  55 0018 0223     		movs	r3, #2
+  56 001a 03AA     		add	r2, sp, #12
+  57 001c 6821     		movs	r1, #104
+  58 001e 2046     		mov	r0, r4
+  59 0020 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+  60              	.LVL0:
+ 337:Core/Src/tda998x.c **** 
+ 338:Core/Src/tda998x.c ****     master_test[0] = 0xFF;
+  61              		.loc 1 338 5 view .LVU7
+  62              		.loc 1 338 20 is_stmt 0 view .LVU8
+ARM GAS  /tmp/ccoWwH9k.s 			page 8
+
+
+  63 0024 8DF80C60 		strb	r6, [sp, #12]
+ 339:Core/Src/tda998x.c ****     master_test[1] = 0x00;
+  64              		.loc 1 339 5 is_stmt 1 view .LVU9
+  65              		.loc 1 339 20 is_stmt 0 view .LVU10
+  66 0028 0026     		movs	r6, #0
+  67 002a 8DF80D60 		strb	r6, [sp, #13]
+ 340:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+  68              		.loc 1 340 5 is_stmt 1 view .LVU11
+  69 002e 0095     		str	r5, [sp]
+  70 0030 0223     		movs	r3, #2
+  71 0032 03AA     		add	r2, sp, #12
+  72 0034 E021     		movs	r1, #224
+  73 0036 2046     		mov	r0, r4
+  74 0038 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+  75              	.LVL1:
+ 341:Core/Src/tda998x.c **** 
+ 342:Core/Src/tda998x.c ****     master_test[0] = 0xA0;
+  76              		.loc 1 342 5 view .LVU12
+  77              		.loc 1 342 20 is_stmt 0 view .LVU13
+  78 003c A023     		movs	r3, #160
+  79 003e 8DF80C30 		strb	r3, [sp, #12]
+ 343:Core/Src/tda998x.c ****     master_test[1] = 0x07;    // pre-defined video formats
+  80              		.loc 1 343 5 is_stmt 1 view .LVU14
+  81              		.loc 1 343 20 is_stmt 0 view .LVU15
+  82 0042 0723     		movs	r3, #7
+  83 0044 8DF80D30 		strb	r3, [sp, #13]
+ 344:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+  84              		.loc 1 344 5 is_stmt 1 view .LVU16
+  85 0048 0095     		str	r5, [sp]
+  86 004a 0223     		movs	r3, #2
+  87 004c 03AA     		add	r2, sp, #12
+  88 004e E021     		movs	r1, #224
+  89 0050 2046     		mov	r0, r4
+  90 0052 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+  91              	.LVL2:
+ 345:Core/Src/tda998x.c ****     
+ 346:Core/Src/tda998x.c ****     master_test[0] = 0xE4;
+  92              		.loc 1 346 5 view .LVU17
+  93              		.loc 1 346 20 is_stmt 0 view .LVU18
+  94 0056 E423     		movs	r3, #228
+  95 0058 8DF80C30 		strb	r3, [sp, #12]
+ 347:Core/Src/tda998x.c ****     master_test[1] = 0xC0;  // generate test pattern
+  96              		.loc 1 347 5 is_stmt 1 view .LVU19
+  97              		.loc 1 347 20 is_stmt 0 view .LVU20
+  98 005c C023     		movs	r3, #192
+  99 005e 8DF80D30 		strb	r3, [sp, #13]
+ 348:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+ 100              		.loc 1 348 5 is_stmt 1 view .LVU21
+ 101 0062 0095     		str	r5, [sp]
+ 102 0064 0223     		movs	r3, #2
+ 103 0066 03AA     		add	r2, sp, #12
+ 104 0068 E021     		movs	r1, #224
+ 105 006a 2046     		mov	r0, r4
+ 106 006c FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 107              	.LVL3:
+ 349:Core/Src/tda998x.c **** 
+ 350:Core/Src/tda998x.c ****     master_test[0] = 0xF0;
+ARM GAS  /tmp/ccoWwH9k.s 			page 9
+
+
+ 108              		.loc 1 350 5 view .LVU22
+ 109              		.loc 1 350 20 is_stmt 0 view .LVU23
+ 110 0070 F023     		movs	r3, #240
+ 111 0072 8DF80C30 		strb	r3, [sp, #12]
+ 351:Core/Src/tda998x.c ****     master_test[1] = 0x00;
+ 112              		.loc 1 351 5 is_stmt 1 view .LVU24
+ 113              		.loc 1 351 20 is_stmt 0 view .LVU25
+ 114 0076 8DF80D60 		strb	r6, [sp, #13]
+ 352:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+ 115              		.loc 1 352 5 is_stmt 1 view .LVU26
+ 116 007a 0095     		str	r5, [sp]
+ 117 007c 0223     		movs	r3, #2
+ 118 007e 03AA     		add	r2, sp, #12
+ 119 0080 E021     		movs	r1, #224
+ 120 0082 2046     		mov	r0, r4
+ 121 0084 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 122              	.LVL4:
+ 353:Core/Src/tda998x.c **** 
+ 354:Core/Src/tda998x.c **** }
+ 123              		.loc 1 354 1 is_stmt 0 view .LVU27
+ 124 0088 04B0     		add	sp, sp, #16
+ 125              	.LCFI2:
+ 126              		.cfi_def_cfa_offset 16
+ 127              		@ sp needed
+ 128 008a 70BD     		pop	{r4, r5, r6, pc}
+ 129              	.L4:
+ 130              		.align	2
+ 131              	.L3:
+ 132 008c 00000000 		.word	hi2c1
+ 133              		.cfi_endproc
+ 134              	.LFE328:
+ 136              		.section	.text.w_reg,"ax",%progbits
+ 137              		.align	1
+ 138              		.global	w_reg
+ 139              		.syntax unified
+ 140              		.thumb
+ 141              		.thumb_func
+ 143              	w_reg:
+ 144              	.LVL5:
+ 145              	.LFB329:
+ 355:Core/Src/tda998x.c **** 
+ 356:Core/Src/tda998x.c **** void w_reg(uint16_t reg, uint8_t val) {
+ 146              		.loc 1 356 39 is_stmt 1 view -0
+ 147              		.cfi_startproc
+ 148              		@ args = 0, pretend = 0, frame = 8
+ 149              		@ frame_needed = 0, uses_anonymous_args = 0
+ 150              		.loc 1 356 39 is_stmt 0 view .LVU29
+ 151 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 152              	.LCFI3:
+ 153              		.cfi_def_cfa_offset 20
+ 154              		.cfi_offset 4, -20
+ 155              		.cfi_offset 5, -16
+ 156              		.cfi_offset 6, -12
+ 157              		.cfi_offset 7, -8
+ 158              		.cfi_offset 14, -4
+ 159 0002 85B0     		sub	sp, sp, #20
+ 160              	.LCFI4:
+ARM GAS  /tmp/ccoWwH9k.s 			page 10
+
+
+ 161              		.cfi_def_cfa_offset 40
+ 162 0004 0446     		mov	r4, r0
+ 163 0006 0D46     		mov	r5, r1
+ 357:Core/Src/tda998x.c **** 
+ 358:Core/Src/tda998x.c ****     uint8_t buf[2];
+ 164              		.loc 1 358 5 is_stmt 1 view .LVU30
+ 359:Core/Src/tda998x.c ****     buf[0] = REG_CURPAGE;
+ 165              		.loc 1 359 5 view .LVU31
+ 166              		.loc 1 359 12 is_stmt 0 view .LVU32
+ 167 0008 FF23     		movs	r3, #255
+ 168 000a 8DF80C30 		strb	r3, [sp, #12]
+ 360:Core/Src/tda998x.c ****     buf[1] = REG2PAGE(reg);
+ 169              		.loc 1 360 5 is_stmt 1 view .LVU33
+ 170              		.loc 1 360 12 is_stmt 0 view .LVU34
+ 171 000e 030A     		lsrs	r3, r0, #8
+ 172 0010 8DF80D30 		strb	r3, [sp, #13]
+ 361:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+ 173              		.loc 1 361 5 is_stmt 1 view .LVU35
+ 174 0014 0B4E     		ldr	r6, .L7
+ 175 0016 4FF47A77 		mov	r7, #1000
+ 176 001a 0097     		str	r7, [sp]
+ 177 001c 0223     		movs	r3, #2
+ 178 001e 03AA     		add	r2, sp, #12
+ 179 0020 E021     		movs	r1, #224
+ 180              	.LVL6:
+ 181              		.loc 1 361 5 is_stmt 0 view .LVU36
+ 182 0022 3046     		mov	r0, r6
+ 183              	.LVL7:
+ 184              		.loc 1 361 5 view .LVU37
+ 185 0024 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 186              	.LVL8:
+ 362:Core/Src/tda998x.c **** 
+ 363:Core/Src/tda998x.c ****     buf[0] = REG2ADDR(reg);
+ 187              		.loc 1 363 5 is_stmt 1 view .LVU38
+ 188              		.loc 1 363 12 is_stmt 0 view .LVU39
+ 189 0028 8DF80C40 		strb	r4, [sp, #12]
+ 364:Core/Src/tda998x.c ****     buf[1] = val;
+ 190              		.loc 1 364 5 is_stmt 1 view .LVU40
+ 191              		.loc 1 364 12 is_stmt 0 view .LVU41
+ 192 002c 8DF80D50 		strb	r5, [sp, #13]
+ 365:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+ 193              		.loc 1 365 5 is_stmt 1 view .LVU42
+ 194 0030 0097     		str	r7, [sp]
+ 195 0032 0223     		movs	r3, #2
+ 196 0034 03AA     		add	r2, sp, #12
+ 197 0036 E021     		movs	r1, #224
+ 198 0038 3046     		mov	r0, r6
+ 199 003a FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 200              	.LVL9:
+ 366:Core/Src/tda998x.c **** 
+ 367:Core/Src/tda998x.c **** }
+ 201              		.loc 1 367 1 is_stmt 0 view .LVU43
+ 202 003e 05B0     		add	sp, sp, #20
+ 203              	.LCFI5:
+ 204              		.cfi_def_cfa_offset 20
+ 205              		@ sp needed
+ 206 0040 F0BD     		pop	{r4, r5, r6, r7, pc}
+ARM GAS  /tmp/ccoWwH9k.s 			page 11
+
+
+ 207              	.LVL10:
+ 208              	.L8:
+ 209              		.loc 1 367 1 view .LVU44
+ 210 0042 00BF     		.align	2
+ 211              	.L7:
+ 212 0044 00000000 		.word	hi2c1
+ 213              		.cfi_endproc
+ 214              	.LFE329:
+ 216              		.section	.text.w16_reg,"ax",%progbits
+ 217              		.align	1
+ 218              		.global	w16_reg
+ 219              		.syntax unified
+ 220              		.thumb
+ 221              		.thumb_func
+ 223              	w16_reg:
+ 224              	.LVL11:
+ 225              	.LFB330:
+ 368:Core/Src/tda998x.c **** 
+ 369:Core/Src/tda998x.c **** void w16_reg(uint16_t reg, uint16_t val) {
+ 226              		.loc 1 369 42 is_stmt 1 view -0
+ 227              		.cfi_startproc
+ 228              		@ args = 0, pretend = 0, frame = 8
+ 229              		@ frame_needed = 0, uses_anonymous_args = 0
+ 230              		.loc 1 369 42 is_stmt 0 view .LVU46
+ 231 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 232              	.LCFI6:
+ 233              		.cfi_def_cfa_offset 20
+ 234              		.cfi_offset 4, -20
+ 235              		.cfi_offset 5, -16
+ 236              		.cfi_offset 6, -12
+ 237              		.cfi_offset 7, -8
+ 238              		.cfi_offset 14, -4
+ 239 0002 85B0     		sub	sp, sp, #20
+ 240              	.LCFI7:
+ 241              		.cfi_def_cfa_offset 40
+ 242 0004 0446     		mov	r4, r0
+ 243 0006 0D46     		mov	r5, r1
+ 370:Core/Src/tda998x.c ****     uint8_t buf[2];
+ 244              		.loc 1 370 5 is_stmt 1 view .LVU47
+ 371:Core/Src/tda998x.c ****     buf[0] = REG_CURPAGE;
+ 245              		.loc 1 371 5 view .LVU48
+ 246              		.loc 1 371 12 is_stmt 0 view .LVU49
+ 247 0008 FF23     		movs	r3, #255
+ 248 000a 8DF80C30 		strb	r3, [sp, #12]
+ 372:Core/Src/tda998x.c ****     buf[1] = REG2PAGE(reg);
+ 249              		.loc 1 372 5 is_stmt 1 view .LVU50
+ 250              		.loc 1 372 12 is_stmt 0 view .LVU51
+ 251 000e 030A     		lsrs	r3, r0, #8
+ 252 0010 8DF80D30 		strb	r3, [sp, #13]
+ 373:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+ 253              		.loc 1 373 5 is_stmt 1 view .LVU52
+ 254 0014 124E     		ldr	r6, .L11
+ 255 0016 4FF47A77 		mov	r7, #1000
+ 256 001a 0097     		str	r7, [sp]
+ 257 001c 0223     		movs	r3, #2
+ 258 001e 03AA     		add	r2, sp, #12
+ 259 0020 E021     		movs	r1, #224
+ARM GAS  /tmp/ccoWwH9k.s 			page 12
+
+
+ 260              	.LVL12:
+ 261              		.loc 1 373 5 is_stmt 0 view .LVU53
+ 262 0022 3046     		mov	r0, r6
+ 263              	.LVL13:
+ 264              		.loc 1 373 5 view .LVU54
+ 265 0024 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 266              	.LVL14:
+ 374:Core/Src/tda998x.c **** 
+ 375:Core/Src/tda998x.c ****     buf[0] = REG2ADDR(reg);
+ 267              		.loc 1 375 5 is_stmt 1 view .LVU55
+ 268              		.loc 1 375 12 is_stmt 0 view .LVU56
+ 269 0028 E4B2     		uxtb	r4, r4
+ 270              	.LVL15:
+ 271              		.loc 1 375 12 view .LVU57
+ 272 002a 8DF80C40 		strb	r4, [sp, #12]
+ 376:Core/Src/tda998x.c ****     buf[1] = val>>8;
+ 273              		.loc 1 376 5 is_stmt 1 view .LVU58
+ 274              		.loc 1 376 12 is_stmt 0 view .LVU59
+ 275 002e 2B0A     		lsrs	r3, r5, #8
+ 276 0030 8DF80D30 		strb	r3, [sp, #13]
+ 377:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+ 277              		.loc 1 377 5 is_stmt 1 view .LVU60
+ 278 0034 0097     		str	r7, [sp]
+ 279 0036 0223     		movs	r3, #2
+ 280 0038 03AA     		add	r2, sp, #12
+ 281 003a E021     		movs	r1, #224
+ 282 003c 3046     		mov	r0, r6
+ 283 003e FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 284              	.LVL16:
+ 378:Core/Src/tda998x.c **** 
+ 379:Core/Src/tda998x.c ****     buf[0] = REG2ADDR(reg+1);
+ 285              		.loc 1 379 5 view .LVU61
+ 286              		.loc 1 379 14 is_stmt 0 view .LVU62
+ 287 0042 0134     		adds	r4, r4, #1
+ 288              		.loc 1 379 12 view .LVU63
+ 289 0044 8DF80C40 		strb	r4, [sp, #12]
+ 380:Core/Src/tda998x.c ****     buf[1] = val;
+ 290              		.loc 1 380 5 is_stmt 1 view .LVU64
+ 291              		.loc 1 380 12 is_stmt 0 view .LVU65
+ 292 0048 8DF80D50 		strb	r5, [sp, #13]
+ 381:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+ 293              		.loc 1 381 5 is_stmt 1 view .LVU66
+ 294 004c 0097     		str	r7, [sp]
+ 295 004e 0223     		movs	r3, #2
+ 296 0050 03AA     		add	r2, sp, #12
+ 297 0052 E021     		movs	r1, #224
+ 298 0054 3046     		mov	r0, r6
+ 299 0056 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 300              	.LVL17:
+ 382:Core/Src/tda998x.c **** }
+ 301              		.loc 1 382 1 is_stmt 0 view .LVU67
+ 302 005a 05B0     		add	sp, sp, #20
+ 303              	.LCFI8:
+ 304              		.cfi_def_cfa_offset 20
+ 305              		@ sp needed
+ 306 005c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 307              	.LVL18:
+ARM GAS  /tmp/ccoWwH9k.s 			page 13
+
+
+ 308              	.L12:
+ 309              		.loc 1 382 1 view .LVU68
+ 310 005e 00BF     		.align	2
+ 311              	.L11:
+ 312 0060 00000000 		.word	hi2c1
+ 313              		.cfi_endproc
+ 314              	.LFE330:
+ 316              		.section	.text.r_reg,"ax",%progbits
+ 317              		.align	1
+ 318              		.global	r_reg
+ 319              		.syntax unified
+ 320              		.thumb
+ 321              		.thumb_func
+ 323              	r_reg:
+ 324              	.LVL19:
+ 325              	.LFB331:
+ 383:Core/Src/tda998x.c **** 
+ 384:Core/Src/tda998x.c **** uint8_t r_reg(uint16_t reg) {
+ 326              		.loc 1 384 29 is_stmt 1 view -0
+ 327              		.cfi_startproc
+ 328              		@ args = 0, pretend = 0, frame = 8
+ 329              		@ frame_needed = 0, uses_anonymous_args = 0
+ 330              		.loc 1 384 29 is_stmt 0 view .LVU70
+ 331 0000 70B5     		push	{r4, r5, r6, lr}
+ 332              	.LCFI9:
+ 333              		.cfi_def_cfa_offset 16
+ 334              		.cfi_offset 4, -16
+ 335              		.cfi_offset 5, -12
+ 336              		.cfi_offset 6, -8
+ 337              		.cfi_offset 14, -4
+ 338 0002 84B0     		sub	sp, sp, #16
+ 339              	.LCFI10:
+ 340              		.cfi_def_cfa_offset 32
+ 341 0004 0446     		mov	r4, r0
+ 385:Core/Src/tda998x.c **** 
+ 386:Core/Src/tda998x.c ****     uint8_t buf[2];
+ 342              		.loc 1 386 5 is_stmt 1 view .LVU71
+ 387:Core/Src/tda998x.c ****     buf[0] = REG_CURPAGE;
+ 343              		.loc 1 387 5 view .LVU72
+ 344              		.loc 1 387 12 is_stmt 0 view .LVU73
+ 345 0006 FF23     		movs	r3, #255
+ 346 0008 8DF80C30 		strb	r3, [sp, #12]
+ 388:Core/Src/tda998x.c ****     buf[1] = REG2PAGE(reg);
+ 347              		.loc 1 388 5 is_stmt 1 view .LVU74
+ 348              		.loc 1 388 12 is_stmt 0 view .LVU75
+ 349 000c 030A     		lsrs	r3, r0, #8
+ 350 000e 8DF80D30 		strb	r3, [sp, #13]
+ 389:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+ 351              		.loc 1 389 5 is_stmt 1 view .LVU76
+ 352 0012 0F4D     		ldr	r5, .L15
+ 353 0014 4FF47A76 		mov	r6, #1000
+ 354 0018 0096     		str	r6, [sp]
+ 355 001a 0223     		movs	r3, #2
+ 356 001c 03AA     		add	r2, sp, #12
+ 357 001e E021     		movs	r1, #224
+ 358 0020 2846     		mov	r0, r5
+ 359              	.LVL20:
+ARM GAS  /tmp/ccoWwH9k.s 			page 14
+
+
+ 360              		.loc 1 389 5 is_stmt 0 view .LVU77
+ 361 0022 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 362              	.LVL21:
+ 390:Core/Src/tda998x.c **** 
+ 391:Core/Src/tda998x.c ****     buf[0] = REG2ADDR(reg);
+ 363              		.loc 1 391 5 is_stmt 1 view .LVU78
+ 364              		.loc 1 391 12 is_stmt 0 view .LVU79
+ 365 0026 8DF80C40 		strb	r4, [sp, #12]
+ 392:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 1, 1000);
+ 366              		.loc 1 392 5 is_stmt 1 view .LVU80
+ 367 002a 0096     		str	r6, [sp]
+ 368 002c 0123     		movs	r3, #1
+ 369 002e 03AA     		add	r2, sp, #12
+ 370 0030 E021     		movs	r1, #224
+ 371 0032 2846     		mov	r0, r5
+ 372 0034 FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 373              	.LVL22:
+ 393:Core/Src/tda998x.c ****     HAL_I2C_Master_Receive(&hi2c1, I2C_ADDRESS_TDA, &buf, 1, 1000);
+ 374              		.loc 1 393 5 view .LVU81
+ 375 0038 0096     		str	r6, [sp]
+ 376 003a 0123     		movs	r3, #1
+ 377 003c 03AA     		add	r2, sp, #12
+ 378 003e E021     		movs	r1, #224
+ 379 0040 2846     		mov	r0, r5
+ 380 0042 FFF7FEFF 		bl	HAL_I2C_Master_Receive
+ 381              	.LVL23:
+ 394:Core/Src/tda998x.c **** 
+ 395:Core/Src/tda998x.c ****     return buf[0];
+ 382              		.loc 1 395 5 view .LVU82
+ 396:Core/Src/tda998x.c **** }
+ 383              		.loc 1 396 1 is_stmt 0 view .LVU83
+ 384 0046 9DF80C00 		ldrb	r0, [sp, #12]	@ zero_extendqisi2
+ 385 004a 04B0     		add	sp, sp, #16
+ 386              	.LCFI11:
+ 387              		.cfi_def_cfa_offset 16
+ 388              		@ sp needed
+ 389 004c 70BD     		pop	{r4, r5, r6, pc}
+ 390              	.LVL24:
+ 391              	.L16:
+ 392              		.loc 1 396 1 view .LVU84
+ 393 004e 00BF     		.align	2
+ 394              	.L15:
+ 395 0050 00000000 		.word	hi2c1
+ 396              		.cfi_endproc
+ 397              	.LFE331:
+ 399              		.section	.text.r_reg_range,"ax",%progbits
+ 400              		.align	1
+ 401              		.global	r_reg_range
+ 402              		.syntax unified
+ 403              		.thumb
+ 404              		.thumb_func
+ 406              	r_reg_range:
+ 407              	.LVL25:
+ 408              	.LFB332:
+ 397:Core/Src/tda998x.c **** 
+ 398:Core/Src/tda998x.c **** uint8_t EDID[256];
+ 399:Core/Src/tda998x.c **** 
+ARM GAS  /tmp/ccoWwH9k.s 			page 15
+
+
+ 400:Core/Src/tda998x.c **** uint16_t r_reg_range(uint16_t reg, uint8_t *buf, uint16_t cnt) {
+ 409              		.loc 1 400 64 is_stmt 1 view -0
+ 410              		.cfi_startproc
+ 411              		@ args = 0, pretend = 0, frame = 8
+ 412              		@ frame_needed = 0, uses_anonymous_args = 0
+ 413              		.loc 1 400 64 is_stmt 0 view .LVU86
+ 414 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 415              	.LCFI12:
+ 416              		.cfi_def_cfa_offset 24
+ 417              		.cfi_offset 4, -24
+ 418              		.cfi_offset 5, -20
+ 419              		.cfi_offset 6, -16
+ 420              		.cfi_offset 7, -12
+ 421              		.cfi_offset 8, -8
+ 422              		.cfi_offset 14, -4
+ 423 0004 84B0     		sub	sp, sp, #16
+ 424              	.LCFI13:
+ 425              		.cfi_def_cfa_offset 40
+ 426 0006 0546     		mov	r5, r0
+ 427 0008 0C46     		mov	r4, r1
+ 428 000a 1746     		mov	r7, r2
+ 401:Core/Src/tda998x.c **** 
+ 402:Core/Src/tda998x.c ****     uint8_t tmp[2];
+ 429              		.loc 1 402 5 is_stmt 1 view .LVU87
+ 403:Core/Src/tda998x.c ****     tmp[0] = REG_CURPAGE;
+ 430              		.loc 1 403 5 view .LVU88
+ 431              		.loc 1 403 12 is_stmt 0 view .LVU89
+ 432 000c FF23     		movs	r3, #255
+ 433 000e 8DF80C30 		strb	r3, [sp, #12]
+ 404:Core/Src/tda998x.c ****     tmp[1] = REG2PAGE(reg);
+ 434              		.loc 1 404 5 is_stmt 1 view .LVU90
+ 435              		.loc 1 404 12 is_stmt 0 view .LVU91
+ 436 0012 030A     		lsrs	r3, r0, #8
+ 437 0014 8DF80D30 		strb	r3, [sp, #13]
+ 405:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &tmp, 2, 1000);
+ 438              		.loc 1 405 5 is_stmt 1 view .LVU92
+ 439 0018 104E     		ldr	r6, .L19
+ 440 001a 4FF47A78 		mov	r8, #1000
+ 441 001e CDF80080 		str	r8, [sp]
+ 442 0022 0223     		movs	r3, #2
+ 443 0024 03AA     		add	r2, sp, #12
+ 444              	.LVL26:
+ 445              		.loc 1 405 5 is_stmt 0 view .LVU93
+ 446 0026 E021     		movs	r1, #224
+ 447              	.LVL27:
+ 448              		.loc 1 405 5 view .LVU94
+ 449 0028 3046     		mov	r0, r6
+ 450              	.LVL28:
+ 451              		.loc 1 405 5 view .LVU95
+ 452 002a FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 453              	.LVL29:
+ 406:Core/Src/tda998x.c **** 
+ 407:Core/Src/tda998x.c ****     tmp[0] = REG2ADDR(reg);
+ 454              		.loc 1 407 5 is_stmt 1 view .LVU96
+ 455              		.loc 1 407 12 is_stmt 0 view .LVU97
+ 456 002e 8DF80C50 		strb	r5, [sp, #12]
+ 408:Core/Src/tda998x.c ****     HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &tmp, 1, 1000);
+ARM GAS  /tmp/ccoWwH9k.s 			page 16
+
+
+ 457              		.loc 1 408 5 is_stmt 1 view .LVU98
+ 458 0032 CDF80080 		str	r8, [sp]
+ 459 0036 0123     		movs	r3, #1
+ 460 0038 03AA     		add	r2, sp, #12
+ 461 003a E021     		movs	r1, #224
+ 462 003c 3046     		mov	r0, r6
+ 463 003e FFF7FEFF 		bl	HAL_I2C_Master_Transmit
+ 464              	.LVL30:
+ 409:Core/Src/tda998x.c ****     HAL_I2C_Master_Receive(&hi2c1, I2C_ADDRESS_TDA, buf, cnt, 1000);
+ 465              		.loc 1 409 5 view .LVU99
+ 466 0042 CDF80080 		str	r8, [sp]
+ 467 0046 3B46     		mov	r3, r7
+ 468 0048 2246     		mov	r2, r4
+ 469 004a E021     		movs	r1, #224
+ 470 004c 3046     		mov	r0, r6
+ 471 004e FFF7FEFF 		bl	HAL_I2C_Master_Receive
+ 472              	.LVL31:
+ 410:Core/Src/tda998x.c **** 
+ 411:Core/Src/tda998x.c ****     return buf[0];
+ 473              		.loc 1 411 5 view .LVU100
+ 412:Core/Src/tda998x.c **** }
+ 474              		.loc 1 412 1 is_stmt 0 view .LVU101
+ 475 0052 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 476 0054 04B0     		add	sp, sp, #16
+ 477              	.LCFI14:
+ 478              		.cfi_def_cfa_offset 24
+ 479              		@ sp needed
+ 480 0056 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 481              	.LVL32:
+ 482              	.L20:
+ 483              		.loc 1 412 1 view .LVU102
+ 484 005a 00BF     		.align	2
+ 485              	.L19:
+ 486 005c 00000000 		.word	hi2c1
+ 487              		.cfi_endproc
+ 488              	.LFE332:
+ 490              		.section	.text.s_reg,"ax",%progbits
+ 491              		.align	1
+ 492              		.global	s_reg
+ 493              		.syntax unified
+ 494              		.thumb
+ 495              		.thumb_func
+ 497              	s_reg:
+ 498              	.LVL33:
+ 499              	.LFB333:
+ 413:Core/Src/tda998x.c **** 
+ 414:Core/Src/tda998x.c **** void s_reg(uint16_t reg, uint8_t val){
+ 500              		.loc 1 414 38 is_stmt 1 view -0
+ 501              		.cfi_startproc
+ 502              		@ args = 0, pretend = 0, frame = 0
+ 503              		@ frame_needed = 0, uses_anonymous_args = 0
+ 504              		.loc 1 414 38 is_stmt 0 view .LVU104
+ 505 0000 38B5     		push	{r3, r4, r5, lr}
+ 506              	.LCFI15:
+ 507              		.cfi_def_cfa_offset 16
+ 508              		.cfi_offset 3, -16
+ 509              		.cfi_offset 4, -12
+ARM GAS  /tmp/ccoWwH9k.s 			page 17
+
+
+ 510              		.cfi_offset 5, -8
+ 511              		.cfi_offset 14, -4
+ 512 0002 0446     		mov	r4, r0
+ 513 0004 0D46     		mov	r5, r1
+ 415:Core/Src/tda998x.c **** 
+ 416:Core/Src/tda998x.c ****     uint8_t old_val;
+ 514              		.loc 1 416 5 is_stmt 1 view .LVU105
+ 417:Core/Src/tda998x.c **** 
+ 418:Core/Src/tda998x.c ****     old_val = r_reg(reg);
+ 515              		.loc 1 418 5 view .LVU106
+ 516              		.loc 1 418 15 is_stmt 0 view .LVU107
+ 517 0006 FFF7FEFF 		bl	r_reg
+ 518              	.LVL34:
+ 419:Core/Src/tda998x.c ****     old_val |= val;
+ 519              		.loc 1 419 5 is_stmt 1 view .LVU108
+ 520              		.loc 1 419 13 is_stmt 0 view .LVU109
+ 521 000a 40EA0501 		orr	r1, r0, r5
+ 522              	.LVL35:
+ 420:Core/Src/tda998x.c ****     w_reg(reg, old_val);
+ 523              		.loc 1 420 5 is_stmt 1 view .LVU110
+ 524 000e C9B2     		uxtb	r1, r1
+ 525              		.loc 1 420 5 is_stmt 0 view .LVU111
+ 526 0010 2046     		mov	r0, r4
+ 527 0012 FFF7FEFF 		bl	w_reg
+ 528              	.LVL36:
+ 421:Core/Src/tda998x.c **** }
+ 529              		.loc 1 421 1 view .LVU112
+ 530 0016 38BD     		pop	{r3, r4, r5, pc}
+ 531              		.loc 1 421 1 view .LVU113
+ 532              		.cfi_endproc
+ 533              	.LFE333:
+ 535              		.section	.text.c_reg,"ax",%progbits
+ 536              		.align	1
+ 537              		.global	c_reg
+ 538              		.syntax unified
+ 539              		.thumb
+ 540              		.thumb_func
+ 542              	c_reg:
+ 543              	.LVL37:
+ 544              	.LFB334:
+ 422:Core/Src/tda998x.c **** 
+ 423:Core/Src/tda998x.c **** void c_reg(uint16_t reg, uint8_t val){
+ 545              		.loc 1 423 38 is_stmt 1 view -0
+ 546              		.cfi_startproc
+ 547              		@ args = 0, pretend = 0, frame = 0
+ 548              		@ frame_needed = 0, uses_anonymous_args = 0
+ 549              		.loc 1 423 38 is_stmt 0 view .LVU115
+ 550 0000 38B5     		push	{r3, r4, r5, lr}
+ 551              	.LCFI16:
+ 552              		.cfi_def_cfa_offset 16
+ 553              		.cfi_offset 3, -16
+ 554              		.cfi_offset 4, -12
+ 555              		.cfi_offset 5, -8
+ 556              		.cfi_offset 14, -4
+ 557 0002 0546     		mov	r5, r0
+ 558 0004 0C46     		mov	r4, r1
+ 424:Core/Src/tda998x.c **** 
+ARM GAS  /tmp/ccoWwH9k.s 			page 18
+
+
+ 425:Core/Src/tda998x.c ****     uint8_t old_val;
+ 559              		.loc 1 425 5 is_stmt 1 view .LVU116
+ 426:Core/Src/tda998x.c **** 
+ 427:Core/Src/tda998x.c ****     old_val = r_reg(reg);
+ 560              		.loc 1 427 5 view .LVU117
+ 561              		.loc 1 427 15 is_stmt 0 view .LVU118
+ 562 0006 FFF7FEFF 		bl	r_reg
+ 563              	.LVL38:
+ 428:Core/Src/tda998x.c ****     old_val &= ~val;
+ 564              		.loc 1 428 5 is_stmt 1 view .LVU119
+ 565              		.loc 1 428 13 is_stmt 0 view .LVU120
+ 566 000a E443     		mvns	r4, r4
+ 567              	.LVL39:
+ 568              		.loc 1 428 13 view .LVU121
+ 569 000c 64B2     		sxtb	r4, r4
+ 570              	.LVL40:
+ 571              		.loc 1 428 13 view .LVU122
+ 572 000e 00EA0401 		and	r1, r0, r4
+ 573              	.LVL41:
+ 429:Core/Src/tda998x.c ****     w_reg(reg, old_val);
+ 574              		.loc 1 429 5 is_stmt 1 view .LVU123
+ 575 0012 C9B2     		uxtb	r1, r1
+ 576              		.loc 1 429 5 is_stmt 0 view .LVU124
+ 577 0014 2846     		mov	r0, r5
+ 578 0016 FFF7FEFF 		bl	w_reg
+ 579              	.LVL42:
+ 430:Core/Src/tda998x.c **** }
+ 580              		.loc 1 430 1 view .LVU125
+ 581 001a 38BD     		pop	{r3, r4, r5, pc}
+ 582              		.loc 1 430 1 view .LVU126
+ 583              		.cfi_endproc
+ 584              	.LFE334:
+ 586              		.section	.text.read_edid,"ax",%progbits
+ 587              		.align	1
+ 588              		.global	read_edid
+ 589              		.syntax unified
+ 590              		.thumb
+ 591              		.thumb_func
+ 593              	read_edid:
+ 594              	.LFB335:
+ 431:Core/Src/tda998x.c **** 
+ 432:Core/Src/tda998x.c **** void read_edid(void) {
+ 595              		.loc 1 432 22 is_stmt 1 view -0
+ 596              		.cfi_startproc
+ 597              		@ args = 0, pretend = 0, frame = 0
+ 598              		@ frame_needed = 0, uses_anonymous_args = 0
+ 599 0000 00B5     		push	{lr}
+ 600              	.LCFI17:
+ 601              		.cfi_def_cfa_offset 4
+ 602              		.cfi_offset 14, -4
+ 603 0002 85B0     		sub	sp, sp, #20
+ 604              	.LCFI18:
+ 605              		.cfi_def_cfa_offset 24
+ 433:Core/Src/tda998x.c ****     w_reg(0x00F9, 0x00);
+ 606              		.loc 1 433 5 view .LVU128
+ 607 0004 0021     		movs	r1, #0
+ 608 0006 F920     		movs	r0, #249
+ARM GAS  /tmp/ccoWwH9k.s 			page 19
+
+
+ 609 0008 FFF7FEFF 		bl	w_reg
+ 610              	.LVL43:
+ 434:Core/Src/tda998x.c ****     w_reg(0x00FE, 0xa0);
+ 611              		.loc 1 434 5 view .LVU129
+ 612 000c A021     		movs	r1, #160
+ 613 000e FE20     		movs	r0, #254
+ 614 0010 FFF7FEFF 		bl	w_reg
+ 615              	.LVL44:
+ 435:Core/Src/tda998x.c **** 
+ 436:Core/Src/tda998x.c ****     HAL_I2C_Mem_Read(&hi2c1, 0xa0, 0, I2C_MEMADD_SIZE_8BIT, &EDID[0], 256, 1000);
+ 616              		.loc 1 436 5 view .LVU130
+ 617 0014 4FF47A73 		mov	r3, #1000
+ 618 0018 0293     		str	r3, [sp, #8]
+ 619 001a 4FF48073 		mov	r3, #256
+ 620 001e 0193     		str	r3, [sp, #4]
+ 621 0020 054B     		ldr	r3, .L27
+ 622 0022 0093     		str	r3, [sp]
+ 623 0024 0123     		movs	r3, #1
+ 624 0026 0022     		movs	r2, #0
+ 625 0028 A021     		movs	r1, #160
+ 626 002a 0448     		ldr	r0, .L27+4
+ 627 002c FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 628              	.LVL45:
+ 437:Core/Src/tda998x.c **** 
+ 438:Core/Src/tda998x.c **** }
+ 629              		.loc 1 438 1 is_stmt 0 view .LVU131
+ 630 0030 05B0     		add	sp, sp, #20
+ 631              	.LCFI19:
+ 632              		.cfi_def_cfa_offset 4
+ 633              		@ sp needed
+ 634 0032 5DF804FB 		ldr	pc, [sp], #4
+ 635              	.L28:
+ 636 0036 00BF     		.align	2
+ 637              	.L27:
+ 638 0038 00000000 		.word	EDID
+ 639 003c 00000000 		.word	hi2c1
+ 640              		.cfi_endproc
+ 641              	.LFE335:
+ 643              		.section	.text.tda_init,"ax",%progbits
+ 644              		.align	1
+ 645              		.global	tda_init
+ 646              		.syntax unified
+ 647              		.thumb
+ 648              		.thumb_func
+ 650              	tda_init:
+ 651              	.LFB336:
+ 439:Core/Src/tda998x.c **** 
+ 440:Core/Src/tda998x.c **** uint8_t debug[200];
+ 441:Core/Src/tda998x.c **** extern LTDC_HandleTypeDef hltdc;
+ 442:Core/Src/tda998x.c **** /*
+ 443:Core/Src/tda998x.c **** 
+ 444:Core/Src/tda998x.c **** typedef struct _LTDCSYNC_t {
+ 445:Core/Src/tda998x.c ****    uint16_t pll3n, pll3p, pll3q, pll3r;
+ 446:Core/Src/tda998x.c ****    uint16_t ahw, avh;
+ 447:Core/Src/tda998x.c ****    uint16_t hfp, hsync, hbp;
+ 448:Core/Src/tda998x.c ****    uint16_t vfp, vsync, vbp;
+ 449:Core/Src/tda998x.c ****    uint16_t hsw,  ahbp, aaw, totalw;
+ARM GAS  /tmp/ccoWwH9k.s 			page 20
+
+
+ 450:Core/Src/tda998x.c ****    uint16_t vsh,  avbp, aah, totalh;
+ 451:Core/Src/tda998x.c **** } LTDCSYNC_t;
+ 452:Core/Src/tda998x.c **** 
+ 453:Core/Src/tda998x.c ****      { 432, 4, 4, 4, 1280, 1024, 48, 112, 248, 1, 3, 38, 111, 359, 1639, 1687, 2, 40, 1064, 1065 },
+ 454:Core/Src/tda998x.c **** 
+ 455:Core/Src/tda998x.c **** 
+ 456:Core/Src/tda998x.c ****      NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVide
+ 457:Core/Src/tda998x.c ****      npix    nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1     
+ 458:Core/Src/tda998x.c ****      1688,   1066,  1,           48,         4,          48,         48,         160,    41,       
+ 459:Core/Src/tda998x.c **** 
+ 460:Core/Src/tda998x.c **** typedef struct _tmHdmiTxVidReg_t
+ 461:Core/Src/tda998x.c **** {
+ 462:Core/Src/tda998x.c ****     UInt16  nPix;               1688
+ 463:Core/Src/tda998x.c ****     UInt16  nLine;              1066
+ 464:Core/Src/tda998x.c ****     UInt8   VsLineStart;        1
+ 465:Core/Src/tda998x.c ****     UInt16  VsPixStart;         48
+ 466:Core/Src/tda998x.c ****     UInt8   VsLineEnd;          4
+ 467:Core/Src/tda998x.c ****     UInt16  VsPixEnd;           48
+ 468:Core/Src/tda998x.c ****     UInt16  HsStart;            48
+ 469:Core/Src/tda998x.c ****     UInt16  HsEnd;              160
+ 470:Core/Src/tda998x.c ****     UInt8   ActiveVideoStart;   41
+ 471:Core/Src/tda998x.c ****     UInt16  ActiveVideoEnd;     1065
+ 472:Core/Src/tda998x.c ****     UInt16  DeStart;            408
+ 473:Core/Src/tda998x.c ****     UInt16  DeEnd;              1688
+ 474:Core/Src/tda998x.c ****     UInt16  ActiveSpaceStart;   0
+ 475:Core/Src/tda998x.c ****     UInt16  ActiveSpaceEnd;     0
+ 476:Core/Src/tda998x.c **** } tmHdmiTxVidReg_t;
+ 477:Core/Src/tda998x.c **** 
+ 478:Core/Src/tda998x.c **** tmErrorCode_t set_video(tmHdmiTxobject_t *pDis,tmbslHdmiTxVidFmt_t reg_idx,tmHdmiTxVidReg_t *format
+ 479:Core/Src/tda998x.c **** {
+ 480:Core/Src/tda998x.c ****    tmErrorCode_t err;
+ 481:Core/Src/tda998x.c ****    UInt8 regVal;
+ 482:Core/Src/tda998x.c **** 
+ 483:Core/Src/tda998x.c ****    regVal = 0x00;// PR1570 FIXED
+ 484:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VIDFORMAT_W, regVal);
+ 485:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 486:Core/Src/tda998x.c **** 
+ 487:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].nPix;
+ 488:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_NPIX_LSB_W, regVal);
+ 489:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 490:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].nPix>>8);
+ 491:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_NPIX_MSB_W, regVal);
+ 492:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 493:Core/Src/tda998x.c ****    
+ 494:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].nLine;
+ 495:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_NLINE_LSB_W, regVal);
+ 496:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 497:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].nLine>>8);
+ 498:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_NLINE_MSB_W, regVal);
+ 499:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 500:Core/Src/tda998x.c ****    
+ 501:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].VsLineStart;
+ 502:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VS_LINE_STRT_1_LSB_W, regVal);
+ 503:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 504:Core/Src/tda998x.c ****    
+ 505:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].VsPixStart;
+ 506:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_LSB_W, regVal);
+ARM GAS  /tmp/ccoWwH9k.s 			page 21
+
+
+ 507:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 508:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].VsPixStart>>8);
+ 509:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_MSB_W, regVal);
+ 510:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 511:Core/Src/tda998x.c ****    
+ 512:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].VsLineEnd;
+ 513:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VS_LINE_END_1_LSB_W, regVal);
+ 514:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 515:Core/Src/tda998x.c ****    
+ 516:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].VsPixEnd;
+ 517:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_LSB_W, regVal);
+ 518:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 519:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].VsPixEnd>>8);
+ 520:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_MSB_W, regVal);
+ 521:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 522:Core/Src/tda998x.c ****    
+ 523:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].HsStart;
+ 524:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_LSB_W, regVal);
+ 525:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 526:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].HsStart>>8);
+ 527:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_MSB_W, regVal);
+ 528:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 529:Core/Src/tda998x.c ****    
+ 530:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].HsEnd;
+ 531:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_LSB_W, regVal);
+ 532:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 533:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].HsEnd>>8);
+ 534:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_MSB_W, regVal);
+ 535:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 536:Core/Src/tda998x.c ****    
+ 537:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].ActiveVideoStart;
+ 538:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_LSB_W, regVal);
+ 539:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 540:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_MSB_W, 0);
+ 541:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 542:Core/Src/tda998x.c ****    
+ 543:Core/Src/tda998x.c **** *  regVal = (UInt8)format_param[reg_idx].ActiveVideoEnd;
+ 544:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_LSB_W, regVal);
+ 545:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 546:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].ActiveVideoEnd>>8);
+ 547:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_MSB_W, regVal);
+ 548:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 549:Core/Src/tda998x.c ****    
+ 550:Core/Src/tda998x.c ****    regVal = (UInt8)format_param[reg_idx].DeStart;
+ 551:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_DE_START_LSB_W, regVal);
+ 552:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 553:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].DeStart>>8);
+ 554:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_DE_START_MSB_W, regVal);
+ 555:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 556:Core/Src/tda998x.c ****    
+ 557:Core/Src/tda998x.c ****    regVal = (UInt8)format_param[reg_idx].DeEnd;
+ 558:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_DE_STOP_LSB_W, regVal);
+ 559:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 560:Core/Src/tda998x.c ****    regVal = (UInt8)(format_param[reg_idx].DeEnd>>8);
+ 561:Core/Src/tda998x.c ****    err = setHwRegister(pDis, E_REG_P00_DE_STOP_MSB_W, regVal);
+ 562:Core/Src/tda998x.c ****    RETIF_REG_FAIL(err);
+ 563:Core/Src/tda998x.c **** 
+ARM GAS  /tmp/ccoWwH9k.s 			page 22
+
+
+ 564:Core/Src/tda998x.c **** 
+ 565:Core/Src/tda998x.c **** 
+ 566:Core/Src/tda998x.c **** 
+ 567:Core/Src/tda998x.c ****     UInt16  nPix;               1688
+ 568:Core/Src/tda998x.c ****     UInt16  nLine;              1066
+ 569:Core/Src/tda998x.c ****     UInt8   VsLineStart;        1
+ 570:Core/Src/tda998x.c ****     UInt16  VsPixStart;         48
+ 571:Core/Src/tda998x.c ****     UInt8   VsLineEnd;          4
+ 572:Core/Src/tda998x.c ****     UInt16  VsPixEnd;           48
+ 573:Core/Src/tda998x.c ****     UInt16  HsStart;            48
+ 574:Core/Src/tda998x.c ****     UInt16  HsEnd;              160
+ 575:Core/Src/tda998x.c ****     UInt8   ActiveVideoStart;   41
+ 576:Core/Src/tda998x.c ****     UInt16  ActiveVideoEnd;     1065
+ 577:Core/Src/tda998x.c ****     UInt16  DeStart;            408
+ 578:Core/Src/tda998x.c ****     UInt16  DeEnd;              1688
+ 579:Core/Src/tda998x.c ****     UInt16  ActiveSpaceStart;   0
+ 580:Core/Src/tda998x.c ****     UInt16  ActiveSpaceEnd;     0
+ 581:Core/Src/tda998x.c **** 
+ 582:Core/Src/tda998x.c **** }
+ 583:Core/Src/tda998x.c **** */
+ 584:Core/Src/tda998x.c **** 
+ 585:Core/Src/tda998x.c **** void tda_init(void) {
+ 652              		.loc 1 585 21 is_stmt 1 view -0
+ 653              		.cfi_startproc
+ 654              		@ args = 0, pretend = 0, frame = 0
+ 655              		@ frame_needed = 0, uses_anonymous_args = 0
+ 656 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 657              	.LCFI20:
+ 658              		.cfi_def_cfa_offset 24
+ 659              		.cfi_offset 3, -24
+ 660              		.cfi_offset 4, -20
+ 661              		.cfi_offset 5, -16
+ 662              		.cfi_offset 6, -12
+ 663              		.cfi_offset 7, -8
+ 664              		.cfi_offset 14, -4
+ 586:Core/Src/tda998x.c **** 
+ 587:Core/Src/tda998x.c ****     read_edid();
+ 665              		.loc 1 587 5 view .LVU133
+ 666 0002 FFF7FEFF 		bl	read_edid
+ 667              	.LVL46:
+ 588:Core/Src/tda998x.c **** 
+ 589:Core/Src/tda998x.c **** #if 0
+ 590:Core/Src/tda998x.c **** 
+ 591:Core/Src/tda998x.c ****     w_reg(REG_VIDFORMAT, 0x00);
+ 592:Core/Src/tda998x.c **** 
+ 593:Core/Src/tda998x.c ****     w16_reg(REG_NPIX_MSB, 1688);
+ 594:Core/Src/tda998x.c ****     w16_reg(REG_NLINE_MSB, 1066);
+ 595:Core/Src/tda998x.c **** 
+ 596:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
+ 597:Core/Src/tda998x.c **** 
+ 598:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_STRT_1_MSB, 48);
+ 599:Core/Src/tda998x.c **** 
+ 600:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_END_1_MSB, 4);
+ 601:Core/Src/tda998x.c **** 
+ 602:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_END_1_MSB, 48);
+ 603:Core/Src/tda998x.c **** 
+ 604:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_START_MSB, 48);
+ARM GAS  /tmp/ccoWwH9k.s 			page 23
+
+
+ 605:Core/Src/tda998x.c **** 
+ 606:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_STOP_MSB, 160);
+ 607:Core/Src/tda998x.c **** 
+ 608:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_START_1_MSB, 41);
+ 609:Core/Src/tda998x.c **** 
+ 610:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_END_1_MSB, 1065);
+ 611:Core/Src/tda998x.c **** 
+ 612:Core/Src/tda998x.c ****     w16_reg(REG_DE_START_MSB, 408);
+ 613:Core/Src/tda998x.c ****     w16_reg(REG_DE_STOP_MSB, 1688);
+ 614:Core/Src/tda998x.c **** 
+ 615:Core/Src/tda998x.c ****     HAL_Delay(400);
+ 616:Core/Src/tda998x.c **** 
+ 617:Core/Src/tda998x.c ****     /* enable video ports */
+ 618:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_0, 0xff);
+ 619:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_1, 0xff);
+ 620:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_2, 0xff);
+ 621:Core/Src/tda998x.c ****     /* set muxing after enabling ports: */
+ 622:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_0, VIP_CNTRL_0_SWAP_A(2) | VIP_CNTRL_0_SWAP_B(3));
+ 623:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_1, VIP_CNTRL_1_SWAP_C(4) | VIP_CNTRL_1_SWAP_D(5));
+ 624:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_2, VIP_CNTRL_2_SWAP_E(0) | VIP_CNTRL_2_SWAP_F(1));
+ 625:Core/Src/tda998x.c **** 
+ 626:Core/Src/tda998x.c **** #else
+ 627:Core/Src/tda998x.c **** 
+ 628:Core/Src/tda998x.c ****     uint8_t reg;
+ 668              		.loc 1 628 5 view .LVU134
+ 629:Core/Src/tda998x.c ****  
+ 630:Core/Src/tda998x.c ****     uint8_t div = 148500 / ((LTDCSYNC[LTDC_VID_FORMAT].pll3n/LTDCSYNC[LTDC_VID_FORMAT].pll3r)*1000)
+ 669              		.loc 1 630 5 view .LVU135
+ 631:Core/Src/tda998x.c ****     uint16_t line_clocks, lines;
+ 670              		.loc 1 631 5 view .LVU136
+ 632:Core/Src/tda998x.c **** 
+ 633:Core/Src/tda998x.c ****     div--;
+ 671              		.loc 1 633 5 view .LVU137
+ 634:Core/Src/tda998x.c ****     if (div > 3)
+ 672              		.loc 1 634 5 view .LVU138
+ 635:Core/Src/tda998x.c ****         div = 3;
+ 673              		.loc 1 635 9 view .LVU139
+ 636:Core/Src/tda998x.c **** 
+ 637:Core/Src/tda998x.c ****     div = 0;
+ 674              		.loc 1 637 5 view .LVU140
+ 638:Core/Src/tda998x.c **** 
+ 639:Core/Src/tda998x.c ****     /* first disable the video ports */
+ 640:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_0, 0);
+ 675              		.loc 1 640 5 view .LVU141
+ 676 0006 0021     		movs	r1, #0
+ 677 0008 1820     		movs	r0, #24
+ 678 000a FFF7FEFF 		bl	w_reg
+ 679              	.LVL47:
+ 641:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_1, 0);
+ 680              		.loc 1 641 5 view .LVU142
+ 681 000e 0021     		movs	r1, #0
+ 682 0010 1920     		movs	r0, #25
+ 683 0012 FFF7FEFF 		bl	w_reg
+ 684              	.LVL48:
+ 642:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_2, 0);
+ 685              		.loc 1 642 5 view .LVU143
+ 686 0016 0021     		movs	r1, #0
+ARM GAS  /tmp/ccoWwH9k.s 			page 24
+
+
+ 687 0018 1A20     		movs	r0, #26
+ 688 001a FFF7FEFF 		bl	w_reg
+ 689              	.LVL49:
+ 643:Core/Src/tda998x.c **** 
+ 644:Core/Src/tda998x.c ****     /* shutdown audio */
+ 645:Core/Src/tda998x.c ****     w_reg(REG_ENA_AP, 0);
+ 690              		.loc 1 645 5 view .LVU144
+ 691 001e 0021     		movs	r1, #0
+ 692 0020 1E20     		movs	r0, #30
+ 693 0022 FFF7FEFF 		bl	w_reg
+ 694              	.LVL50:
+ 646:Core/Src/tda998x.c **** 
+ 647:Core/Src/tda998x.c ****     line_clocks = LTDCSYNC[LTDC_VID_FORMAT].totalw; 
+ 695              		.loc 1 647 5 view .LVU145
+ 696              		.loc 1 647 17 is_stmt 0 view .LVU146
+ 697 0026 754C     		ldr	r4, .L31
+ 698 0028 B4F88651 		ldrh	r5, [r4, #390]
+ 699              	.LVL51:
+ 648:Core/Src/tda998x.c ****     lines =       LTDCSYNC[LTDC_VID_FORMAT].totalh;
+ 700              		.loc 1 648 5 is_stmt 1 view .LVU147
+ 701              		.loc 1 648 11 is_stmt 0 view .LVU148
+ 702 002c B4F88E61 		ldrh	r6, [r4, #398]
+ 703              	.LVL52:
+ 649:Core/Src/tda998x.c **** 
+ 650:Core/Src/tda998x.c ****     /* mute the audio FIFO */
+ 651:Core/Src/tda998x.c ****     s_reg(REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_FIFO);
+ 704              		.loc 1 651 5 is_stmt 1 view .LVU149
+ 705 0030 0121     		movs	r1, #1
+ 706 0032 4FF48850 		mov	r0, #4352
+ 707 0036 FFF7FEFF 		bl	s_reg
+ 708              	.LVL53:
+ 652:Core/Src/tda998x.c ****     /* HDMI HDCP: off */
+ 653:Core/Src/tda998x.c ****     w_reg(REG_TBG_CNTRL_1, TBG_CNTRL_1_DWIN_DIS);
+ 709              		.loc 1 653 5 view .LVU150
+ 710 003a 4021     		movs	r1, #64
+ 711 003c CB20     		movs	r0, #203
+ 712 003e FFF7FEFF 		bl	w_reg
+ 713              	.LVL54:
+ 654:Core/Src/tda998x.c ****     c_reg(REG_TX33, TX33_HDMI);
+ 714              		.loc 1 654 5 view .LVU151
+ 715 0042 0221     		movs	r1, #2
+ 716 0044 41F2B820 		movw	r0, #4792
+ 717 0048 FFF7FEFF 		bl	c_reg
+ 718              	.LVL55:
+ 655:Core/Src/tda998x.c ****     w_reg(REG_ENC_CNTRL, ENC_CNTRL_CTL_CODE(0));
+ 719              		.loc 1 655 5 view .LVU152
+ 720 004c 0021     		movs	r1, #0
+ 721 004e 41F20D10 		movw	r0, #4365
+ 722 0052 FFF7FEFF 		bl	w_reg
+ 723              	.LVL56:
+ 656:Core/Src/tda998x.c **** 
+ 657:Core/Src/tda998x.c ****     // no pre-filter or interpolator
+ 658:Core/Src/tda998x.c ****     
+ 659:Core/Src/tda998x.c ****     //w_reg(REG_HVF_CNTRL_0, HVF_CNTRL_0_PREFIL(0) | HVF_CNTRL_0_INTPOL(0));
+ 660:Core/Src/tda998x.c ****     //s_reg(REG_FEAT_POWERDOWN,FEAT_POWERDOWN_PREFILT);
+ 661:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_5, VIP_CNTRL_5_SP_CNT(0));
+ 724              		.loc 1 661 5 view .LVU153
+ARM GAS  /tmp/ccoWwH9k.s 			page 25
+
+
+ 725 0056 0021     		movs	r1, #0
+ 726 0058 2520     		movs	r0, #37
+ 727 005a FFF7FEFF 		bl	w_reg
+ 728              	.LVL57:
+ 662:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_4, VIP_CNTRL_4_BLANKIT(0) | VIP_CNTRL_4_BLC(0) | VIP_CNTRL_4_TST_PAT);
+ 729              		.loc 1 662 5 view .LVU154
+ 730 005e 8021     		movs	r1, #128
+ 731 0060 2420     		movs	r0, #36
+ 732 0062 FFF7FEFF 		bl	w_reg
+ 733              	.LVL58:
+ 663:Core/Src/tda998x.c **** 
+ 664:Core/Src/tda998x.c ****     c_reg(REG_PLL_SERIAL_1, PLL_SERIAL_1_SRL_MAN_IZ);
+ 734              		.loc 1 664 5 view .LVU155
+ 735 0066 4021     		movs	r1, #64
+ 736 0068 4FF40070 		mov	r0, #512
+ 737 006c FFF7FEFF 		bl	c_reg
+ 738              	.LVL59:
+ 665:Core/Src/tda998x.c ****     c_reg(REG_PLL_SERIAL_3, PLL_SERIAL_3_SRL_CCIR | PLL_SERIAL_3_SRL_DE);
+ 739              		.loc 1 665 5 view .LVU156
+ 740 0070 0521     		movs	r1, #5
+ 741 0072 40F20220 		movw	r0, #514
+ 742 0076 FFF7FEFF 		bl	c_reg
+ 743              	.LVL60:
+ 666:Core/Src/tda998x.c **** 
+ 667:Core/Src/tda998x.c ****     w_reg(REG_SERIALIZER, 0);
+ 744              		.loc 1 667 5 view .LVU157
+ 745 007a 0021     		movs	r1, #0
+ 746 007c 40F20320 		movw	r0, #515
+ 747 0080 FFF7FEFF 		bl	w_reg
+ 748              	.LVL61:
+ 668:Core/Src/tda998x.c ****     w_reg(REG_HVF_CNTRL_1, HVF_CNTRL_1_VQR(0));
+ 749              		.loc 1 668 5 view .LVU158
+ 750 0084 0021     		movs	r1, #0
+ 751 0086 E520     		movs	r0, #229
+ 752 0088 FFF7FEFF 		bl	w_reg
+ 753              	.LVL62:
+ 669:Core/Src/tda998x.c **** 
+ 670:Core/Src/tda998x.c ****     w_reg(REG_RPT_CNTRL, 0);
+ 754              		.loc 1 670 5 view .LVU159
+ 755 008c 0021     		movs	r1, #0
+ 756 008e F020     		movs	r0, #240
+ 757 0090 FFF7FEFF 		bl	w_reg
+ 758              	.LVL63:
+ 671:Core/Src/tda998x.c ****     w_reg(REG_SEL_CLK, SEL_CLK_SEL_VRF_CLK(0) );
+ 759              		.loc 1 671 5 view .LVU160
+ 760 0094 0021     		movs	r1, #0
+ 761 0096 40F21120 		movw	r0, #529
+ 762 009a FFF7FEFF 		bl	w_reg
+ 763              	.LVL64:
+ 672:Core/Src/tda998x.c ****     w_reg(REG_PLL_SERIAL_2, PLL_SERIAL_2_SRL_NOSC(div) | PLL_SERIAL_2_SRL_PR(0));
+ 764              		.loc 1 672 5 view .LVU161
+ 765 009e 0021     		movs	r1, #0
+ 766 00a0 40F20120 		movw	r0, #513
+ 767 00a4 FFF7FEFF 		bl	w_reg
+ 768              	.LVL65:
+ 673:Core/Src/tda998x.c **** 
+ 674:Core/Src/tda998x.c ****     // set color matrix bypass flag:
+ARM GAS  /tmp/ccoWwH9k.s 			page 26
+
+
+ 675:Core/Src/tda998x.c ****     w_reg(REG_MAT_CONTRL, MAT_CONTRL_MAT_BP | MAT_CONTRL_MAT_SC(1));
+ 769              		.loc 1 675 5 view .LVU162
+ 770 00a8 0521     		movs	r1, #5
+ 771 00aa 8020     		movs	r0, #128
+ 772 00ac FFF7FEFF 		bl	w_reg
+ 773              	.LVL66:
+ 676:Core/Src/tda998x.c ****     s_reg(REG_FEAT_POWERDOWN, FEAT_POWERDOWN_CSC);
+ 774              		.loc 1 676 5 view .LVU163
+ 775 00b0 0221     		movs	r1, #2
+ 776 00b2 0E20     		movs	r0, #14
+ 777 00b4 FFF7FEFF 		bl	s_reg
+ 778              	.LVL67:
+ 677:Core/Src/tda998x.c **** 
+ 678:Core/Src/tda998x.c ****     // set BIAS tmds value:
+ 679:Core/Src/tda998x.c ****     w_reg(REG_ANA_GENERAL, 0x09);
+ 779              		.loc 1 679 5 view .LVU164
+ 780 00b8 0921     		movs	r1, #9
+ 781 00ba 40F21220 		movw	r0, #530
+ 782 00be FFF7FEFF 		bl	w_reg
+ 783              	.LVL68:
+ 680:Core/Src/tda998x.c **** 
+ 681:Core/Src/tda998x.c ****     //w_reg(REG_BUFFER_OUT, 0);
+ 682:Core/Src/tda998x.c **** 
+ 683:Core/Src/tda998x.c ****     reg = VIP_CNTRL_3_SYNC_HS;
+ 784              		.loc 1 683 5 view .LVU165
+ 684:Core/Src/tda998x.c **** #if 0
+ 685:Core/Src/tda998x.c ****     if(hltdc.Init.HSPolarity == LTDC_HSPOLARITY_AL) {
+ 686:Core/Src/tda998x.c ****         reg |= VIP_CNTRL_3_H_TGL;
+ 687:Core/Src/tda998x.c ****     };
+ 688:Core/Src/tda998x.c ****     if(hltdc.Init.VSPolarity == LTDC_VSPOLARITY_AL) {
+ 689:Core/Src/tda998x.c ****         reg |= VIP_CNTRL_3_V_TGL;    
+ 690:Core/Src/tda998x.c ****     };
+ 691:Core/Src/tda998x.c ****     if(hltdc.Init.DEPolarity == LTDC_DEPOLARITY_AL) {
+ 692:Core/Src/tda998x.c ****         reg |= VIP_CNTRL_3_X_TGL;    
+ 693:Core/Src/tda998x.c ****     };
+ 694:Core/Src/tda998x.c ****     if(hltdc.Init.PCPolarity == LTDC_PCPOLARITY_IIPC) {
+ 695:Core/Src/tda998x.c ****         reg |= VIP_CNTRL_3_EDGE;    
+ 696:Core/Src/tda998x.c ****     };
+ 697:Core/Src/tda998x.c **** #endif
+ 698:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_3, reg);
+ 785              		.loc 1 698 5 view .LVU166
+ 786 00c2 2021     		movs	r1, #32
+ 787 00c4 2320     		movs	r0, #35
+ 788 00c6 FFF7FEFF 		bl	w_reg
+ 789              	.LVL69:
+ 699:Core/Src/tda998x.c **** 
+ 700:Core/Src/tda998x.c **** #if 0
+ 701:Core/Src/tda998x.c ****     w_reg(REG_VIDFORMAT, 0x00);
+ 702:Core/Src/tda998x.c ****     w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
+ 703:Core/Src/tda998x.c ****     w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
+ 704:Core/Src/tda998x.c ****     w16_reg(REG_NPIX_MSB, line_clocks);
+ 705:Core/Src/tda998x.c ****     w16_reg(REG_NLINE_MSB, lines);
+ 706:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp);
+ 707:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
+ 708:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp + LTDCSYNC[LTDC_VID_FORMAT].vsync)
+ 709:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
+ 710:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
+ARM GAS  /tmp/ccoWwH9k.s 			page 27
+
+
+ 711:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
+ 712:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_END_2_MSB, 0);
+ 713:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_END_2_MSB, 0);
+ 714:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_START_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
+ 715:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_STOP_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp + LTDCSYNC[LTDC_VID_FORMAT].hsync);
+ 716:Core/Src/tda998x.c **** 
+ 717:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_START_1_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh); //-1
+ 718:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_END_1_MSB, lines); //-1
+ 719:Core/Src/tda998x.c **** 
+ 720:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_START_2_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh);
+ 721:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_END_2_MSB, lines);
+ 722:Core/Src/tda998x.c **** 
+ 723:Core/Src/tda998x.c ****     w16_reg(REG_DE_START_MSB, line_clocks - LTDCSYNC[LTDC_VID_FORMAT].ahw);
+ 724:Core/Src/tda998x.c ****     w16_reg(REG_DE_STOP_MSB, line_clocks);
+ 725:Core/Src/tda998x.c **** 
+ 726:Core/Src/tda998x.c **** #else
+ 727:Core/Src/tda998x.c ****   //  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVid
+ 728:Core/Src/tda998x.c **** //    npix  nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1  vw_e
+ 729:Core/Src/tda998x.c **** //   {1688, 1066,       1,          48,          4,         48,       48,       160,       41,  106
+ 730:Core/Src/tda998x.c **** 
+ 731:Core/Src/tda998x.c **** //   pll3n 432  pll3p    4 pll3q  4 pll3r     4
+ 732:Core/Src/tda998x.c **** //   ahw  1280  avh   1024
+ 733:Core/Src/tda998x.c **** 
+ 734:Core/Src/tda998x.c **** //   hfp    48  hsync  112 hbp  248
+ 735:Core/Src/tda998x.c **** //   hsw   111  ahbp   359 aaw 1639 totalw 1687
+ 736:Core/Src/tda998x.c **** 
+ 737:Core/Src/tda998x.c **** //   vfp     1  vsync    3 vbp   38
+ 738:Core/Src/tda998x.c **** //   vsh     2  avbp    40 aah 1064 totalh 1065
+ 739:Core/Src/tda998x.c **** 
+ 740:Core/Src/tda998x.c ****     w_reg(REG_VIDFORMAT, 0x00);
+ 790              		.loc 1 740 5 view .LVU167
+ 791 00ca 0021     		movs	r1, #0
+ 792 00cc A020     		movs	r0, #160
+ 793 00ce FFF7FEFF 		bl	w_reg
+ 794              	.LVL70:
+ 741:Core/Src/tda998x.c ****     w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
+ 795              		.loc 1 741 5 view .LVU168
+ 796 00d2 B4F87411 		ldrh	r1, [r4, #372]
+ 797 00d6 A120     		movs	r0, #161
+ 798 00d8 FFF7FEFF 		bl	w16_reg
+ 799              	.LVL71:
+ 742:Core/Src/tda998x.c ****     w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
+ 800              		.loc 1 742 5 view .LVU169
+ 801 00dc B4F87A11 		ldrh	r1, [r4, #378]
+ 802 00e0 A320     		movs	r0, #163
+ 803 00e2 FFF7FEFF 		bl	w16_reg
+ 804              	.LVL72:
+ 743:Core/Src/tda998x.c ****     w16_reg(REG_NPIX_MSB, line_clocks);
+ 805              		.loc 1 743 5 view .LVU170
+ 806 00e6 2946     		mov	r1, r5
+ 807 00e8 A520     		movs	r0, #165
+ 808 00ea FFF7FEFF 		bl	w16_reg
+ 809              	.LVL73:
+ 744:Core/Src/tda998x.c ****     w16_reg(REG_NLINE_MSB, lines);
+ 810              		.loc 1 744 5 view .LVU171
+ 811 00ee 3146     		mov	r1, r6
+ 812 00f0 A720     		movs	r0, #167
+ARM GAS  /tmp/ccoWwH9k.s 			page 28
+
+
+ 813 00f2 FFF7FEFF 		bl	w16_reg
+ 814              	.LVL74:
+ 745:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
+ 815              		.loc 1 745 5 view .LVU172
+ 816 00f6 0121     		movs	r1, #1
+ 817 00f8 A920     		movs	r0, #169
+ 818 00fa FFF7FEFF 		bl	w16_reg
+ 819              	.LVL75:
+ 746:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsync);
+ 820              		.loc 1 746 5 view .LVU173
+ 821 00fe B4F87C11 		ldrh	r1, [r4, #380]
+ 822 0102 AD20     		movs	r0, #173
+ 823 0104 FFF7FEFF 		bl	w16_reg
+ 824              	.LVL76:
+ 747:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+ 825              		.loc 1 747 5 view .LVU174
+ 826              		.loc 1 747 61 is_stmt 0 view .LVU175
+ 827 0108 B4F88A71 		ldrh	r7, [r4, #394]
+ 828              		.loc 1 747 5 view .LVU176
+ 829 010c 3946     		mov	r1, r7
+ 830 010e AB20     		movs	r0, #171
+ 831 0110 FFF7FEFF 		bl	w16_reg
+ 832              	.LVL77:
+ 748:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+ 833              		.loc 1 748 5 is_stmt 1 view .LVU177
+ 834 0114 3946     		mov	r1, r7
+ 835 0116 AF20     		movs	r0, #175
+ 836 0118 FFF7FEFF 		bl	w16_reg
+ 837              	.LVL78:
+ 749:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
+ 838              		.loc 1 749 5 view .LVU178
+ 839 011c 0021     		movs	r1, #0
+ 840 011e B120     		movs	r0, #177
+ 841 0120 FFF7FEFF 		bl	w16_reg
+ 842              	.LVL79:
+ 750:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_END_2_MSB, 0);
+ 843              		.loc 1 750 5 view .LVU179
+ 844 0124 0021     		movs	r1, #0
+ 845 0126 B520     		movs	r0, #181
+ 846 0128 FFF7FEFF 		bl	w16_reg
+ 847              	.LVL80:
+ 751:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
+ 848              		.loc 1 751 5 view .LVU180
+ 849 012c 0021     		movs	r1, #0
+ 850 012e B320     		movs	r0, #179
+ 851 0130 FFF7FEFF 		bl	w16_reg
+ 852              	.LVL81:
+ 752:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_END_2_MSB, 0);
+ 853              		.loc 1 752 5 view .LVU181
+ 854 0134 0021     		movs	r1, #0
+ 855 0136 B720     		movs	r0, #183
+ 856 0138 FFF7FEFF 		bl	w16_reg
+ 857              	.LVL82:
+ 753:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_START_MSB, 0);
+ 858              		.loc 1 753 5 view .LVU182
+ 859 013c 0021     		movs	r1, #0
+ 860 013e B920     		movs	r0, #185
+ARM GAS  /tmp/ccoWwH9k.s 			page 29
+
+
+ 861 0140 FFF7FEFF 		bl	w16_reg
+ 862              	.LVL83:
+ 754:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_STOP_MSB, line_clocks);
+ 863              		.loc 1 754 5 view .LVU183
+ 864 0144 2946     		mov	r1, r5
+ 865 0146 BB20     		movs	r0, #187
+ 866 0148 FFF7FEFF 		bl	w16_reg
+ 867              	.LVL84:
+ 755:Core/Src/tda998x.c **** 
+ 756:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_START_1_MSB, 0); //-1
+ 868              		.loc 1 756 5 view .LVU184
+ 869 014c 0021     		movs	r1, #0
+ 870 014e BD20     		movs	r0, #189
+ 871 0150 FFF7FEFF 		bl	w16_reg
+ 872              	.LVL85:
+ 757:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].totalh); //-1
+ 873              		.loc 1 757 5 view .LVU185
+ 874 0154 3146     		mov	r1, r6
+ 875 0156 BF20     		movs	r0, #191
+ 876 0158 FFF7FEFF 		bl	w16_reg
+ 877              	.LVL86:
+ 758:Core/Src/tda998x.c **** 
+ 759:Core/Src/tda998x.c ****     //w16_reg(REG_VWIN_START_2_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh);
+ 760:Core/Src/tda998x.c ****     //w16_reg(REG_VWIN_END_2_MSB, lines);
+ 761:Core/Src/tda998x.c **** 
+ 762:Core/Src/tda998x.c ****     w16_reg(REG_DE_START_MSB, line_clocks - LTDCSYNC[LTDC_VID_FORMAT].ahw);
+ 878              		.loc 1 762 5 view .LVU186
+ 879              		.loc 1 762 70 is_stmt 0 view .LVU187
+ 880 015c B4F87011 		ldrh	r1, [r4, #368]
+ 881              		.loc 1 762 5 view .LVU188
+ 882 0160 691A     		subs	r1, r5, r1
+ 883 0162 89B2     		uxth	r1, r1
+ 884 0164 C520     		movs	r0, #197
+ 885 0166 FFF7FEFF 		bl	w16_reg
+ 886              	.LVL87:
+ 763:Core/Src/tda998x.c ****     w16_reg(REG_DE_STOP_MSB, line_clocks);
+ 887              		.loc 1 763 5 is_stmt 1 view .LVU189
+ 888 016a 2946     		mov	r1, r5
+ 889 016c C720     		movs	r0, #199
+ 890 016e FFF7FEFF 		bl	w16_reg
+ 891              	.LVL88:
+ 764:Core/Src/tda998x.c **** /*    
+ 765:Core/Src/tda998x.c ****     w_reg(REG_VIDFORMAT, 0x00);
+ 766:Core/Src/tda998x.c ****     w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
+ 767:Core/Src/tda998x.c ****     w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
+ 768:Core/Src/tda998x.c ****     w16_reg(REG_NPIX_MSB, 1688);
+ 769:Core/Src/tda998x.c ****     w16_reg(REG_NLINE_MSB, 1066);
+ 770:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
+ 771:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_STRT_1_MSB, 48);
+ 772:Core/Src/tda998x.c ****     w16_reg(REG_VS_LINE_END_1_MSB, 4);
+ 773:Core/Src/tda998x.c ****     w16_reg(REG_VS_PIX_END_1_MSB, 48);
+ 774:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_START_MSB, 48);
+ 775:Core/Src/tda998x.c ****     w16_reg(REG_HS_PIX_STOP_MSB, 160);
+ 776:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_START_1_MSB, 41);
+ 777:Core/Src/tda998x.c ****     w16_reg(REG_VWIN_END_1_MSB, 1065);
+ 778:Core/Src/tda998x.c ****     w16_reg(REG_DE_START_MSB, 408);
+ 779:Core/Src/tda998x.c ****     w16_reg(REG_DE_STOP_MSB, 1688);
+ARM GAS  /tmp/ccoWwH9k.s 			page 30
+
+
+ 780:Core/Src/tda998x.c **** */
+ 781:Core/Src/tda998x.c **** #endif
+ 782:Core/Src/tda998x.c **** 
+ 783:Core/Src/tda998x.c ****     /*
+ 784:Core/Src/tda998x.c ****      * Always generate sync polarity relative to input sync and
+ 785:Core/Src/tda998x.c ****      * revert input stage toggled sync at output stage
+ 786:Core/Src/tda998x.c ****      */
+ 787:Core/Src/tda998x.c ****     
+ 788:Core/Src/tda998x.c ****     reg = TBG_CNTRL_1_DWIN_DIS | TBG_CNTRL_1_TGL_EN;
+ 892              		.loc 1 788 5 view .LVU190
+ 789:Core/Src/tda998x.c ****     //if (hltdc.Init.HSPolarity == LTDC_HSPOLARITY_AL)
+ 790:Core/Src/tda998x.c ****     //    reg |= TBG_CNTRL_1_H_TGL;
+ 791:Core/Src/tda998x.c ****     //if (hltdc.Init.VSPolarity == LTDC_VSPOLARITY_AL)
+ 792:Core/Src/tda998x.c ****     //    reg |= TBG_CNTRL_1_V_TGL;
+ 793:Core/Src/tda998x.c ****     w_reg(REG_TBG_CNTRL_1, reg);
+ 893              		.loc 1 793 5 view .LVU191
+ 894 0172 4421     		movs	r1, #68
+ 895 0174 CB20     		movs	r0, #203
+ 896 0176 FFF7FEFF 		bl	w_reg
+ 897              	.LVL89:
+ 794:Core/Src/tda998x.c **** 
+ 795:Core/Src/tda998x.c ****     /* must be last register set: */
+ 796:Core/Src/tda998x.c ****     w_reg(REG_TBG_CNTRL_0, 0);
+ 898              		.loc 1 796 5 view .LVU192
+ 899 017a 0021     		movs	r1, #0
+ 900 017c CA20     		movs	r0, #202
+ 901 017e FFF7FEFF 		bl	w_reg
+ 902              	.LVL90:
+ 797:Core/Src/tda998x.c **** 
+ 798:Core/Src/tda998x.c ****     /* turn on HDMI HDCP */
+ 799:Core/Src/tda998x.c ****     reg &= ~TBG_CNTRL_1_DWIN_DIS;
+ 903              		.loc 1 799 5 view .LVU193
+ 800:Core/Src/tda998x.c ****     w_reg(REG_TBG_CNTRL_1, reg);
+ 904              		.loc 1 800 5 view .LVU194
+ 905 0182 0421     		movs	r1, #4
+ 906 0184 CB20     		movs	r0, #203
+ 907 0186 FFF7FEFF 		bl	w_reg
+ 908              	.LVL91:
+ 801:Core/Src/tda998x.c ****     w_reg(REG_ENC_CNTRL, ENC_CNTRL_CTL_CODE(1));
+ 909              		.loc 1 801 5 view .LVU195
+ 910 018a 0421     		movs	r1, #4
+ 911 018c 41F20D10 		movw	r0, #4365
+ 912 0190 FFF7FEFF 		bl	w_reg
+ 913              	.LVL92:
+ 802:Core/Src/tda998x.c ****     s_reg(REG_TX33, TX33_HDMI);
+ 914              		.loc 1 802 5 view .LVU196
+ 915 0194 0221     		movs	r1, #2
+ 916 0196 41F2B820 		movw	r0, #4792
+ 917 019a FFF7FEFF 		bl	s_reg
+ 918              	.LVL93:
+ 803:Core/Src/tda998x.c **** 
+ 804:Core/Src/tda998x.c ****     HAL_Delay(400);
+ 919              		.loc 1 804 5 view .LVU197
+ 920 019e 4FF4C870 		mov	r0, #400
+ 921 01a2 FFF7FEFF 		bl	HAL_Delay
+ 922              	.LVL94:
+ 805:Core/Src/tda998x.c **** 
+ARM GAS  /tmp/ccoWwH9k.s 			page 31
+
+
+ 806:Core/Src/tda998x.c **** 
+ 807:Core/Src/tda998x.c **** 
+ 808:Core/Src/tda998x.c ****     /* enable video ports */
+ 809:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_0, 0xff);
+ 923              		.loc 1 809 5 view .LVU198
+ 924 01a6 FF21     		movs	r1, #255
+ 925 01a8 1820     		movs	r0, #24
+ 926 01aa FFF7FEFF 		bl	w_reg
+ 927              	.LVL95:
+ 810:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_1, 0xff);
+ 928              		.loc 1 810 5 view .LVU199
+ 929 01ae FF21     		movs	r1, #255
+ 930 01b0 1920     		movs	r0, #25
+ 931 01b2 FFF7FEFF 		bl	w_reg
+ 932              	.LVL96:
+ 811:Core/Src/tda998x.c ****     w_reg(REG_ENA_VP_2, 0xff);
+ 933              		.loc 1 811 5 view .LVU200
+ 934 01b6 FF21     		movs	r1, #255
+ 935 01b8 1A20     		movs	r0, #26
+ 936 01ba FFF7FEFF 		bl	w_reg
+ 937              	.LVL97:
+ 812:Core/Src/tda998x.c ****     /* set muxing after enabling ports: */
+ 813:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_0, VIP_CNTRL_0_SWAP_A(2) | VIP_CNTRL_0_SWAP_B(3));
+ 938              		.loc 1 813 5 view .LVU201
+ 939 01be 2321     		movs	r1, #35
+ 940 01c0 2020     		movs	r0, #32
+ 941 01c2 FFF7FEFF 		bl	w_reg
+ 942              	.LVL98:
+ 814:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_1, VIP_CNTRL_1_SWAP_C(4) | VIP_CNTRL_1_SWAP_D(5));
+ 943              		.loc 1 814 5 view .LVU202
+ 944 01c6 4521     		movs	r1, #69
+ 945 01c8 2120     		movs	r0, #33
+ 946 01ca FFF7FEFF 		bl	w_reg
+ 947              	.LVL99:
+ 815:Core/Src/tda998x.c ****     w_reg(REG_VIP_CNTRL_2, VIP_CNTRL_2_SWAP_E(0) | VIP_CNTRL_2_SWAP_F(1));
+ 948              		.loc 1 815 5 view .LVU203
+ 949 01ce 0121     		movs	r1, #1
+ 950 01d0 2220     		movs	r0, #34
+ 951 01d2 FFF7FEFF 		bl	w_reg
+ 952              	.LVL100:
+ 816:Core/Src/tda998x.c **** 
+ 817:Core/Src/tda998x.c ****     w_reg(0x1100, 1<<6|1<<0);
+ 953              		.loc 1 817 5 view .LVU204
+ 954 01d6 4121     		movs	r1, #65
+ 955 01d8 4FF48850 		mov	r0, #4352
+ 956 01dc FFF7FEFF 		bl	w_reg
+ 957              	.LVL101:
+ 818:Core/Src/tda998x.c ****     HAL_Delay(100);
+ 958              		.loc 1 818 5 view .LVU205
+ 959 01e0 6420     		movs	r0, #100
+ 960 01e2 FFF7FEFF 		bl	HAL_Delay
+ 961              	.LVL102:
+ 819:Core/Src/tda998x.c ****     w_reg(0x1100, 0);
+ 962              		.loc 1 819 5 view .LVU206
+ 963 01e6 0021     		movs	r1, #0
+ 964 01e8 4FF48850 		mov	r0, #4352
+ 965 01ec FFF7FEFF 		bl	w_reg
+ARM GAS  /tmp/ccoWwH9k.s 			page 32
+
+
+ 966              	.LVL103:
+ 820:Core/Src/tda998x.c **** 
+ 821:Core/Src/tda998x.c ****     //w_reg(0x110b, 1<<0);
+ 822:Core/Src/tda998x.c **** 
+ 823:Core/Src/tda998x.c **** 
+ 824:Core/Src/tda998x.c ****     w_reg(REG_AIP_CLKSEL, AIP_CLKSEL_AIP_I2S);
+ 967              		.loc 1 824 5 view .LVU207
+ 968 01f0 0821     		movs	r1, #8
+ 969 01f2 FD20     		movs	r0, #253
+ 970 01f4 FFF7FEFF 		bl	w_reg
+ 971              	.LVL104:
+ 825:Core/Src/tda998x.c **** 
+ 826:Core/Src/tda998x.c **** #endif
+ 827:Core/Src/tda998x.c **** 
+ 828:Core/Src/tda998x.c **** }
+ 972              		.loc 1 828 1 is_stmt 0 view .LVU208
+ 973 01f8 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 974              	.LVL105:
+ 975              	.L32:
+ 976              		.loc 1 828 1 view .LVU209
+ 977 01fa 00BF     		.align	2
+ 978              	.L31:
+ 979 01fc 00000000 		.word	LTDCSYNC
+ 980              		.cfi_endproc
+ 981              	.LFE336:
+ 983              		.global	debug
+ 984              		.section	.bss.debug,"aw",%nobits
+ 985              		.align	2
+ 988              	debug:
+ 989 0000 00000000 		.space	200
+ 989      00000000 
+ 989      00000000 
+ 989      00000000 
+ 989      00000000 
+ 990              		.global	EDID
+ 991              		.section	.bss.EDID,"aw",%nobits
+ 992              		.align	2
+ 995              	EDID:
+ 996 0000 00000000 		.space	256
+ 996      00000000 
+ 996      00000000 
+ 996      00000000 
+ 996      00000000 
+ 997              		.text
+ 998              	.Letext0:
+ 999              		.file 2 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 1000              		.file 3 "/home/jyko/Embedded/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi/arm-none-eabi/includ
+ 1001              		.file 4 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h"
+ 1002              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 1003              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 1004              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_i2c.h"
+ 1005              		.file 8 "Core/Inc/ltdc.h"
+ 1006              		.file 9 "Core/Inc/i2c.h"
+ 1007              		.file 10 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+ARM GAS  /tmp/ccoWwH9k.s 			page 33
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 tda998x.c
+     /tmp/ccoWwH9k.s:20     .text.tda19988_testmode:00000000 $t
+     /tmp/ccoWwH9k.s:26     .text.tda19988_testmode:00000000 tda19988_testmode
+     /tmp/ccoWwH9k.s:132    .text.tda19988_testmode:0000008c $d
+     /tmp/ccoWwH9k.s:137    .text.w_reg:00000000 $t
+     /tmp/ccoWwH9k.s:143    .text.w_reg:00000000 w_reg
+     /tmp/ccoWwH9k.s:212    .text.w_reg:00000044 $d
+     /tmp/ccoWwH9k.s:217    .text.w16_reg:00000000 $t
+     /tmp/ccoWwH9k.s:223    .text.w16_reg:00000000 w16_reg
+     /tmp/ccoWwH9k.s:312    .text.w16_reg:00000060 $d
+     /tmp/ccoWwH9k.s:317    .text.r_reg:00000000 $t
+     /tmp/ccoWwH9k.s:323    .text.r_reg:00000000 r_reg
+     /tmp/ccoWwH9k.s:395    .text.r_reg:00000050 $d
+     /tmp/ccoWwH9k.s:400    .text.r_reg_range:00000000 $t
+     /tmp/ccoWwH9k.s:406    .text.r_reg_range:00000000 r_reg_range
+     /tmp/ccoWwH9k.s:486    .text.r_reg_range:0000005c $d
+     /tmp/ccoWwH9k.s:491    .text.s_reg:00000000 $t
+     /tmp/ccoWwH9k.s:497    .text.s_reg:00000000 s_reg
+     /tmp/ccoWwH9k.s:536    .text.c_reg:00000000 $t
+     /tmp/ccoWwH9k.s:542    .text.c_reg:00000000 c_reg
+     /tmp/ccoWwH9k.s:587    .text.read_edid:00000000 $t
+     /tmp/ccoWwH9k.s:593    .text.read_edid:00000000 read_edid
+     /tmp/ccoWwH9k.s:638    .text.read_edid:00000038 $d
+     /tmp/ccoWwH9k.s:995    .bss.EDID:00000000 EDID
+     /tmp/ccoWwH9k.s:644    .text.tda_init:00000000 $t
+     /tmp/ccoWwH9k.s:650    .text.tda_init:00000000 tda_init
+     /tmp/ccoWwH9k.s:979    .text.tda_init:000001fc $d
+     /tmp/ccoWwH9k.s:988    .bss.debug:00000000 debug
+     /tmp/ccoWwH9k.s:985    .bss.debug:00000000 $d
+     /tmp/ccoWwH9k.s:992    .bss.EDID:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_I2C_Master_Transmit
+hi2c1
+HAL_I2C_Master_Receive
+HAL_I2C_Mem_Read
+HAL_Delay
+LTDCSYNC

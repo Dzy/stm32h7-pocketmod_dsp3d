@@ -62,33 +62,33 @@ extern const LTDCSYNC_t LTDCSYNC[];
 
 
 #define ASSEMBLE_ARGB(A,R,G,B) (A << 24 | R << 16 | G << 8 | B)
-#define SCREEN_ASPECT_RATIO		((float32_t)SCREEN_WIDTH / (float32_t)SCREEN_HEIGHT)
+#define SCREEN_ASPECT_RATIO		((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)
 
 #define ABS(x)   		((x) > 0 ? (x) : -(x))
 #define MIN(x, y)		((x) > (y) ? (y) : (x))
 #define MAX(x, y)		((x) < (y) ? (y) : (x))
 #define ROUND(x) 		((x)>=0?(int32_t)((x)+0.5):(int32_t)((x)-0.5))
 
-float32_t cameraPosition[3] = 			{0.0, 0.0, 10.0};
-float32_t cameraTarget[3] = 			{0.0, 0.0, 0.0};
+float cameraPosition[3] = 			{0.0, 0.0, 10.0};
+float cameraTarget[3] = 			{0.0, 0.0, 0.0};
 
-float32_t meshRotation[3] = 			{0.0, 0.0, 0.0};
-float32_t meshPosition[3] = 			{0.0, 0.0, 0.0};
+float meshRotation[3] = 			{0.0, 0.0, 0.0};
+float meshPosition[3] = 			{0.0, 0.0, 0.0};
 
-float32_t lightPosition[3] = 			{0.0, 10.0, 10.0};
+float lightPosition[3] = 			{0.0, 10.0, 10.0};
 
-float32_t unitX[3] = 					{1.0, 0.0, 0.0};
-float32_t unitY[3] = 					{0.0, 1.0, 0.0};
-float32_t unitZ[3] = 					{0.0, 0.0, 1.0};
+float unitX[3] = 					{1.0, 0.0, 0.0};
+float unitY[3] = 					{0.0, 1.0, 0.0};
+float unitZ[3] = 					{0.0, 0.0, 1.0};
 
-float32_t matrix_view[16] = 			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_projection[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_rotation[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_translation[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_world[16] = 			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_worldView[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_transform[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float32_t matrix_transformhelper[16] = 	{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_view[16] = 			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_projection[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_rotation[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_translation[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_world[16] = 			{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_worldView[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_transform[16] = 		{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float matrix_transformhelper[16] = 	{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 uint8_t lastRenderingType, culling;
 
@@ -101,34 +101,35 @@ arm_matrix_instance_f32 instance_matrix_projection;
 arm_matrix_instance_f32 instance_matrix_world;
 arm_matrix_instance_f32 instance_matrix_worldView;
 
-float32_t dsp3D_clamp(float32_t value);
-float32_t dsp3D_interpolate(float32_t min, float32_t max, float32_t gradient);
-float32_t dsp3D_computeNDotL(float32_t *vertex, float32_t *normal, float32_t *lightPosition);
-void dsp3D_vectorNormalTransform(float32_t *v, float32_t *m, float32_t *result);
-void dsp3D_vectorCrossProduct(float32_t *a, float32_t *b, float32_t *v);
-void dsp3D_vectorNorm(float32_t *a, float32_t *v);
-void dsp3D_transformVertex(float32_t *v, float32_t *m, float32_t *tv);
-void dsp3D_generateLookAtMatrixLH(float32_t *cameraPosition, float32_t *cameraTarget, float32_t *cameraUpVector, float32_t *m);
-void dsp3D_generatePerspectiveFovMatrixLH(float32_t fov, float32_t aspect, float32_t znear, float32_t zfar, float32_t* m);
-void dsp3D_generateRotationMatrix(float32_t yaw, float32_t pitch, float32_t roll, float32_t *m);
-void dsp3D_generateTranslationMatrix(float32_t xaxis, float32_t yaxis, float32_t zaxis, float32_t *m);
-void dsp3D_generateScalingMatrix(float32_t xaxis, float32_t yaxis, float32_t zaxis, float32_t *m);
+float dsp3D_clamp(float value);
+float dsp3D_interpolate(float min, float max, float gradient);
+float dsp3D_computeNDotL(float *vertex, float *normal, float *lightPosition);
+void dsp3D_vectorNormalTransform(float *v, float *m, float *result);
+void dsp3D_vectorCrossProduct(float *a, float *b, float *v);
+void dsp3D_vectorNorm(float *a, float *v);
+void dsp3D_transformVertex(float *v, float *m, float *tv);
+void dsp3D_generateLookAtMatrixLH(float *cameraPosition, float *cameraTarget, float *cameraUpVector, float *m);
+void dsp3D_generatePerspectiveFovMatrixLH(float fov, float aspect, float znear, float zfar, float* m);
+void dsp3D_generateRotationMatrix(float yaw, float pitch, float roll, float *m);
+void dsp3D_generateTranslationMatrix(float xaxis, float yaxis, float zaxis, float *m);
+void dsp3D_generateScalingMatrix(float xaxis, float yaxis, float zaxis, float *m);
 
-void dsp3D_projectVertex(float32_t *coord, float32_t *m);
-void dsp3D_projectVertexComplete(float32_t *vertex, float32_t *vertexNormal, float32_t *m);
+void dsp3D_projectVertex(float *coord, float *m);
+void dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, float *m);
 void dsp3D_drawPoint(int32_t x, int32_t y, color32_t color);
-void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float32_t z, color32_t color);
+void dsp3D_drawPointF(int16_t x, int16_t y);
+void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_t color);
 void dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, color32_t color);
-void dsp3D_processScanLineGouraud(int32_t y, float32_t *ndotl, float32_t* pa, float32_t* pb, float32_t* pc, float32_t* pd, color32_t color);
-void dsp3D_processScanLineFlat(int32_t y, float32_t ndotl, float32_t* pa, float32_t* pb, float32_t* pc, float32_t* pd, color32_t color);
-void dsp3D_swapArray(float32_t *a, float32_t *b);
-void dsp3D_drawFaceFlat(float32_t *p1, float32_t *p2, float32_t *p3, color32_t color);
-void dsp3D_drawFaceGouraud(float32_t *p1, float32_t *p2, float32_t *p3, color32_t color);
-void dsp3D_calculateFaceNormal(float32_t *a, float32_t *b, float32_t *c, float32_t *m, float32_t *n);
+void dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color);
+void dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color);
+void dsp3D_swapArray(float *a, float *b);
+void dsp3D_drawFaceFlat(float *p1, float *p2, float *p3, color32_t color);
+void dsp3D_drawFaceGouraud(float *p1, float *p2, float *p3, color32_t color);
+void dsp3D_calculateFaceNormal(float *a, float *b, float *c, float *m, float *n);
 
-void __inline dsp3D_generateMatrices(void);
+void dsp3D_generateMatrices(void);
 
-void dsp3D_setCameraPosition(float32_t x, float32_t y, float32_t z)
+void dsp3D_setCameraPosition(float x, float y, float z)
 {
 	cameraPosition[0] = x;
 	cameraPosition[1] = y;
@@ -137,7 +138,7 @@ void dsp3D_setCameraPosition(float32_t x, float32_t y, float32_t z)
 	dsp3D_generateLookAtMatrixLH(cameraPosition, cameraTarget, unitY, matrix_view);
 }
 
-void __inline dsp3D_setCameraTarget(float32_t x, float32_t y, float32_t z)
+void __inline dsp3D_setCameraTarget(float x, float y, float z)
 {
 	cameraTarget[0] = x;
 	cameraTarget[1] = y;
@@ -146,7 +147,7 @@ void __inline dsp3D_setCameraTarget(float32_t x, float32_t y, float32_t z)
 	dsp3D_generateLookAtMatrixLH(cameraPosition, cameraTarget, unitY, matrix_view);
 }
 
-void __inline dsp3D_setMeshPosition(float32_t x, float32_t y, float32_t z)
+void __inline dsp3D_setMeshPosition(float x, float y, float z)
 {
 	meshPosition[0] = x;
 	meshPosition[1] = y;
@@ -155,7 +156,7 @@ void __inline dsp3D_setMeshPosition(float32_t x, float32_t y, float32_t z)
 	dsp3D_generateTranslationMatrix(meshPosition[0], meshPosition[1], meshPosition[2], matrix_translation);
 }
 
-void dsp3D_setMeshRotation(float32_t yaw, float32_t pitch, float32_t roll)
+void dsp3D_setMeshRotation(float yaw, float pitch, float roll)
 {
 	meshRotation[0] = yaw;
 	meshRotation[1] = pitch;
@@ -164,29 +165,29 @@ void dsp3D_setMeshRotation(float32_t yaw, float32_t pitch, float32_t roll)
 	dsp3D_generateRotationMatrix(meshRotation[0], meshRotation[1], meshRotation[2], matrix_rotation);
 }
 
-void __inline dsp3D_setLightPosition(float32_t x, float32_t y, float32_t z)
+void __inline dsp3D_setLightPosition(float x, float y, float z)
 {
 	lightPosition[0] = x;
 	lightPosition[1] = y;
 	lightPosition[2] = z;
 }
 
-float32_t __inline dsp3D_clamp(float32_t value)
+float __inline dsp3D_clamp(float value)
 {
 	return MAX(0.0, MIN(value, 1.0));
 }
 
-float32_t __inline dsp3D_interpolate(float32_t min, float32_t max, float32_t gradient)
+float __inline dsp3D_interpolate(float min, float max, float gradient)
 {
 	return (min + (max - min) * dsp3D_clamp(gradient));
 }
 
-float32_t __inline dsp3D_computeNDotL(float32_t *vertex, float32_t *normal, float32_t *lightPosition)
+float __inline dsp3D_computeNDotL(float *vertex, float *normal, float *lightPosition)
 {
-	float32_t lightDirection[3];
-	float32_t normalNorm[3];
-	float32_t lightDirectionNorm[3];
-	float32_t dotProd;
+	float lightDirection[3];
+	float normalNorm[3];
+	float lightDirectionNorm[3];
+	float dotProd;
 
 	arm_sub_f32(lightPosition, vertex, lightDirection, 3);
 	dsp3D_vectorNorm(normal, normalNorm);
@@ -197,24 +198,24 @@ float32_t __inline dsp3D_computeNDotL(float32_t *vertex, float32_t *normal, floa
 	return MAX(0.0, -dotProd);
 }
 
-void __inline dsp3D_vectorNormalTransform(float32_t *v, float32_t *m, float32_t *result)
+void __inline dsp3D_vectorNormalTransform(float *v, float *m, float *result)
 {
-	float32_t vectorNormal[3];
+	float vectorNormal[3];
 
 	dsp3D_vectorNorm(v, vectorNormal);
 	dsp3D_transformVertex(vectorNormal, m, result);
 }
 
-void __inline dsp3D_vectorCrossProduct(float32_t *a, float32_t *b, float32_t *v)
+void __inline dsp3D_vectorCrossProduct(float *a, float *b, float *v)
 {
 	v[0] = a[1]*b[2] - a[2]*b[1];
 	v[1] = a[2]*b[0] - a[0]*b[2];
 	v[2] = a[0]*b[1] - a[1]*b[0];
 }
 
-void __inline dsp3D_vectorNorm(float32_t *a, float32_t *v)
+void __inline dsp3D_vectorNorm(float *a, float *v)
 {
-	float32_t norm;
+	float norm;
 	arm_sqrt_f32(a[0]*a[0] + a[1]*a[1] + a[2]*a[2], &norm);
 
 	if(norm != 0.0)
@@ -226,9 +227,9 @@ void __inline dsp3D_vectorNorm(float32_t *a, float32_t *v)
 }
 
 // OPTIMIZE IT!
-void __inline dsp3D_transformVertex(float32_t *v, float32_t *m, float32_t *tv)
+void __inline dsp3D_transformVertex(float *v, float *m, float *tv)
 {
-	float32_t w;
+	float w;
 	
 	tv[0] = v[0]*m[0] + v[1]*m[4] + v[2]*m[8] + m[12];
 	tv[1] = v[0]*m[1] + v[1]*m[5] + v[2]*m[9] + m[13];
@@ -241,16 +242,16 @@ void __inline dsp3D_transformVertex(float32_t *v, float32_t *m, float32_t *tv)
 	tv[2] *= w;
 }
 
-void __inline dsp3D_generateLookAtMatrixLH(float32_t *cameraPosition, float32_t *cameraTarget, float32_t *cameraUpVector, float32_t *m)
+void __inline dsp3D_generateLookAtMatrixLH(float *cameraPosition, float *cameraTarget, float *cameraUpVector, float *m)
 {
-	float32_t xaxis[3];
-	float32_t yaxis[3];
-	float32_t zaxis[3];
+	float xaxis[3];
+	float yaxis[3];
+	float zaxis[3];
 
-	float32_t deltaVect[3];
-	float32_t crossProd[3];
+	float deltaVect[3];
+	float crossProd[3];
 
-	float32_t dotProd;
+	float dotProd;
 
 	arm_sub_f32(cameraTarget, cameraPosition, deltaVect, 3);
 	dsp3D_vectorNorm(deltaVect, zaxis);
@@ -281,10 +282,10 @@ void __inline dsp3D_generateLookAtMatrixLH(float32_t *cameraPosition, float32_t 
 	m[15] = 1;
 }
 
-void __inline dsp3D_generatePerspectiveFovMatrixLH(float32_t fov, float32_t aspect, float32_t znear, float32_t zfar, float32_t* m)
+void __inline dsp3D_generatePerspectiveFovMatrixLH(float fov, float aspect, float znear, float zfar, float* m)
 {
 	int32_t x, y;
-	float32_t yScale, q;
+	float yScale, q;
 	
 	yScale = 1.0 / tan(fov * 0.5);
 	q = zfar / (zfar - znear);
@@ -300,19 +301,19 @@ void __inline dsp3D_generatePerspectiveFovMatrixLH(float32_t fov, float32_t aspe
 	m[14] = - q * znear;
 }
 
-void __inline dsp3D_generateRotationMatrix(float32_t yaw, float32_t pitch, float32_t roll, float32_t *m)
+void __inline dsp3D_generateRotationMatrix(float yaw, float pitch, float roll, float *m)
 {
-	float32_t s_y = arm_sin_f32(yaw * 0.5);
-	float32_t c_y = arm_cos_f32(yaw * 0.5);
-	float32_t s_p = arm_sin_f32(pitch * 0.5);
-	float32_t c_p = arm_cos_f32(pitch * 0.5);
-	float32_t s_r = arm_sin_f32(roll * 0.5);
-	float32_t c_r = arm_cos_f32(roll * 0.5);
+	float s_y = arm_sin_f32(yaw * 0.5);
+	float c_y = arm_cos_f32(yaw * 0.5);
+	float s_p = arm_sin_f32(pitch * 0.5);
+	float c_p = arm_cos_f32(pitch * 0.5);
+	float s_r = arm_sin_f32(roll * 0.5);
+	float c_r = arm_cos_f32(roll * 0.5);
 
-	float32_t x = c_y * s_p * c_r + s_y * c_p * s_r;
-	float32_t y = s_y * c_p * c_r - c_y * s_p * s_r;
-	float32_t z = c_y * c_p * s_r - s_y * s_p * c_r;
-	float32_t w = c_y * c_p * c_r + s_y * s_p * s_r;
+	float x = c_y * s_p * c_r + s_y * c_p * s_r;
+	float y = s_y * c_p * c_r - c_y * s_p * s_r;
+	float z = c_y * c_p * s_r - s_y * s_p * c_r;
+	float w = c_y * c_p * c_r + s_y * s_p * s_r;
 	
 	m[0] = 1.0 - (2.0 * (y * y + z * z));
 	m[1] = 2.0 * (x * y + z * w);
@@ -332,7 +333,7 @@ void __inline dsp3D_generateRotationMatrix(float32_t yaw, float32_t pitch, float
 	m[15] = 1;
 }
 
-void __inline dsp3D_generateTranslationMatrix(float32_t xaxis, float32_t yaxis, float32_t zaxis, float32_t *m)
+void __inline dsp3D_generateTranslationMatrix(float xaxis, float yaxis, float zaxis, float *m)
 {
 	int32_t x, y;
 	
@@ -348,7 +349,7 @@ void __inline dsp3D_generateTranslationMatrix(float32_t xaxis, float32_t yaxis, 
 	m[14] = zaxis;
 }
 
-void __inline dsp3D_generateScalingMatrix(float32_t xaxis, float32_t yaxis, float32_t zaxis, float32_t *m)
+void __inline dsp3D_generateScalingMatrix(float xaxis, float yaxis, float zaxis, float *m)
 {
 	int32_t x,y;
 	
@@ -362,29 +363,29 @@ void __inline dsp3D_generateScalingMatrix(float32_t xaxis, float32_t yaxis, floa
 	m[15] = 1;
 }
 
-void __inline dsp3D_projectVertex(float32_t *vertex, float32_t *m)
+void __inline dsp3D_projectVertex(float *vertex, float *m)
 {
-	float32_t coordinates[4];
+	float coordinates[4];
 	
 	dsp3D_transformVertex(vertex, matrix_transform, coordinates);
 	
-	m[0] = coordinates[0] * (float32_t)SCREEN_WIDTH + (float32_t)SCREEN_WIDTH / 2.0;
-	m[1] = -coordinates[1] * (float32_t)SCREEN_HEIGHT + (float32_t)SCREEN_HEIGHT / 2.0;
+	m[0] = coordinates[0] * (float)SCREEN_WIDTH + (float)SCREEN_WIDTH / 2.0;
+	m[1] = -coordinates[1] * (float)SCREEN_HEIGHT + (float)SCREEN_HEIGHT / 2.0;
 	m[2] = coordinates[2];
 }
 
-void __inline dsp3D_projectVertexComplete(float32_t *vertex, float32_t *vertexNormal, float32_t *m)
+void __inline dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, float *m)
 {
-	float32_t coordinates[4];
-	float32_t pointWorld[4];
-	float32_t pointNormalWorld[4];
+	float coordinates[4];
+	float pointWorld[4];
+	float pointNormalWorld[4];
 	
 	dsp3D_transformVertex(vertex, matrix_transform, coordinates);
 	dsp3D_transformVertex(vertex, matrix_world, pointWorld);
 	dsp3D_transformVertex(vertexNormal, matrix_world, pointNormalWorld);
 	
-	m[0] = coordinates[0] * (float32_t)SCREEN_WIDTH + (float32_t)SCREEN_WIDTH / 2.0;
-	m[1] = -coordinates[1] * (float32_t)SCREEN_HEIGHT + (float32_t)SCREEN_HEIGHT / 2.0;
+	m[0] = coordinates[0] * (float)SCREEN_WIDTH + (float)SCREEN_WIDTH / 2.0;
+	m[1] = -coordinates[1] * (float)SCREEN_HEIGHT + (float)SCREEN_HEIGHT / 2.0;
 	m[2] = coordinates[2];
 	m[3] = pointWorld[0];
 	m[4] = pointWorld[1];
@@ -396,15 +397,15 @@ void __inline dsp3D_projectVertexComplete(float32_t *vertex, float32_t *vertexNo
 
 void __inline dsp3D_drawPoint(int32_t x, int32_t y, color32_t color)
 {
-	if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
+	//if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
 		dsp3D_LL_drawPoint(x, y, color);
 }
 
-void __inline dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float32_t z, color32_t color)
+void __inline dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_t color)
 {
 	if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
 	{
-		int32_t index = (x + y * SCREEN_WIDTH) * sizeof(float32_t);
+		int32_t index = (x + y * SCREEN_WIDTH) * sizeof(float);
 
 		if(dsp3D_LL_readFromDepthBuffer(index) > z)
 			return;
@@ -425,7 +426,8 @@ void __inline dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, col
 
 	for (;;)
 	{
-		dsp3D_drawPoint(x0, y0, color);
+		//dsp3D_drawPoint(x0, y0, color);
+		dsp3D_LL_drawPointF(x0, y0);
 
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -446,13 +448,13 @@ void __inline dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, col
 	}
 }
 
-void __inline dsp3D_processScanLineGouraud(int32_t y, float32_t *ndotl, float32_t* pa, float32_t* pb, float32_t* pc, float32_t* pd, color32_t color)
+void __inline dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
 {
     int32_t x, sx, ex;
     uint8_t a, r, g, b;
-    float32_t z, z1, z2; 
-    float32_t ndl, snl, enl;
-    float32_t gradient, gradient1, gradient2;
+    float z, z1, z2; 
+    float ndl, snl, enl;
+    float gradient, gradient1, gradient2;
 
     if(pa[1] != pb[1])
     	gradient1 = (y - pa[1]) / (pb[1] - pa[1]);
@@ -475,7 +477,7 @@ void __inline dsp3D_processScanLineGouraud(int32_t y, float32_t *ndotl, float32_
 
     for (x = sx; x < ex; x++)
     {
-    	gradient = (float32_t)(x - sx) / (float32_t)(ex - sx);
+    	gradient = (float)(x - sx) / (float)(ex - sx);
 
     	z = dsp3D_interpolate(z1, z2, gradient);
     	ndl = dsp3D_interpolate(snl, enl, gradient);
@@ -485,20 +487,20 @@ void __inline dsp3D_processScanLineGouraud(int32_t y, float32_t *ndotl, float32_
     	g = (color >> 8);
     	b = (color);
     	
-    	r = (uint8_t)((float32_t)r * ndl);
-    	g = (uint8_t)((float32_t)g * ndl);
-    	b = (uint8_t)((float32_t)b * ndl);
+    	r = (uint8_t)((float)r * ndl);
+    	g = (uint8_t)((float)g * ndl);
+    	b = (uint8_t)((float)b * ndl);
 
     	dsp3D_drawPointDepthBuffer(x, y, z, ASSEMBLE_ARGB(a, r, g, b));
     }
 }
 
-void __inline dsp3D_processScanLineFlat(int32_t y, float32_t ndotl, float32_t* pa, float32_t* pb, float32_t* pc, float32_t* pd, color32_t color)
+void __inline dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
 {
     int32_t x, sx, ex;
     uint8_t a, r, g, b;
-    float32_t z, z1, z2;
-    float32_t gradient, gradient1, gradient2;
+    float z, z1, z2;
+    float gradient, gradient1, gradient2;
 
     if(pa[1] != pb[1])
     	gradient1 = (y - pa[1]) / (pb[1] - pa[1]);
@@ -518,7 +520,7 @@ void __inline dsp3D_processScanLineFlat(int32_t y, float32_t ndotl, float32_t* p
 
     for (x = sx; x < ex; x++)
     {
-    	gradient = (float32_t)(x - sx) / (float32_t)(ex - sx);
+    	gradient = (float)(x - sx) / (float)(ex - sx);
 
     	z = dsp3D_interpolate(z1, z2, gradient);
 
@@ -527,17 +529,17 @@ void __inline dsp3D_processScanLineFlat(int32_t y, float32_t ndotl, float32_t* p
     	g = (color >> 8);
     	b = (color);
 
-    	r = (float32_t)r * ndotl;
-    	g = (float32_t)g * ndotl;
-    	b = (float32_t)b * ndotl;
+    	r = (float)r * ndotl;
+    	g = (float)g * ndotl;
+    	b = (float)b * ndotl;
 
     	dsp3D_drawPointDepthBuffer(x, y, z, ASSEMBLE_ARGB(a, r, g, b));
     }
 }
 
-void __inline dsp3D_swapArray(float32_t *a, float32_t *b)
+void __inline dsp3D_swapArray(float *a, float *b)
 {
-	float32_t temp[9];
+	float temp[9];
 	uint32_t index;
 
 	for(index = 0; index < 9; index++)
@@ -548,11 +550,11 @@ void __inline dsp3D_swapArray(float32_t *a, float32_t *b)
 	}
 }
 
-void __inline dsp3D_drawFaceGouraud(float32_t *v1, float32_t *v2, float32_t *v3, color32_t color)
+void __inline dsp3D_drawFaceGouraud(float *v1, float *v2, float *v3, color32_t color)
 {
-	float32_t ndotl[4];
-	float32_t nl1, nl2, nl3;
-	float32_t dP1P2, dP1P3;
+	float ndotl[4];
+	float nl1, nl2, nl3;
+	float dP1P2, dP1P3;
 	int32_t y;
 
 	if (v1[1] > v2[1])
@@ -620,12 +622,12 @@ void __inline dsp3D_drawFaceGouraud(float32_t *v1, float32_t *v2, float32_t *v3,
     }
 }
 
-void __inline dsp3D_drawFaceFlat(float32_t *v1, float32_t *v2, float32_t *v3, color32_t color)
+void __inline dsp3D_drawFaceFlat(float *v1, float *v2, float *v3, color32_t color)
 {
-	float32_t ndotl;
-	float32_t vnFace[3];
-	float32_t centerPoint[3];
-	float32_t dP1P2, dP1P3;
+	float ndotl;
+	float vnFace[3];
+	float centerPoint[3];
+	float dP1P2, dP1P3;
 	int32_t y;
 
 	if (v1[1] > v2[1])
@@ -671,10 +673,10 @@ void __inline dsp3D_drawFaceFlat(float32_t *v1, float32_t *v2, float32_t *v3, co
                 dsp3D_processScanLineFlat(y, ndotl, v2, v3, v1, v3, color);
 }
 
-void __inline dsp3D_calculateFaceNormal(float32_t *a, float32_t *b, float32_t *c, float32_t *m, float32_t *n)
+void __inline dsp3D_calculateFaceNormal(float *a, float *b, float *c, float *m, float *n)
 {
-	float32_t h[3];
-	float32_t hn[3];
+	float h[3];
+	float hn[3];
 
 	h[0] = (a[0] + b[0] + c[0]) / 3.0;
 	h[1] = (a[1] + b[1] + c[1]) / 3.0;
@@ -692,14 +694,14 @@ void dsp3D_init(void)
 {
 	dsp3D_LL_init();
 	
-	arm_mat_init_f32(&instance_matrix_view, 4, 4, (float32_t *)matrix_view);
-	arm_mat_init_f32(&instance_matrix_rotation, 4, 4, (float32_t *)matrix_rotation);
-	arm_mat_init_f32(&instance_matrix_translation, 4, 4, (float32_t *)matrix_translation);
-	arm_mat_init_f32(&instance_matrix_transform, 4, 4, (float32_t *)matrix_transform);
-	arm_mat_init_f32(&instance_matrix_transformhelper, 4, 4, (float32_t *)matrix_transformhelper);
-	arm_mat_init_f32(&instance_matrix_projection, 4, 4, (float32_t *)matrix_projection);
-	arm_mat_init_f32(&instance_matrix_world, 4, 4, (float32_t *)matrix_world);
-	arm_mat_init_f32(&instance_matrix_worldView, 4, 4, (float32_t *)matrix_worldView);
+	arm_mat_init_f32(&instance_matrix_view, 4, 4, (float *)matrix_view);
+	arm_mat_init_f32(&instance_matrix_rotation, 4, 4, (float *)matrix_rotation);
+	arm_mat_init_f32(&instance_matrix_translation, 4, 4, (float *)matrix_translation);
+	arm_mat_init_f32(&instance_matrix_transform, 4, 4, (float *)matrix_transform);
+	arm_mat_init_f32(&instance_matrix_transformhelper, 4, 4, (float *)matrix_transformhelper);
+	arm_mat_init_f32(&instance_matrix_projection, 4, 4, (float *)matrix_projection);
+	arm_mat_init_f32(&instance_matrix_world, 4, 4, (float *)matrix_world);
+	arm_mat_init_f32(&instance_matrix_worldView, 4, 4, (float *)matrix_worldView);
 
 	dsp3D_generateMatrices();
 
@@ -707,28 +709,28 @@ void dsp3D_init(void)
 	culling = 0;
 }
 
-void dsp3D_renderGouraud(float32_t * dsp3dModel)
+void dsp3D_renderGouraud(float * dsp3dModel)
 {
 	uint32_t i;
 	uint32_t a, b, c;
 	uint32_t numVert, numFaces;
 	uint8_t RGBr, RGBg, RGBb;
 	
-	float32_t vertex_transform_a[9];
-	float32_t vertex_transform_b[9];
-	float32_t vertex_transform_c[9];
-	float32_t vertex_a[3];
-	float32_t vertex_b[3];
-	float32_t vertex_c[3];
-	float32_t vertex_norm_a[3];
-	float32_t vertex_norm_b[3];
-	float32_t vertex_norm_c[3];
-	float32_t face_norm[3];
+	float vertex_transform_a[9];
+	float vertex_transform_b[9];
+	float vertex_transform_c[9];
+	float vertex_a[3];
+	float vertex_b[3];
+	float vertex_c[3];
+	float vertex_norm_a[3];
+	float vertex_norm_b[3];
+	float vertex_norm_c[3];
+	float face_norm[3];
 
-	float32_t camToPointVector[3];
-	float32_t faceNormalNormalized[3];
-	float32_t camToPointVectorNormalized[3];
-	float32_t cullingAngle;
+	float camToPointVector[3];
+	float faceNormalNormalized[3];
+	float camToPointVectorNormalized[3];
+	float cullingAngle;
 
 	dsp3D_generateMatrices();
 
@@ -790,28 +792,28 @@ void dsp3D_renderGouraud(float32_t * dsp3dModel)
 		lastRenderingType = 2;
 }
 
-void dsp3D_renderFlat(float32_t * dsp3dModel)
+void dsp3D_renderFlat(float * dsp3dModel)
 {
 	uint32_t i;
 	uint32_t a, b, c;
 	uint32_t numVert, numFaces;
 	uint8_t RGBr, RGBg, RGBb;
 	
-	float32_t vertex_transform_a[9];
-	float32_t vertex_transform_b[9];
-	float32_t vertex_transform_c[9];
-	float32_t vertex_a[3];
-	float32_t vertex_b[3];
-	float32_t vertex_c[3];
-	float32_t vertex_norm_a[3];
-	float32_t vertex_norm_b[3];
-	float32_t vertex_norm_c[3];
-	float32_t face_norm[3];
+	float vertex_transform_a[9];
+	float vertex_transform_b[9];
+	float vertex_transform_c[9];
+	float vertex_a[3];
+	float vertex_b[3];
+	float vertex_c[3];
+	float vertex_norm_a[3];
+	float vertex_norm_b[3];
+	float vertex_norm_c[3];
+	float face_norm[3];
 
-	float32_t camToPointVector[3];
-	float32_t faceNormalNormalized[3];
-	float32_t camToPointVectorNormalized[3];
-	float32_t cullingAngle;
+	float camToPointVector[3];
+	float faceNormalNormalized[3];
+	float camToPointVectorNormalized[3];
+	float cullingAngle;
 
 	dsp3D_generateMatrices();
 
@@ -874,19 +876,19 @@ void dsp3D_renderFlat(float32_t * dsp3dModel)
 		lastRenderingType = 2;
 }
 
-void dsp3D_renderWireframe(float32_t * dsp3dModel)
+void dsp3D_renderWireframe(float * dsp3dModel)
 {
 	uint32_t i;
 	uint32_t a, b, c;
 	uint32_t numVert, numFaces;
 	uint8_t RGBr, RGBg, RGBb;
 	
-	float32_t coord_a[4];
-	float32_t coord_b[4];
-	float32_t coord_c[4];
-	float32_t vertex_a[4];
-	float32_t vertex_b[4];
-	float32_t vertex_c[4];
+	float coord_a[4];
+	float coord_b[4];
+	float coord_c[4];
+	float vertex_a[4];
+	float vertex_b[4];
+	float vertex_c[4];
 
 	dsp3D_generateMatrices();
 
@@ -927,13 +929,13 @@ void dsp3D_renderWireframe(float32_t * dsp3dModel)
 		lastRenderingType = 1;
 }
 
-void dsp3D_renderPoints(float32_t * dsp3dModel)
+void dsp3D_renderPoints(float * dsp3dModel)
 {
 	uint32_t i;
 	uint32_t numVert;
 	
-	float32_t coord[3];
-	float32_t vertex[3];
+	float coord[3];
+	float vertex[3];
 
 	dsp3D_generateMatrices();
 	
@@ -954,10 +956,10 @@ void dsp3D_renderPoints(float32_t * dsp3dModel)
 		lastRenderingType = 1;
 }
 
-void __inline dsp3D_renderPoint(float32_t x, float32_t y, float32_t z)
+void __inline dsp3D_renderPoint(float x, float y, float z)
 {
-	float32_t vector[3];
-	float32_t coord[2];
+	float vector[3];
+	float coord[2];
 
 	dsp3D_generateMatrices();
 
@@ -987,7 +989,7 @@ void dsp3D_present(void)
 	lastRenderingType = 0;
 }
 
-void __inline dsp3D_generateMatrices(void)
+void dsp3D_generateMatrices(void)
 {
 	dsp3D_generateLookAtMatrixLH(cameraPosition, cameraTarget, unitY, matrix_view);
 	dsp3D_generatePerspectiveFovMatrixLH(0.78, SCREEN_ASPECT_RATIO, 0.01, 1.0, matrix_projection);
