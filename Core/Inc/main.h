@@ -50,7 +50,7 @@ extern "C" {
 #define LTDC_VID_FORMAT 9
 #define LTDC_VID_FORMAT 10
 
-#define LTDC_VID_FORMAT 9
+#define LTDC_VID_FORMAT 10
 
 /* USER CODE END EC */
 

@@ -766,7 +766,7 @@ void tda_init(void) {
     w16_reg(REG_HS_PIX_STOP_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp + LTDCSYNC[LTDC_VID_FORMAT].hsw);
 
     w16_reg(REG_VWIN_START_1_MSB, 0); //-1
-    w16_reg(REG_VWIN_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].totalh); //-1
+    w16_reg(REG_VWIN_END_1_MSB, lines); //-1
 
     //w16_reg(REG_VWIN_START_2_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh);
     //w16_reg(REG_VWIN_END_2_MSB, lines);
