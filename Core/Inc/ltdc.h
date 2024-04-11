@@ -36,10 +36,8 @@ extern LTDC_HandleTypeDef hltdc;
 typedef struct _LTDCSYNC_t {
    uint16_t pll3n, pll3p, pll3q, pll3r;
    uint16_t ahw, avh;
-   uint16_t hfp, hsync, hbp;
-   uint16_t vfp, vsync, vbp;
-   uint16_t hsw,  ahbp, aaw, totalw;
-   uint16_t vsh,  avbp, aah, totalh;
+   uint16_t hfp, hsw, hbp;
+   uint16_t vfp, vsh, vbp;
 } LTDCSYNC_t;
 
 /* USER CODE END Private defines */

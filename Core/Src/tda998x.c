@@ -644,8 +644,8 @@ void tda_init(void) {
     /* shutdown audio */
     w_reg(REG_ENA_AP, 0);
 
-    line_clocks = LTDCSYNC[LTDC_VID_FORMAT].totalw; 
-    lines =       LTDCSYNC[LTDC_VID_FORMAT].totalh;
+    line_clocks = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hfp); 
+    lines =       (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vfp);
 
     /* mute the audio FIFO */
     s_reg(REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_FIFO);
@@ -738,20 +738,32 @@ void tda_init(void) {
 //   vsh     2  avbp    40 aah 1064 totalh 1065
 
     w_reg(REG_VIDFORMAT, 0x00);
+
     w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
     w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
+
     w16_reg(REG_NPIX_MSB, line_clocks);
     w16_reg(REG_NLINE_MSB, lines);
+
     w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
-    w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsync);
-    w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
-    w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
-    w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
-    w16_reg(REG_VS_LINE_END_2_MSB, 0);
-    w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
-    w16_reg(REG_VS_PIX_END_2_MSB, 0);
-    w16_reg(REG_HS_PIX_START_MSB, 0);
-    w16_reg(REG_HS_PIX_STOP_MSB, line_clocks);
+    w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsh);
+    //w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+    //w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+
+ //   w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
+ //   w16_reg(REG_VS_LINE_END_2_MSB, 0);
+ //   w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
+ //   w16_reg(REG_VS_PIX_END_2_MSB, 0);
+//
+//
+ //   w16_reg(REG_VS_LINE_STRT_2_MSB, 1);
+ //   w16_reg(REG_VS_LINE_END_2_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsh-1);
+ //   w16_reg(REG_VS_PIX_STRT_2_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+ //   w16_reg(REG_VS_PIX_END_2_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
+
+
+    w16_reg(REG_HS_PIX_START_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
+    w16_reg(REG_HS_PIX_STOP_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp + LTDCSYNC[LTDC_VID_FORMAT].hsw);
 
     w16_reg(REG_VWIN_START_1_MSB, 0); //-1
     w16_reg(REG_VWIN_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].totalh); //-1

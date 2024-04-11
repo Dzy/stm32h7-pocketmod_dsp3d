@@ -22,18 +22,20 @@
 
 /* USER CODE BEGIN 0 */
 const LTDCSYNC_t LTDCSYNC[] = {
- { 252, 2, 2, 8,    640,  480,    24,  40, 128,    9, 3, 28,    39, 167,  807,  831,   2, 30,  510,  519 }, // 0 640x480_72Hz
- { 252, 2, 2, 8,    640,  480,    16,  96,  48,   11, 2, 32,    95, 143,  783,  799,   1, 33,  513,  524 }, // 1 640x480_75Hz
- { 288, 2, 2, 8,    640,  480,    32,  48, 112,    1, 3, 25,    47, 159,  799,  831,   2, 27,  507,  508 }, // 2 640x480_85Hz
- { 295, 2, 2, 8,    800,  600,    40, 128,  88,    1, 4, 23,   127, 215, 1015, 1055,   3, 26,  626,  627 }, // 3 800x600_60Hz
- { 400, 2, 2, 8,    800,  600,    56, 120,  64,   37, 6, 23,   119, 183,  983, 1039,   5, 28,  628,  665 }, // 4 800x600_72Hz
- { 396, 2, 2, 8,    800,  600,    16,  80, 160,    1, 2, 21,    79, 239, 1039, 1055,   1, 22,  622,  623 }, // 5 800x600_75Hz
- { 450, 2, 2, 8,    800,  600,    32,  64, 152,    1, 3, 27,    63, 215, 1015, 1047,   2, 29,  629,  630 }, // 6 800x600_85Hz
- { 265, 4, 4, 4,   1024,  768,    24, 136, 160,    3, 6, 29,   135, 295, 1319, 1343,   5, 34,  802,  805 }, // 7 1024x768_60Hz
- { 300, 4, 4, 4,   1024,  768,    24, 136, 144,    3, 6, 29,   135, 279, 1303, 1327,   5, 34,  802,  805 }, // 8 1024x768_70Hz
- { 315, 4, 4, 4,   1024,  768,    16,  96, 176,    1, 3, 28,    95, 271, 1295, 1311,   2, 30,  798,  799 }, // 9 1024x768_75Hz
- { 432, 4, 4, 4,   1280, 1024,    48, 112, 248,    1, 3, 38,   111, 359, 1639, 1687,   2, 40, 1064, 1065 }, //10 1280x1024_60Hz
- { 432, 4, 4, 4,   1920, 1080,   128, 208, 336,    1, 3, 38,   111, 359, 1639, 1687,   2, 40, 1064, 1065 }, //11 1920x1080_60Hz
+ { 252, 2, 2, 8,    640,  480,    24,  40, 128,    9, 3, 28 }, // 0 640x480_72Hz
+ { 252, 2, 2, 8,    640,  480,    16,  96,  48,   11, 2, 32 }, // 1 640x480_75Hz
+ { 288, 2, 2, 8,    640,  480,    32,  48, 112,    1, 3, 25 }, // 2 640x480_85Hz
+ { 295, 2, 2, 8,    800,  600,    40, 128,  88,    1, 4, 23 }, // 3 800x600_60Hz
+ { 400, 2, 2, 8,    800,  600,    56, 120,  64,   37, 6, 23 }, // 4 800x600_72Hz
+ { 396, 2, 2, 8,    800,  600,    16,  80, 160,    1, 2, 21 }, // 5 800x600_75Hz
+ { 450, 2, 2, 8,    800,  600,    32,  64, 152,    1, 3, 27 }, // 6 800x600_85Hz
+ { 265, 4, 4, 4,   1024,  768,    24, 136, 160,    3, 6, 29 }, // 7 1024x768_60Hz
+    
+ { 300, 4, 4, 4,   1024,  768,    24, 136, 144,    3, 6, 29 }, // 8 1024x768_70Hz
+    
+ { 315, 4, 4, 4,   1024,  768,    16,  96, 176,    1, 3, 28 }, // 9 1024x768_75Hz
+ { 432, 4, 4, 4,   1280, 1024,    48, 112, 248,    1, 3, 38 }, //10 1280x1024_60Hz
+ { 432, 4, 4, 4,   1920, 1080,   128, 208, 336,    1, 3, 38 }, //11 1920x1080_60Hz
 };    
 /*
 
@@ -46,10 +48,8 @@ const LTDCSYNC_t LTDCSYNC[] = {
 typedef struct _LTDCSYNC_t {
    uint16_t pll3n, pll3p, pll3q, pll3r;
    uint16_t ahw, avh;
-   uint16_t hfp, hsync, hbp;
-   uint16_t vfp, vsync, vbp;
-   uint16_t hsw,  ahbp, aaw, totalw;
-   uint16_t vsh,  avbp, aah, totalh;
+   uint16_t hfp, hsw, hbp;
+   uint16_t vfp, vsh, vbp;
 } LTDCSYNC_t;
  { 432, 4, 4, 4, 1280, 1024, 48, 112, 248, 1, 3, 38, 111, 359, 1639, 1687, 2, 40, 1064, 1065 }, //10 1280x1024_60Hz
 
@@ -138,7 +138,11 @@ static CONST_DAT tmHdmiTxVidReg_t format_param_PC[HDMITX_VFMT_PC_NUM] =
     {832,   520,      1,          24,          4,           24,         24,     64,     31,         511,    192,    832, 0, 0},/ E_REGVFMT_640x480p_72Hz   /
     {840,   500,      1,          16,          4,           16,         16,     80,     19,         499,    200,    840, 0, 0},/ E_REGVFMT_640x480p_75Hz   /
     {832,   509,      1,          56,          4,           56,         56,     112,    28,         508,    192,    832, 0, 0},/ E_REGVFMT_640x480p_85Hz   /
+
     {1056,  628,      1,          40,          5,           40,         40,     168,    27,         627,    256,   1056, 0, 0},/ E_REGVFMT_800x600p_60Hz   /
+
+800x600, 60Hz   40.000  800 40  128 88  600 1 4 23
+
     {1040,  666,      1,          56,          7,           56,         56,     176,    29,         619,    240,   1040, 0, 0},/ E_REGVFMT_800x600p_72Hz   /
     {1056,  625,      1,          16,          4,           16,         16,     96,     24,         624,    256,   1056, 0, 0},/ E_REGVFMT_800x600p_75Hz   /
     {1048,  631,      1,          32,          4,           32,         32,     96,     30,         630,    248,   1048, 0, 0},/ E_REGVFMT_800x600p_85Hz   /
@@ -168,25 +172,14 @@ void MX_LTDC_Init(void)
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IIPC;
 
-
-//  hltdc.Init.HorizontalSync = LTDCSYNC[LTDC_VID_FORMAT].hsw;      //HSW;
-//  hltdc.Init.VerticalSync = LTDCSYNC[LTDC_VID_FORMAT].vsh;        //VSH;
-//  hltdc.Init.AccumulatedHBP = LTDCSYNC[LTDC_VID_FORMAT].ahbp;     //AHBP;
-//  hltdc.Init.AccumulatedVBP = LTDCSYNC[LTDC_VID_FORMAT].avbp;     //AVBP;
-//  hltdc.Init.AccumulatedActiveW = LTDCSYNC[LTDC_VID_FORMAT].aaw;  //AAW;
-//  hltdc.Init.AccumulatedActiveH = LTDCSYNC[LTDC_VID_FORMAT].aah;  //AAH;
-//  hltdc.Init.TotalWidth = LTDCSYNC[LTDC_VID_FORMAT].totalw;       //TOTALW;
-//  hltdc.Init.TotalHeigh = LTDCSYNC[LTDC_VID_FORMAT].totalh;       //TOTALH;
-
-
   hltdc.Init.HorizontalSync     = (LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
   hltdc.Init.VerticalSync       = (LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
   hltdc.Init.AccumulatedHBP     = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].hbp - 1);
   hltdc.Init.AccumulatedVBP     = (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].vbp - 1);
-  hltdc.Init.AccumulatedActiveW = (LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
-  hltdc.Init.AccumulatedActiveH = (LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
-  hltdc.Init.TotalWidth         = (LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].hfp - 1);
-  hltdc.Init.TotalHeigh         = (LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].vfp - 1);
+  hltdc.Init.AccumulatedActiveW = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp  - 1);
+  hltdc.Init.AccumulatedActiveH = (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp  - 1);
+  hltdc.Init.TotalWidth         = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hfp - 1);
+  hltdc.Init.TotalHeigh         = (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vfp - 1);
 
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
