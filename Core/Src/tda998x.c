@@ -584,57 +584,79 @@ tmErrorCode_t set_video(tmHdmiTxobject_t *pDis,tmbslHdmiTxVidFmt_t reg_idx,tmHdm
 
 void tda_init(void) {
 
+    /* reset audio and i2c master: */
+    w_reg(REG_SOFTRESET, SOFTRESET_AUDIO | SOFTRESET_I2C_MASTER);
+    HAL_Delay(50);
+    w_reg(REG_SOFTRESET, 0);
+    HAL_Delay(50);
+
+    /* reset transmitter: */
+    s_reg(REG_MAIN_CNTRL0, MAIN_CNTRL0_SR);
+    c_reg(REG_MAIN_CNTRL0, MAIN_CNTRL0_SR);
+#if 0
+    /* PLL registers common configuration */
+    w_reg(REG_PLL_SERIAL_1, 0x00);
+    w_reg(REG_PLL_SERIAL_2, PLL_SERIAL_2_SRL_NOSC(1));
+    w_reg(REG_PLL_SERIAL_3, 0x00);
+    w_reg(REG_SERIALIZER,   0x00);
+    w_reg(REG_BUFFER_OUT,   0x00);
+    w_reg(REG_PLL_SCG1,     0x00);
+    w_reg(REG_AUDIO_DIV,    AUDIO_DIV_SERCLK_8);
+    w_reg(REG_SEL_CLK,      SEL_CLK_SEL_CLK1 | SEL_CLK_ENA_SC_CLK);
+    w_reg(REG_PLL_SCGN1,    0xfa);
+    w_reg(REG_PLL_SCGN2,    0x00);
+    w_reg(REG_PLL_SCGR1,    0x5b);
+    w_reg(REG_PLL_SCGR2,    0x00);
+    w_reg(REG_PLL_SCG2,     0x10);
+
+    /* Write the default value MUX register */
+    w_reg(REG_MUX_VP_VIP_OUT, 0x24);
+#endif
+
+
     read_edid();
 
-#if 0
 
-    w_reg(REG_VIDFORMAT, 0x00);
-
-    w16_reg(REG_NPIX_MSB, 1688);
-    w16_reg(REG_NLINE_MSB, 1066);
-
-    w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
-
-    w16_reg(REG_VS_PIX_STRT_1_MSB, 48);
-
-    w16_reg(REG_VS_LINE_END_1_MSB, 4);
-
-    w16_reg(REG_VS_PIX_END_1_MSB, 48);
-
-    w16_reg(REG_HS_PIX_START_MSB, 48);
-
-    w16_reg(REG_HS_PIX_STOP_MSB, 160);
-
-    w16_reg(REG_VWIN_START_1_MSB, 41);
-
-    w16_reg(REG_VWIN_END_1_MSB, 1065);
-
-    w16_reg(REG_DE_START_MSB, 408);
-    w16_reg(REG_DE_STOP_MSB, 1688);
-
-    HAL_Delay(400);
-
-    /* enable video ports */
-    w_reg(REG_ENA_VP_0, 0xff);
-    w_reg(REG_ENA_VP_1, 0xff);
-    w_reg(REG_ENA_VP_2, 0xff);
-    /* set muxing after enabling ports: */
-    w_reg(REG_VIP_CNTRL_0, VIP_CNTRL_0_SWAP_A(2) | VIP_CNTRL_0_SWAP_B(3));
-    w_reg(REG_VIP_CNTRL_1, VIP_CNTRL_1_SWAP_C(4) | VIP_CNTRL_1_SWAP_D(5));
-    w_reg(REG_VIP_CNTRL_2, VIP_CNTRL_2_SWAP_E(0) | VIP_CNTRL_2_SWAP_F(1));
-
-#else
-
-    uint8_t reg;
- 
-    uint8_t div = 148500 / ((LTDCSYNC[LTDC_VID_FORMAT].pll3n/LTDCSYNC[LTDC_VID_FORMAT].pll3r)*1000);
+    uint32_t pixel_clock;
     uint16_t line_clocks, lines;
+    uint8_t reg, rep, div, sel_clk;
 
-    div--;
-    if (div > 3)
-        div = 3;
 
-    div = 0;
+    uint16_t ref_pix, ref_line, n_pix, n_line;
+    uint16_t hs_pix_s, hs_pix_e;
+    uint16_t vs1_pix_s, vs1_pix_e, vs1_line_s, vs1_line_e;
+    uint16_t vs2_pix_s, vs2_pix_e, vs2_line_s, vs2_line_e;
+    uint16_t vwin1_line_s, vwin1_line_e;
+    uint16_t vwin2_line_s, vwin2_line_e;
+    uint16_t de_pix_s, de_pix_e;
+
+
+
+    /*
+     * Select pixel repeat depending on the double-clock flag
+     * (which means we have to repeat each pixel once.)
+     */
+//    rep = mode->flags & DRM_MODE_FLAG_DBLCLK ? 1 : 0;
+    rep = 0;
+    sel_clk = SEL_CLK_ENA_SC_CLK | SEL_CLK_SEL_CLK1 | SEL_CLK_SEL_VRF_CLK(rep ? 2 : 0);
+
+    /* the TMDS clock is scaled up by the pixel repeat */
+//    tmds_clock = mode->clock * (1 + rep);
+    pixel_clock = (LTDCSYNC[LTDC_VID_FORMAT].pll3n/LTDCSYNC[LTDC_VID_FORMAT].pll3r) * (1 + rep);
+
+    /*
+     * The divisor is power-of-2. The TDA9983B datasheet gives
+     * this as ranges of Msample/s, which is 10x the TMDS clock:
+     *   0 - 800 to 1500 Msample/s 8000 80-150 MHz pixel rate
+     *   1 - 400 to 800 Msample/s  4000 40-80
+     *   2 - 200 to 400 Msample/s  2000 20 40
+     *   3 - as 2 above
+     */
+
+    for (div = 0; div < 3; div++)
+        if (80 >> div <= pixel_clock)
+            break;
+
 
     /* first disable the video ports */
     w_reg(REG_ENA_VP_0, 0);
@@ -655,21 +677,19 @@ void tda_init(void) {
     w_reg(REG_ENC_CNTRL, ENC_CNTRL_CTL_CODE(0));
 
     // no pre-filter or interpolator
-    
-    //w_reg(REG_HVF_CNTRL_0, HVF_CNTRL_0_PREFIL(0) | HVF_CNTRL_0_INTPOL(0));
-    //s_reg(REG_FEAT_POWERDOWN,FEAT_POWERDOWN_PREFILT);
+    w_reg(REG_HVF_CNTRL_0, HVF_CNTRL_0_PREFIL(0) | HVF_CNTRL_0_INTPOL(0));
+    s_reg(REG_FEAT_POWERDOWN,FEAT_POWERDOWN_PREFILT);
     w_reg(REG_VIP_CNTRL_5, VIP_CNTRL_5_SP_CNT(0));
     w_reg(REG_VIP_CNTRL_4, VIP_CNTRL_4_BLANKIT(0) | VIP_CNTRL_4_BLC(0) | VIP_CNTRL_4_TST_PAT);
 
     c_reg(REG_PLL_SERIAL_1, PLL_SERIAL_1_SRL_MAN_IZ);
     c_reg(REG_PLL_SERIAL_3, PLL_SERIAL_3_SRL_CCIR | PLL_SERIAL_3_SRL_DE);
-
     w_reg(REG_SERIALIZER, 0);
     w_reg(REG_HVF_CNTRL_1, HVF_CNTRL_1_VQR(0));
 
-    w_reg(REG_RPT_CNTRL, 0);
-    w_reg(REG_SEL_CLK, SEL_CLK_SEL_VRF_CLK(0) );
-    w_reg(REG_PLL_SERIAL_2, PLL_SERIAL_2_SRL_NOSC(div) | PLL_SERIAL_2_SRL_PR(0));
+    w_reg(REG_RPT_CNTRL, RPT_CNTRL_REPEAT(rep));
+    w_reg(REG_SEL_CLK, sel_clk);
+    w_reg(REG_PLL_SERIAL_2, PLL_SERIAL_2_SRL_NOSC(div) | PLL_SERIAL_2_SRL_PR(rep));
 
     // set color matrix bypass flag:
     w_reg(REG_MAT_CONTRL, MAT_CONTRL_MAT_BP | MAT_CONTRL_MAT_SC(1));
@@ -678,119 +698,95 @@ void tda_init(void) {
     // set BIAS tmds value:
     w_reg(REG_ANA_GENERAL, 0x09);
 
-    //w_reg(REG_BUFFER_OUT, 0);
-
+    // Sync on rising HSYNC/VSYNC
     reg = VIP_CNTRL_3_SYNC_HS;
-#if 0
-    if(hltdc.Init.HSPolarity == LTDC_HSPOLARITY_AL) {
+
+    // TDA19988 requires high-active sync at input stage,
+    // so invert low-active sync provided by master encoder here
+    if (hltdc.Init.HSPolarity == LTDC_HSPOLARITY_AL)
         reg |= VIP_CNTRL_3_H_TGL;
-    };
-    if(hltdc.Init.VSPolarity == LTDC_VSPOLARITY_AL) {
-        reg |= VIP_CNTRL_3_V_TGL;    
-    };
-    if(hltdc.Init.DEPolarity == LTDC_DEPOLARITY_AL) {
-        reg |= VIP_CNTRL_3_X_TGL;    
-    };
-    if(hltdc.Init.PCPolarity == LTDC_PCPOLARITY_IIPC) {
-        reg |= VIP_CNTRL_3_EDGE;    
-    };
-#endif
+    if (hltdc.Init.VSPolarity == LTDC_VSPOLARITY_AL)
+        reg |= VIP_CNTRL_3_V_TGL;
     w_reg(REG_VIP_CNTRL_3, reg);
 
-#if 0
+/**
+ * The horizontal and vertical timings are defined per the following diagram.
+ *
+ * ::
+ *
+ *
+ *               Active                 Front           Sync           Back
+ *              Region                 Porch                          Porch
+ *     <-----------------------><----------------><-------------><-------------->
+ *       //////////////////////|
+ *      ////////////////////// |
+ *     //////////////////////  |..................               ................
+ *                                                _______________
+ *     <----- [hv]display ----->
+ *     <------------- [hv]sync_start ------------>
+ *     <--------------------- [hv]sync_end --------------------->
+ *     <-------------------------------- [hv]total ----------------------------->*
+ *
+ */
+
+    n_pix        = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hfp);
+    n_line       = (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vfp);
+
+    //hs_pix_e     = mode->hsync_end - mode->hdisplay;
+    hs_pix_e     = LTDCSYNC[LTDC_VID_FORMAT].hfp + LTDCSYNC[LTDC_VID_FORMAT].hsw;
+    //hs_pix_s     = mode->hsync_start - mode->hdisplay;
+    hs_pix_s     = LTDCSYNC[LTDC_VID_FORMAT].hfp;
+    de_pix_e     = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hfp);
+    de_pix_s     = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hfp);
+    ref_pix      = 3 + hs_pix_s;
+
+
+    // Attached LCD controllers may generate broken sync. Allow
+    // those to adjust the position of the rising VS edge by adding
+    // HSKEW to ref_pix.
+    //if (adjusted_mode->flags & DRM_MODE_FLAG_HSKEW)
+    ref_pix += 0;
+
+    //ref_line   = 1 + mode->vsync_start - mode->vdisplay;
+    ref_line     = 1 + LTDCSYNC[LTDC_VID_FORMAT].vfp;
+    //vwin1_line_s = mode->vtotal - mode->vdisplay - 1;
+    vwin1_line_s = LTDCSYNC[LTDC_VID_FORMAT].vfp + LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].vbp-1;
+    //vwin1_line_e = vwin1_line_s + mode->vdisplay;
+    vwin1_line_e = vwin1_line_s + LTDCSYNC[LTDC_VID_FORMAT].avh;
+    vs1_pix_s    = vs1_pix_e = hs_pix_s;
+    //vs1_line_s   = mode->vsync_start - mode->vdisplay;
+    vs1_line_s   = LTDCSYNC[LTDC_VID_FORMAT].vfp; // ref_line - 1;
+    //vs1_line_e   = vs1_line_s + mode->vsync_end - mode->vsync_start;
+    vs1_line_e   = vs1_line_s + LTDCSYNC[LTDC_VID_FORMAT].vsh;
+    vwin2_line_s = vwin2_line_e = 0;
+    vs2_pix_s    = vs2_pix_e  = 0;
+    vs2_line_s   = vs2_line_e = 0;
+
+
     w_reg(REG_VIDFORMAT, 0x00);
-    w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
-    w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
-    w16_reg(REG_NPIX_MSB, line_clocks);
-    w16_reg(REG_NLINE_MSB, lines);
-    w16_reg(REG_VS_LINE_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp);
-    w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
-    w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp + LTDCSYNC[LTDC_VID_FORMAT].vsync);
-    w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
-    w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
-    w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
-    w16_reg(REG_VS_LINE_END_2_MSB, 0);
-    w16_reg(REG_VS_PIX_END_2_MSB, 0);
-    w16_reg(REG_HS_PIX_START_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
-    w16_reg(REG_HS_PIX_STOP_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp + LTDCSYNC[LTDC_VID_FORMAT].hsync);
+    w16_reg(REG_REFPIX_MSB, ref_pix);
+    w16_reg(REG_REFLINE_MSB, ref_line);
+    w16_reg(REG_NPIX_MSB, n_pix);
+    w16_reg(REG_NLINE_MSB, n_line);
+    w16_reg(REG_VS_LINE_STRT_1_MSB, vs1_line_s);
+    w16_reg(REG_VS_PIX_STRT_1_MSB, vs1_pix_s);
+    w16_reg(REG_VS_LINE_END_1_MSB, vs1_line_e);
+    w16_reg(REG_VS_PIX_END_1_MSB, vs1_pix_e);
+    w16_reg(REG_VS_LINE_STRT_2_MSB, vs2_line_s);
+    w16_reg(REG_VS_PIX_STRT_2_MSB, vs2_pix_s);
+    w16_reg(REG_VS_LINE_END_2_MSB, vs2_line_e);
+    w16_reg(REG_VS_PIX_END_2_MSB, vs2_pix_e);
+    w16_reg(REG_HS_PIX_START_MSB, hs_pix_s);
+    w16_reg(REG_HS_PIX_STOP_MSB, hs_pix_e);
+    w16_reg(REG_VWIN_START_1_MSB, vwin1_line_s);
+    w16_reg(REG_VWIN_END_1_MSB, vwin1_line_e);
+    w16_reg(REG_VWIN_START_2_MSB, vwin2_line_s);
+    w16_reg(REG_VWIN_END_2_MSB, vwin2_line_e);
+    w16_reg(REG_DE_START_MSB, de_pix_s);
+    w16_reg(REG_DE_STOP_MSB, de_pix_e);
 
-    w16_reg(REG_VWIN_START_1_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh); //-1
-    w16_reg(REG_VWIN_END_1_MSB, lines); //-1
-
-    w16_reg(REG_VWIN_START_2_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh);
-    w16_reg(REG_VWIN_END_2_MSB, lines);
-
-    w16_reg(REG_DE_START_MSB, line_clocks - LTDCSYNC[LTDC_VID_FORMAT].ahw);
-    w16_reg(REG_DE_STOP_MSB, line_clocks);
-
-#else
-  //  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVideoStart   ActiveVideoEnd DeStart DeEnd
-//    npix  nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1  vw_e1   de_s  de_e    
-//   {1688, 1066,       1,          48,          4,         48,       48,       160,       41,  1065,   408, 1688, 0, 0} , // E_REGVFMT_1280x1024p_60Hz
-
-//   pll3n 432  pll3p    4 pll3q  4 pll3r     4
-//   ahw  1280  avh   1024
-
-//   hfp    48  hsync  112 hbp  248
-//   hsw   111  ahbp   359 aaw 1639 totalw 1687
-
-//   vfp     1  vsync    3 vbp   38
-//   vsh     2  avbp    40 aah 1064 totalh 1065
-
-    w_reg(REG_VIDFORMAT, 0x00);
-
-    w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
-    w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
-
-    w16_reg(REG_NPIX_MSB, line_clocks);
-    w16_reg(REG_NLINE_MSB, lines);
-
-    w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
-    w16_reg(REG_VS_LINE_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsh);
-    //w16_reg(REG_VS_PIX_STRT_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
-    //w16_reg(REG_VS_PIX_END_1_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
-
- //   w16_reg(REG_VS_LINE_STRT_2_MSB, 0);
- //   w16_reg(REG_VS_LINE_END_2_MSB, 0);
- //   w16_reg(REG_VS_PIX_STRT_2_MSB, 0);
- //   w16_reg(REG_VS_PIX_END_2_MSB, 0);
-//
-//
- //   w16_reg(REG_VS_LINE_STRT_2_MSB, 1);
- //   w16_reg(REG_VS_LINE_END_2_MSB, LTDCSYNC[LTDC_VID_FORMAT].vsh-1);
- //   w16_reg(REG_VS_PIX_STRT_2_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
- //   w16_reg(REG_VS_PIX_END_2_MSB, LTDCSYNC[LTDC_VID_FORMAT].avbp);
-
-
-    w16_reg(REG_HS_PIX_START_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp);
-    w16_reg(REG_HS_PIX_STOP_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp + LTDCSYNC[LTDC_VID_FORMAT].hsw);
-
-    w16_reg(REG_VWIN_START_1_MSB, 0); //-1
-    w16_reg(REG_VWIN_END_1_MSB, lines); //-1
-
-    //w16_reg(REG_VWIN_START_2_MSB, lines - LTDCSYNC[LTDC_VID_FORMAT].avh);
-    //w16_reg(REG_VWIN_END_2_MSB, lines);
-
-    w16_reg(REG_DE_START_MSB, line_clocks - LTDCSYNC[LTDC_VID_FORMAT].ahw);
-    w16_reg(REG_DE_STOP_MSB, line_clocks);
-/*    
-    w_reg(REG_VIDFORMAT, 0x00);
-    w16_reg(REG_REFPIX_MSB, LTDCSYNC[LTDC_VID_FORMAT].hfp); //+3
-    w16_reg(REG_REFLINE_MSB, LTDCSYNC[LTDC_VID_FORMAT].vfp); //+1
-    w16_reg(REG_NPIX_MSB, 1688);
-    w16_reg(REG_NLINE_MSB, 1066);
-    w16_reg(REG_VS_LINE_STRT_1_MSB, 1);
-    w16_reg(REG_VS_PIX_STRT_1_MSB, 48);
-    w16_reg(REG_VS_LINE_END_1_MSB, 4);
-    w16_reg(REG_VS_PIX_END_1_MSB, 48);
-    w16_reg(REG_HS_PIX_START_MSB, 48);
-    w16_reg(REG_HS_PIX_STOP_MSB, 160);
-    w16_reg(REG_VWIN_START_1_MSB, 41);
-    w16_reg(REG_VWIN_END_1_MSB, 1065);
-    w16_reg(REG_DE_START_MSB, 408);
-    w16_reg(REG_DE_STOP_MSB, 1688);
-*/
-#endif
+    //TDA19988
+    //w_reg(REG_ENABLE_SPACE, 0x00);
 
     /*
      * Always generate sync polarity relative to input sync and
@@ -798,10 +794,10 @@ void tda_init(void) {
      */
     
     reg = TBG_CNTRL_1_DWIN_DIS | TBG_CNTRL_1_TGL_EN;
-    //if (hltdc.Init.HSPolarity == LTDC_HSPOLARITY_AL)
-    //    reg |= TBG_CNTRL_1_H_TGL;
-    //if (hltdc.Init.VSPolarity == LTDC_VSPOLARITY_AL)
-    //    reg |= TBG_CNTRL_1_V_TGL;
+    if (hltdc.Init.HSPolarity == LTDC_HSPOLARITY_AL)
+        reg |= TBG_CNTRL_1_H_TGL;
+    if (hltdc.Init.VSPolarity == LTDC_VSPOLARITY_AL)
+        reg |= TBG_CNTRL_1_V_TGL;
     w_reg(REG_TBG_CNTRL_1, reg);
 
     /* must be last register set: */
@@ -815,9 +811,7 @@ void tda_init(void) {
 
     HAL_Delay(400);
 
-
-
-    /* enable video ports */
+    /* enable video ports, audio will be enabled later */
     w_reg(REG_ENA_VP_0, 0xff);
     w_reg(REG_ENA_VP_1, 0xff);
     w_reg(REG_ENA_VP_2, 0xff);
@@ -832,10 +826,7 @@ void tda_init(void) {
 
     //w_reg(0x110b, 1<<0);
 
-
     w_reg(REG_AIP_CLKSEL, AIP_CLKSEL_AIP_I2S);
 
-#endif
 
 }
-

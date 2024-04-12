@@ -35,127 +35,8 @@ const LTDCSYNC_t LTDCSYNC[] = {
  { 432, 4, 4, 4,   1280, 1024,    48, 112, 248,    1, 3, 38 }, //10 1280x1024_60Hz
  { 297, 4, 4, 2,   1920, 1080,    88,  44, 148,    4, 5, 36 }, //11 1920x1080_60Hz
 };    
-/*
-
- { 252, 2, 2, 8,    640,  480,    16,  64, 120,    1, 3, 16,    95, 143,  783,  799,   1, 33,  513,  524 }, // 1 640x480_75Hz
-
-  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVideoStart   ActiveVideoEnd DeStart DeEnd
-  npix    nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1              vw_e1          de_s    de_e
- {1688,   1066,  1,           48,         4,          48,         48,         160,    41,                1065,          408,    1688, 0, 0}, // E_REGVFMT_1280x1024p_60Hz 
-
-typedef struct _LTDCSYNC_t {
-   uint16_t pll3n, pll3p, pll3q, pll3r;
-   uint16_t ahw, avh;
-   uint16_t hfp, hsw, hbp;
-   uint16_t vfp, vsh, vbp;
-} LTDCSYNC_t;
- { 432, 4, 4, 4, 1280, 1024, 48, 112, 248, 1, 3, 38, 111, 359, 1639, 1687, 2, 40, 1064, 1065 }, //10 1280x1024_60Hz
-
-//                        HTOTAL VTOTAL
-//1280 × 1024p [1] 60.020 1688 1066 63.98132 108.0004682
-
-  regVal = 0x00; 
-  err = setHwRegister(pDis, E_REG_P00_VIDFORMAT_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].nPix;
-  err = setHwRegister(pDis, E_REG_P00_NPIX_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].nPix >> 8);
-  err = setHwRegister(pDis, E_REG_P00_NPIX_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].nLine;
-  err = setHwRegister(pDis, E_REG_P00_NLINE_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].nLine >> 8);
-  err = setHwRegister(pDis, E_REG_P00_NLINE_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].VsLineStart;
-  err = setHwRegister(pDis, E_REG_P00_VS_LINE_STRT_1_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].VsPixStart;
-  err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].VsPixStart >> 8);
-  err = setHwRegister(pDis, E_REG_P00_VS_PIX_STRT_1_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].VsLineEnd;
-  err = setHwRegister(pDis, E_REG_P00_VS_LINE_END_1_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].VsPixEnd;
-  err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].VsPixEnd >> 8);
-  err = setHwRegister(pDis, E_REG_P00_VS_PIX_END_1_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].HsStart;
-  err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].HsStart >> 8);
-  err = setHwRegister(pDis, E_REG_P00_HS_PIX_START_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].HsEnd;
-  err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].HsEnd >> 8);
-  err = setHwRegister(pDis, E_REG_P00_HS_PIX_STOP_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].ActiveVideoStart;
-  err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  err = setHwRegister(pDis, E_REG_P00_VWIN_START_1_MSB_W, 0);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].ActiveVideoEnd;
-  err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].ActiveVideoEnd >> 8);
-  err = setHwRegister(pDis, E_REG_P00_VWIN_END_1_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].DeStart;
-  err = setHwRegister(pDis, E_REG_P00_DE_START_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].DeStart >> 8);
-  err = setHwRegister(pDis, E_REG_P00_DE_START_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) format_param[reg_idx].DeEnd;
-  err = setHwRegister(pDis, E_REG_P00_DE_STOP_LSB_W, regVal);
-  RETIF_REG_FAIL(err);
-  regVal = (UInt8) (format_param[reg_idx].DeEnd >> 8);
-  err = setHwRegister(pDis, E_REG_P00_DE_STOP_MSB_W, regVal);
-  RETIF_REG_FAIL(err);
-*/
 
 /* USER CODE END 0 */
-
-
-/*
-#ifdef FORMAT_PC
-static CONST_DAT tmHdmiTxVidReg_t format_param_PC[HDMITX_VFMT_PC_NUM] =
-{
-   //  NPIX    NLINE  VsLineStart  VsPixStart  VsLineEnd   VsPixEnd    HsStart     HsEnd   ActiveVideoStart   ActiveVideoEnd DeStart DeEnd
-   //  npix    nline  vsl_s1       vsp_s1      vsl_e1      vsp_e1      hs_e        hs_e    vw_s1              vw_e1          de_s    de_e
-    {832,   520,      1,          24,          4,           24,         24,     64,     31,         511,    192,    832, 0, 0},/ E_REGVFMT_640x480p_72Hz   /
-    {840,   500,      1,          16,          4,           16,         16,     80,     19,         499,    200,    840, 0, 0},/ E_REGVFMT_640x480p_75Hz   /
-    {832,   509,      1,          56,          4,           56,         56,     112,    28,         508,    192,    832, 0, 0},/ E_REGVFMT_640x480p_85Hz   /
-
-    {1056,  628,      1,          40,          5,           40,         40,     168,    27,         627,    256,   1056, 0, 0},/ E_REGVFMT_800x600p_60Hz   /
-
-800x600, 60Hz   40.000  800 40  128 88  600 1 4 23
-
-    {1040,  666,      1,          56,          7,           56,         56,     176,    29,         619,    240,   1040, 0, 0},/ E_REGVFMT_800x600p_72Hz   /
-    {1056,  625,      1,          16,          4,           16,         16,     96,     24,         624,    256,   1056, 0, 0},/ E_REGVFMT_800x600p_75Hz   /
-    {1048,  631,      1,          32,          4,           32,         32,     96,     30,         630,    248,   1048, 0, 0},/ E_REGVFMT_800x600p_85Hz   /
-    {1344,  806,      1,          24,          7,           24,         24,     160,    35,         803,    320,   1344, 0, 0},/ E_REGVFMT_1024x768p_60Hz  /
-    {1328,  806,      1,          24,          7,           24,         24,     160,    35,         803,    304,   1328, 0, 0},/ E_REGVFMT_1024x768p_70Hz  /
-    {1312,  800,      1,          16,          4,           16,         16,     112,    31,         799,    288,   1312, 0, 0},/ E_REGVFMT_1024x768p_75Hz  /
-    {1664,  798,      1,          64,          8,           64,         64,     192,    27,         795,    384,   1664, 0, 0},/ E_REGVFMT_1280x768p_60Hz  /
-    {1688,  1066,     1,          48,          4,           48,         48,     160,    41,         1065,   408,   1688, 0, 0},/ E_REGVFMT_1280x1024p_60Hz /
-    {1792,  795,      1,          64,          7,           64,         64,     176,    24,         792,    432,   1792, 0, 0},/ E_REGVFMT_1360x768p_60Hz  /
-    {1864,  1089,     1,          88,          5,           88,         88,     232,    36,         1086,   464,   1864, 0, 0},/ E_REGVFMT_1400x1050p_60Hz /
-    {2160,  1250,     1,          64,          4,           64,         64,     256,    49,         1249,   560,   2160, 0, 0},/ E_REGVFMT_1600x1200p_60Hz /
-    {1728,  1072,     1,          64,          4,           64,         64,     224,    47,         1071,   448,   1728, 0, 0} / E_REGVFMT_1280x1024p_85Hz /
-};
-#endif
-*/
 
 LTDC_HandleTypeDef hltdc;
 
@@ -168,7 +49,7 @@ void MX_LTDC_Init(void)
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AH;
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
-  hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
+  hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IIPC;
 
   hltdc.Init.HorizontalSync     = (LTDCSYNC[LTDC_VID_FORMAT].hsw - 1);
   hltdc.Init.VerticalSync       = (LTDCSYNC[LTDC_VID_FORMAT].vsh - 1);
