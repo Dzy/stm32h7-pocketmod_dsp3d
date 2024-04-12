@@ -75,8 +75,8 @@ uint32_t bbuffer, fbuffer, tmp;
 
 /* USER CODE BEGIN PV */
 
-extern const uint16_t hdh48_3[];
-extern const uint16_t hdh48_3_small[];
+extern const uint8_t hdh48_3[];
+extern const uint8_t hdh48_3_small[];
 
 extern const LTDCSYNC_t LTDCSYNC[];
 
@@ -110,9 +110,28 @@ void blitchar2(uint32_t xpos, uint32_t ypos, uint8_t c) {
     hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw-32;
     HAL_DMA2D_Init(&hdma2d);
 
-    HAL_DMA2D_Start(&hdma2d, &hdh48_3[(16*26*2)*(c-' ')], bbuffer+((ypos)*24*LTDCSYNC[LTDC_VID_FORMAT].ahw*2)+(xpos*32), 32, 24*2);
-    HAL_DMA2D_PollForTransfer(&hdma2d, 100); 
-    //HAL_Delay(1); 
+  //32x48?
+
+  HAL_DMA2D_Start(&hdma2d, &hdh48_3[ ((32*52) * (c-' ')) ], bbuffer+((ypos)*48*LTDCSYNC[LTDC_VID_FORMAT].ahw)+(xpos*32), 32, 48);
+  HAL_DMA2D_PollForTransfer(&hdma2d, 1000); 
+  //HAL_Delay(1);
+
+
+/*
+  uint8_t *dest;
+  uint8_t *source;  
+
+  for(uint32_t i = 0; i<48; i++){
+
+    dest = bbuffer + (LTDCSYNC[LTDC_VID_FORMAT].ahw * i) + (xpos * 32) + (ypos * LTDCSYNC[LTDC_VID_FORMAT].ahw * 48);
+    source = &hdh48_3[ ((32*48)*(c-' ')) + (i * 32)];
+    for(uint32_t z = 0; z<32; z++){
+      dest[z] = source[z];
+    }
+
+  }
+*/
+ 
 }
 
 int _write(int file, char *data, int len)
@@ -326,18 +345,27 @@ MPU_Conf();
   * @retval HAL status
   */
 
+  uint8_t z = 0x00;
   uint32_t pCLUT[256], i, t;
   uint32_t r,g;
-
+/*
   for(i=0;i<256;i++){
       r = ((32.0/256.0)*(float)i)*8.0;
       g = ((64.0/256.0)*(float)i)*4.0;
       pCLUT[i] = 0xff000000 |r<<16|g<<8|r;
   }
 
+*/
+
+  for(i=0;i<256;i++){
+    pCLUT[i] = 0xff000000 | z<<16 | z<<8 | z;
+    z++;
+  }
+
   HAL_LTDC_ConfigCLUT(&hltdc, &pCLUT, 256, 0);
   HAL_LTDC_EnableCLUT(&hltdc, 0);
   HAL_LTDC_DisableDither(&hltdc);
+
 
   tda_init();
 
@@ -393,11 +421,14 @@ MPU_Conf();
 
     if(redraw == 1) {
 
+        uint8_t *screen = bbuffer;
+        screen[0] = 0xff;
+
         redraw = 1;
 
         //dsp3D_setMeshRotation(rx, ry, rz);
         
-        cz += 0.05;
+        cz += 0.0005;
         dsp3D_setMeshRotation(cz, cz, cz);
 
         sprintf(txtbuf, "%dms (min %dms/max %dms) %d FPS",te, tmin, tmax, (uint32_t)(1.0/(float)te*1000.0));
@@ -441,6 +472,9 @@ HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
 
         sprintf(txtbuf, "%.2u.%.2u.%.2u",sDate.Date, sDate.Month, sDate.Year);
         blitstring2(0,7, txtbuf);
+
+        sprintf(txtbuf, "0123456789ABCD");
+        blitstring2(0,8, txtbuf);
 
         //dsp3D_setLightPosition(0.0, 0.0, 100.0);
         dsp3D_renderWireframe((float *)&MODELNAME);

@@ -137,7 +137,7 @@ void MX_FMC_Init(void)
   HAL_SDRAM_SendCommand(&hsdram1, &Command, SDRAM_TIMEOUT);
 
   /* Step 5: Program the external memory mode register */
-  tmpmrd = (uint32_t)  SDRAM_MODEREG_BURST_LENGTH_4          | \
+  tmpmrd = (uint32_t)  SDRAM_MODEREG_BURST_LENGTH_8          | \
                        SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL   | \ 
                        SDRAM_MODEREG_CAS_LATENCY_2           | \
                        SDRAM_MODEREG_OPERATING_MODE_STANDARD | \

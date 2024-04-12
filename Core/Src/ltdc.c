@@ -71,7 +71,7 @@ void MX_LTDC_Init(void)
   pLayerCfg.WindowY1 = LTDCSYNC[LTDC_VID_FORMAT].avh;
   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_L8; //RGB565;
   pLayerCfg.Alpha = 255;
-  pLayerCfg.Alpha0 = 255;
+  pLayerCfg.Alpha0 = 0;
   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
   pLayerCfg.FBStartAdress = 0xc0000000;

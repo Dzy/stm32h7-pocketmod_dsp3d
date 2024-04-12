@@ -26,29 +26,24 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define MAIN_CNTRL0_CECS         (1 << 3)
 # define MAIN_CNTRL0_CEHS         (1 << 4)
 # define MAIN_CNTRL0_SCALER       (1 << 7)
-
 #define REG_VERSION_MSB           REG(0x00, 0x02)     /* read */
 #define REG_SOFTRESET             REG(0x00, 0x0a)     /* write */
 # define SOFTRESET_AUDIO          (1 << 0)
 # define SOFTRESET_I2C_MASTER     (1 << 1)
-
 #define REG_DDC_DISABLE           REG(0x00, 0x0b)     /* read/write */
 #define REG_CCLK_ON               REG(0x00, 0x0c)     /* read/write */
 #define REG_I2C_MASTER            REG(0x00, 0x0d)     /* read/write */
 # define I2C_MASTER_DIS_MM        (1 << 0)
 # define I2C_MASTER_DIS_FILT      (1 << 1)
 # define I2C_MASTER_APP_STRT_LAT  (1 << 2)
-
 #define REG_FEAT_POWERDOWN        REG(0x00, 0x0e)     /* read/write */
 # define FEAT_POWERDOWN_PREFILT   BIT(0)
 # define FEAT_POWERDOWN_CSC       BIT(1)
 # define FEAT_POWERDOWN_SPDIF     (1 << 3)
-
 #define REG_INT_FLAGS_0           REG(0x00, 0x0f)     /* read/write */
 #define REG_INT_FLAGS_1           REG(0x00, 0x10)     /* read/write */
 #define REG_INT_FLAGS_2           REG(0x00, 0x11)     /* read/write */
 # define INT_FLAGS_2_EDID_BLK_RD  (1 << 1)
-
 #define REG_ENA_ACLK              REG(0x00, 0x16)     /* read/write */
 #define REG_ENA_VP_0              REG(0x00, 0x18)     /* read/write */
 #define REG_ENA_VP_1              REG(0x00, 0x19)     /* read/write */
@@ -59,19 +54,16 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define VIP_CNTRL_0_SWAP_A(x)    (((x) & 7) << 4)
 # define VIP_CNTRL_0_MIRR_B       (1 << 3)
 # define VIP_CNTRL_0_SWAP_B(x)    (((x) & 7) << 0)
-
 #define REG_VIP_CNTRL_1           REG(0x00, 0x21)     /* write */
 # define VIP_CNTRL_1_MIRR_C       (1 << 7)
 # define VIP_CNTRL_1_SWAP_C(x)    (((x) & 7) << 4)
 # define VIP_CNTRL_1_MIRR_D       (1 << 3)
 # define VIP_CNTRL_1_SWAP_D(x)    (((x) & 7) << 0)
-
 #define REG_VIP_CNTRL_2           REG(0x00, 0x22)     /* write */
 # define VIP_CNTRL_2_MIRR_E       (1 << 7)
 # define VIP_CNTRL_2_SWAP_E(x)    (((x) & 7) << 4)
 # define VIP_CNTRL_2_MIRR_F       (1 << 3)
 # define VIP_CNTRL_2_SWAP_F(x)    (((x) & 7) << 0)
-
 #define REG_VIP_CNTRL_3           REG(0x00, 0x23)     /* write */
 # define VIP_CNTRL_3_X_TGL        (1 << 0)
 # define VIP_CNTRL_3_H_TGL        (1 << 1)
@@ -79,9 +71,8 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define VIP_CNTRL_3_EMB          (1 << 3)
 # define VIP_CNTRL_3_SYNC_DE      (1 << 4)
 # define VIP_CNTRL_3_SYNC_HS      (1 << 5)
-//# define VIP_CNTRL_3_DE_INT       (1 << 6)
+# define VIP_CNTRL_3_DE_INT       (1 << 6)
 # define VIP_CNTRL_3_EDGE         (1 << 7)
-
 #define REG_VIP_CNTRL_4           REG(0x00, 0x24)     /* write */
 # define VIP_CNTRL_4_BLC(x)       (((x) & 3) << 0)
 # define VIP_CNTRL_4_BLANKIT(x)   (((x) & 3) << 2)
@@ -89,20 +80,16 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define VIP_CNTRL_4_656_ALT      (1 << 5)
 # define VIP_CNTRL_4_TST_656      (1 << 6)
 # define VIP_CNTRL_4_TST_PAT      (1 << 7)
-
 #define REG_VIP_CNTRL_5           REG(0x00, 0x25)     /* write */
 # define VIP_CNTRL_5_CKCASE       (1 << 0)
 # define VIP_CNTRL_5_SP_CNT(x)    (((x) & 3) << 1)
-
 #define REG_MUX_AP                REG(0x00, 0x26)     /* read/write */
 # define MUX_AP_SELECT_I2S    0x64
 # define MUX_AP_SELECT_SPDIF      0x40
-
 #define REG_MUX_VP_VIP_OUT        REG(0x00, 0x27)     /* read/write */
 #define REG_MAT_CONTRL            REG(0x00, 0x80)     /* write */
 # define MAT_CONTRL_MAT_SC(x)     (((x) & 3) << 0)
 # define MAT_CONTRL_MAT_BP        (1 << 2)
-
 #define REG_VIDFORMAT             REG(0x00, 0xa0)     /* write */
 #define REG_REFPIX_MSB            REG(0x00, 0xa1)     /* write */
 #define REG_REFPIX_LSB            REG(0x00, 0xa2)     /* write */
@@ -152,7 +139,6 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define TBG_CNTRL_0_FRAME_DIS    (1 << 5)
 # define TBG_CNTRL_0_SYNC_MTHD    (1 << 6)
 # define TBG_CNTRL_0_SYNC_ONCE    (1 << 7)
-
 #define REG_TBG_CNTRL_1           REG(0x00, 0xcb)     /* write */
 # define TBG_CNTRL_1_H_TGL        (1 << 0)
 # define TBG_CNTRL_1_V_TGL        (1 << 1)
@@ -161,29 +147,24 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define TBG_CNTRL_1_H_EXT        (1 << 4)
 # define TBG_CNTRL_1_V_EXT        (1 << 5)
 # define TBG_CNTRL_1_DWIN_DIS     (1 << 6)
-
 #define REG_ENABLE_SPACE          REG(0x00, 0xd6)     /* write */
 #define REG_HVF_CNTRL_0           REG(0x00, 0xe4)     /* write */
 # define HVF_CNTRL_0_SM           (1 << 7)
 # define HVF_CNTRL_0_RWB          (1 << 6)
 # define HVF_CNTRL_0_PREFIL(x)    (((x) & 3) << 2)
 # define HVF_CNTRL_0_INTPOL(x)    (((x) & 3) << 0)
-
 #define REG_HVF_CNTRL_1           REG(0x00, 0xe5)     /* write */
 # define HVF_CNTRL_1_FOR          (1 << 0)
 # define HVF_CNTRL_1_YUVBLK       (1 << 1)
 # define HVF_CNTRL_1_VQR(x)       (((x) & 3) << 2)
 # define HVF_CNTRL_1_PAD(x)       (((x) & 3) << 4)
 # define HVF_CNTRL_1_SEMI_PLANAR  (1 << 6)
-
 #define REG_RPT_CNTRL             REG(0x00, 0xf0)     /* write */
 # define RPT_CNTRL_REPEAT(x)      ((x) & 15)
-
 #define REG_I2S_FORMAT            REG(0x00, 0xfc)     /* read/write */
 # define I2S_FORMAT_PHILIPS       (0 << 0)
 # define I2S_FORMAT_LEFT_J        (2 << 0)
 # define I2S_FORMAT_RIGHT_J       (3 << 0)
-
 #define REG_AIP_CLKSEL            REG(0x00, 0xfd)     /* write */
 # define AIP_CLKSEL_AIP_SPDIF     (0 << 3)
 # define AIP_CLKSEL_AIP_I2S   (1 << 3)
@@ -196,16 +177,13 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define PLL_SERIAL_1_SRL_FDN     (1 << 0)
 # define PLL_SERIAL_1_SRL_IZ(x)   (((x) & 3) << 1)
 # define PLL_SERIAL_1_SRL_MAN_IZ  (1 << 6)
-
 #define REG_PLL_SERIAL_2          REG(0x02, 0x01)     /* read/write */
 # define PLL_SERIAL_2_SRL_NOSC(x) ((x) << 0)
 # define PLL_SERIAL_2_SRL_PR(x)   (((x) & 0xf) << 4)
-
 #define REG_PLL_SERIAL_3          REG(0x02, 0x02)     /* read/write */
 # define PLL_SERIAL_3_SRL_CCIR    (1 << 0)
 # define PLL_SERIAL_3_SRL_DE      (1 << 2)
 # define PLL_SERIAL_3_SRL_PXIN_SEL (1 << 4)
-
 #define REG_SERIALIZER            REG(0x02, 0x03)     /* read/write */
 #define REG_BUFFER_OUT            REG(0x02, 0x04)     /* read/write */
 #define REG_PLL_SCG1              REG(0x02, 0x05)     /* read/write */
@@ -221,13 +199,12 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define AUDIO_DIV_SERCLK_8       3
 # define AUDIO_DIV_SERCLK_16      4
 # define AUDIO_DIV_SERCLK_32      5
-
 #define REG_SEL_CLK               REG(0x02, 0x11)     /* read/write */
 # define SEL_CLK_SEL_CLK1         (1 << 0)
 # define SEL_CLK_SEL_VRF_CLK(x)   (((x) & 3) << 1)
 # define SEL_CLK_ENA_SC_CLK       (1 << 3)
-
 #define REG_ANA_GENERAL           REG(0x02, 0x12)     /* read/write */
+
 
 /* Page 09h: EDID Control */
 #define REG_EDID_DATA_0           REG(0x09, 0x00)     /* read */
@@ -238,12 +215,14 @@ extern const LTDCSYNC_t LTDCSYNC[];
 #define REG_DDC_SEGM_ADDR         REG(0x09, 0xfd)     /* read/write */
 #define REG_DDC_SEGM              REG(0x09, 0xfe)     /* read/write */
 
+
 /* Page 10h: information frames and packets */
 #define REG_IF1_HB0               REG(0x10, 0x20)     /* read/write */
 #define REG_IF2_HB0               REG(0x10, 0x40)     /* read/write */
 #define REG_IF3_HB0               REG(0x10, 0x60)     /* read/write */
 #define REG_IF4_HB0               REG(0x10, 0x80)     /* read/write */
 #define REG_IF5_HB0               REG(0x10, 0xa0)     /* read/write */
+
 
 /* Page 11h: audio settings and content info packets */
 #define REG_AIP_CNTRL_0           REG(0x11, 0x00)     /* read/write */
@@ -252,11 +231,9 @@ extern const LTDCSYNC_t LTDCSYNC[];
 # define AIP_CNTRL_0_LAYOUT       (1 << 2)
 # define AIP_CNTRL_0_ACR_MAN      (1 << 5)
 # define AIP_CNTRL_0_RST_CTS      (1 << 6)
-
 #define REG_CA_I2S                REG(0x11, 0x01)     /* read/write */
 # define CA_I2S_CA_I2S(x)         (((x) & 31) << 0)
 # define CA_I2S_HBR_CHSTAT        (1 << 6)
-
 #define REG_LATENCY_RD            REG(0x11, 0x04)     /* read/write */
 #define REG_ACR_CTS_0             REG(0x11, 0x05)     /* read/write */
 #define REG_ACR_CTS_1             REG(0x11, 0x06)     /* read/write */
@@ -267,24 +244,21 @@ extern const LTDCSYNC_t LTDCSYNC[];
 #define REG_CTS_N                 REG(0x11, 0x0c)     /* read/write */
 # define CTS_N_K(x)               (((x) & 7) << 0)
 # define CTS_N_M(x)               (((x) & 3) << 4)
-
 #define REG_ENC_CNTRL             REG(0x11, 0x0d)     /* read/write */
 # define ENC_CNTRL_RST_ENC        (1 << 0)
 # define ENC_CNTRL_RST_SEL        (1 << 1)
 # define ENC_CNTRL_CTL_CODE(x)    (((x) & 3) << 2)
-
 #define REG_DIP_FLAGS             REG(0x11, 0x0e)     /* read/write */
 # define DIP_FLAGS_ACR            (1 << 0)
 # define DIP_FLAGS_GC             (1 << 1)
-
 #define REG_DIP_IF_FLAGS          REG(0x11, 0x0f)     /* read/write */
 # define DIP_IF_FLAGS_IF1         (1 << 1)
 # define DIP_IF_FLAGS_IF2         (1 << 2)
 # define DIP_IF_FLAGS_IF3         (1 << 3)
 # define DIP_IF_FLAGS_IF4         (1 << 4)
 # define DIP_IF_FLAGS_IF5         (1 << 5)
-
 #define REG_CH_STAT_B(x)          REG(0x11, 0x14 + (x)) /* read/write */
+
 
 /* Page 12h: HDCP and OTP */
 #define REG_TX3                   REG(0x12, 0x9a)     /* read/write */
@@ -293,7 +267,10 @@ extern const LTDCSYNC_t LTDCSYNC[];
 #define REG_TX33                  REG(0x12, 0xb8)     /* read/write */
 # define TX33_HDMI                (1 << 1)
 
+
 /* Page 13h: Gamut related metadata packets */
+
+
 
 /* CEC registers: (not paged)
  */
@@ -657,7 +634,6 @@ void tda_init(void) {
         if (80 >> div <= pixel_clock)
             break;
 
-
     /* first disable the video ports */
     w_reg(REG_ENA_VP_0, 0);
     w_reg(REG_ENA_VP_1, 0);
@@ -819,6 +795,12 @@ void tda_init(void) {
     w_reg(REG_VIP_CNTRL_0, VIP_CNTRL_0_SWAP_A(2) | VIP_CNTRL_0_SWAP_B(3));
     w_reg(REG_VIP_CNTRL_1, VIP_CNTRL_1_SWAP_C(4) | VIP_CNTRL_1_SWAP_D(5));
     w_reg(REG_VIP_CNTRL_2, VIP_CNTRL_2_SWAP_E(0) | VIP_CNTRL_2_SWAP_F(1));
+
+//    w_reg(REG_VIP_CNTRL_0, VIP_CNTRL_0_SWAP_A(2) | VIP_CNTRL_0_MIRR_A | VIP_CNTRL_0_SWAP_B(3) | VIP_CNTRL_0_MIRR_B);
+//    w_reg(REG_VIP_CNTRL_1, VIP_CNTRL_1_SWAP_C(4) | VIP_CNTRL_1_MIRR_C | VIP_CNTRL_1_SWAP_D(5) | VIP_CNTRL_1_MIRR_D);
+//    w_reg(REG_VIP_CNTRL_2, VIP_CNTRL_2_SWAP_E(0) | VIP_CNTRL_2_MIRR_E | VIP_CNTRL_2_SWAP_F(1) | VIP_CNTRL_2_MIRR_F);
+
+
 
     w_reg(0x1100, 1<<6|1<<0);
     HAL_Delay(100);
