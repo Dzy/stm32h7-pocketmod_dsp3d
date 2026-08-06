@@ -42,15 +42,23 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-//div 1 / 10 7 (odd red on bg) 8 9
-#define LTDC_VID_FORMAT 0
-#define LTDC_VID_FORMAT 1
-#define LTDC_VID_FORMAT 3
-#define LTDC_VID_FORMAT 8
-#define LTDC_VID_FORMAT 9
-#define LTDC_VID_FORMAT 10
+/* LTDC timing/pixel-format entry selected from LTDCSYNC[]. */
+#define LTDC_VID_FORMAT 8U
 
-#define LTDC_VID_FORMAT 0
+/* External SDRAM and framebuffer layout.
+ *
+ * Two 4 MiB slots are reserved for L8 framebuffers.  The first 8 MiB is
+ * overlaid by a non-cacheable MPU region so CPU, DMA2D and LTDC always see
+ * the same bytes without per-frame cache maintenance.  The remaining SDRAM
+ * stays cacheable; the depth buffer starts immediately after the two slots.
+ */
+#define SDRAM_BASE_ADDRESS              0xC0000000U
+#define SDRAM_SIZE_BYTES                (32U * 1024U * 1024U)
+#define FRAMEBUFFER_SLOT_SIZE_BYTES     (4U * 1024U * 1024U)
+#define FRAMEBUFFER0_ADDRESS            (SDRAM_BASE_ADDRESS)
+#define FRAMEBUFFER1_ADDRESS            (SDRAM_BASE_ADDRESS + FRAMEBUFFER_SLOT_SIZE_BYTES)
+#define FRAMEBUFFER_MPU_SIZE_BYTES      (8U * 1024U * 1024U)
+#define DEPTH_BUFFER_ADDRESS            (SDRAM_BASE_ADDRESS + FRAMEBUFFER_MPU_SIZE_BYTES)
 
 /* USER CODE END EC */
 
