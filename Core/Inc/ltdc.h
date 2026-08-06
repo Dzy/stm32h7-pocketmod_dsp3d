@@ -33,11 +33,17 @@ extern "C" {
 
 extern LTDC_HandleTypeDef hltdc;
 
+#define HDMI_AVI_ASPECT_NONE  0U
+#define HDMI_AVI_ASPECT_4_3   1U
+#define HDMI_AVI_ASPECT_16_9  2U
+
 typedef struct _LTDCSYNC_t {
    uint16_t pll3n, pll3p, pll3q, pll3r;
    uint16_t ahw, avh;
    uint16_t hfp, hsw, hbp;
    uint16_t vfp, vsh, vbp;
+   uint32_t hpol, vpol;
+   uint8_t hdmi_vic, hdmi_aspect;
 } LTDCSYNC_t;
 
 /* USER CODE END Private defines */
