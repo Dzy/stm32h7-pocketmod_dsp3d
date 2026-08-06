@@ -1,0 +1,27 @@
+name: Delete stale branches
+
+on:
+  push:
+    branches:
+      - maintenance/delete-stale-branches
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check out maintenance branch
+        uses: actions/checkout@v4
+        with:
+          ref: maintenance/delete-stale-branches
+          fetch-depth: 1
+
+      - name: Delete merged and obsolete branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push origin --delete feature/avi-infoframe-1080p60
+          git push origin --delete fix/sync-packaged-project
+          git push origin --delete maintenance/delete-stale-branches
