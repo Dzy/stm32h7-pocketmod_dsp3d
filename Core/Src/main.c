@@ -29,6 +29,7 @@
 #include "gpio.h"
 #include "fmc.h"
 #include "rtc.h"
+#include "tda998x.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -42,8 +43,9 @@
 #include "dsp3D.h"
 #include "dsp3D_LL.h"
 
-#include "stdint.h"
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -59,7 +61,8 @@ pocketmod_context context;
 #define MODELNAME teapotModelData
 extern float32_t MODELNAME[];
 
-uint32_t bbuffer, fbuffer, tmp;
+uint32_t bbuffer = FRAMEBUFFER1_ADDRESS;
+uint32_t fbuffer = FRAMEBUFFER0_ADDRESS;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -80,74 +83,80 @@ extern const uint8_t hdh48_3_small[];
 
 extern const LTDCSYNC_t LTDCSYNC[];
 
-void blitstring(uint32_t xpos, uint32_t ypos, uint8_t *ptr) {
-  while (*ptr != 0) {
-    blitchar(xpos, ypos, (uint8_t)*ptr);
-    xpos++;
-    ptr++;
+static void blitchar(uint32_t xpos, uint32_t ypos, uint8_t c);
+static void blitchar2(uint32_t xpos, uint32_t ypos, uint8_t c);
+
+static void blitchar(uint32_t xpos, uint32_t ypos, uint8_t c)
+{
+  if ((c < (uint8_t)' ') || (c > (uint8_t)'~')) {
+    c = (uint8_t)'?';
   }
-}
 
-void blitchar(uint32_t xpos, uint32_t ypos, uint8_t c) {
-
-  hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw-16;
+  hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw - 16U;
   HAL_DMA2D_Init(&hdma2d);
 
-  HAL_DMA2D_Start(&hdma2d, &hdh48_3_small[(8*26)*(c-' ')], bbuffer+((ypos)*24*LTDCSYNC[LTDC_VID_FORMAT].ahw)+(xpos*16), 16, 24);
-  HAL_DMA2D_PollForTransfer(&hdma2d, 100); 
+  HAL_DMA2D_Start(&hdma2d,
+                  (uint32_t)(uintptr_t)&hdh48_3_small[(8U * 26U) * (uint32_t)(c - (uint8_t)' ')],
+                  bbuffer + (ypos * 24U * LTDCSYNC[LTDC_VID_FORMAT].ahw) + (xpos * 16U),
+                  16U,
+                  24U);
+  HAL_DMA2D_PollForTransfer(&hdma2d, 100U);
 }
 
-void blitstring2(uint32_t xpos, uint32_t ypos, uint8_t *ptr) {
-  while (*ptr != 0) {
+static void blitstring2(uint32_t xpos, uint32_t ypos, const char *ptr)
+{
+  while (*ptr != '\0') {
     blitchar2(xpos, ypos, (uint8_t)*ptr);
     xpos++;
     ptr++;
   }
 }
 
-void blitchar2(uint32_t xpos, uint32_t ypos, uint8_t c) {
-
-    hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw-32;
-    HAL_DMA2D_Init(&hdma2d);
-
-  //32x48?
-
-  HAL_DMA2D_Start(&hdma2d, &hdh48_3[ ((32*52) * (c-' ')) ], bbuffer+((ypos)*48*LTDCSYNC[LTDC_VID_FORMAT].ahw)+(xpos*32), 32, 48);
-  HAL_DMA2D_PollForTransfer(&hdma2d, 1000); 
-  //HAL_Delay(1);
-
-
-/*
-  uint8_t *dest;
-  uint8_t *source;  
-
-  for(uint32_t i = 0; i<48; i++){
-
-    dest = bbuffer + (LTDCSYNC[LTDC_VID_FORMAT].ahw * i) + (xpos * 32) + (ypos * LTDCSYNC[LTDC_VID_FORMAT].ahw * 48);
-    source = &hdh48_3[ ((32*48)*(c-' ')) + (i * 32)];
-    for(uint32_t z = 0; z<32; z++){
-      dest[z] = source[z];
-    }
-
+static void blitchar2(uint32_t xpos, uint32_t ypos, uint8_t c)
+{
+  if ((c < (uint8_t)' ') || (c > (uint8_t)'~')) {
+    c = (uint8_t)'?';
   }
-*/
- 
+
+  hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw - 32U;
+  HAL_DMA2D_Init(&hdma2d);
+
+  HAL_DMA2D_Start(&hdma2d,
+                  (uint32_t)(uintptr_t)&hdh48_3[(32U * 52U) * (uint32_t)(c - (uint8_t)' ')],
+                  bbuffer + (ypos * 48U * LTDCSYNC[LTDC_VID_FORMAT].ahw) + (xpos * 32U),
+                  32U,
+                  48U);
+  HAL_DMA2D_PollForTransfer(&hdma2d, 1000U);
 }
 
 int _write(int file, char *data, int len)
 {
-  /* Your implementation of fputc(). */
-  blitstring(0,0, data);
+  (void)file;
+
+  for (int i = 0; i < len; ++i) {
+    const uint8_t c = (uint8_t)data[i];
+    if (c == (uint8_t)'\n') {
+      continue;
+    }
+    blitchar((uint32_t)i, 0U, c);
+  }
+
   return len;
 }
 
-__IO uint32_t ReloadFlag = 0;
+static volatile uint8_t ltdc_swap_pending = 0U;
+static volatile uint8_t ltdc_reload_complete = 0U;
 int8_t redraw = 1;
 
+void HAL_LTDC_ReloadEventCallback(LTDC_HandleTypeDef *hltdc)
+{
+  (void)hltdc;
 
-void HAL_LTDC_ReloadEventCallback(LTDC_HandleTypeDef *hltdc) {
-  ReloadFlag = 1;
-  //redraw = 1;
+  /* Ignore unrelated LTDC reloads (for example CLUT configuration). */
+  if (ltdc_swap_pending != 0U) {
+    __DMB();
+    ltdc_reload_complete = 1U;
+  }
 }
 
 extern HID_MOUSE_Info_TypeDef    mouse_info;
@@ -171,8 +180,8 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     Mouse_Info = USBH_HID_GetMouseInfo(phost);  // Get the info
     MouseX = Mouse_Info->x;  // get the x value
     MouseY = Mouse_Info->y;  // get the y value
-    rx -= (float)MouseX/128.0;
-    ry += (float)MouseY/128.0;
+    rx -= (float)MouseX / 128.0f;
+    ry += (float)MouseY / 128.0f;
     redraw = 1;
   }
 
@@ -194,6 +203,7 @@ uint32_t modticks = 0, modticks_old = 0;
 
 void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
+  (void)hi2s;
   modticks++;
   rendered_bytes = pocketmod_render(&context, buffer, 256);
   rendered_samples = rendered_bytes / sizeof(float[2]);
@@ -203,7 +213,7 @@ void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
     output[i][1] = (int16_t) (clip(buffer[i][1]) * 0x7fff);
   }
 
-  HAL_I2S_Transmit_IT(&hi2s1, &output, rendered_samples*2);
+  HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)(void *)output, (uint16_t)(rendered_samples * 2));
 }
 
 
@@ -228,8 +238,6 @@ double temp;
 void readtemp(void) {
 
   uint32_t adc_v;
-  double adcx;
-
   HAL_ADC_Start(&hadc3);
   HAL_ADC_PollForConversion(&hadc3, 100);
 
@@ -241,39 +249,136 @@ void readtemp(void) {
 }
 
 
-void MPU_Conf()
+static size_t Framebuffer_SizeBytes(void)
 {
-    MPU_Region_InitTypeDef MPU_InitStruct;
+  return (size_t)LTDCSYNC[LTDC_VID_FORMAT].ahw *
+         (size_t)LTDCSYNC[LTDC_VID_FORMAT].avh;
+}
 
-    HAL_MPU_Disable();
+static void Framebuffer_Clear(uint32_t address)
+{
+  const uint32_t width = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+  const uint32_t height = LTDCSYNC[LTDC_VID_FORMAT].avh;
 
-    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+  /* The project intentionally uses RGB565 DMA2D output as a two-byte write
+   * unit for the L8 framebuffer.  Clearing width/2 RGB565 pixels therefore
+   * writes exactly width L8 bytes on every scanline. */
+  if ((width & 1U) != 0U) {
+    Error_Handler();
+  }
 
-    MPU_InitStruct.BaseAddress = 0xc0000000;
-    MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+  hdma2d.Init.Mode = DMA2D_R2M;
+  hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+  hdma2d.Init.OutputOffset = 0U;
 
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+  if (HAL_DMA2D_Init(&hdma2d) != HAL_OK) {
+    Error_Handler();
+  }
 
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-    MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  if (HAL_DMA2D_Start(&hdma2d, 0U, address, width / 2U, height) != HAL_OK) {
+    Error_Handler();
+  }
 
-//Shared Device
-//    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-//    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-//    MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
-//    MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  if (HAL_DMA2D_PollForTransfer(&hdma2d, 1000U) != HAL_OK) {
+    Error_Handler();
+  }
 
-    MPU_InitStruct.Number = MPU_REGION_NUMBER0;
+  /* Restore the mode expected by the existing font blitters. */
+  hdma2d.Init.Mode = DMA2D_M2M;
+  hdma2d.Init.OutputOffset = 0U;
 
-    MPU_InitStruct.SubRegionDisable = 0x00;
+  if (HAL_DMA2D_Init(&hdma2d) != HAL_OK) {
+    Error_Handler();
+  }
 
-    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  /* The framebuffer MPU overlay is Normal, non-cacheable memory. */
+  __DSB();
+}
 
-    HAL_MPU_ConfigRegion(&MPU_InitStruct);
+static void Framebuffer_QueuePresent(void)
+{
+  if (ltdc_swap_pending != 0U) {
+    return;
+  }
 
-    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+  /* Complete all CPU writes before the LTDC shadow register is reloaded.
+   * DMA2D transfers used by the text renderer are already polled to completion. */
+  __DSB();
+
+  ltdc_reload_complete = 0U;
+
+  if (HAL_LTDC_SetAddress_NoReload(&hltdc, bbuffer, 0U) != HAL_OK) {
+    Error_Handler();
+  }
+
+  ltdc_swap_pending = 1U;
+  __DMB();
+
+  if (HAL_LTDC_Reload(&hltdc, LTDC_RELOAD_VERTICAL_BLANKING) != HAL_OK) {
+    ltdc_swap_pending = 0U;
+    Error_Handler();
+  }
+}
+
+static uint8_t Framebuffer_FinishPresent(void)
+{
+  uint32_t old_front;
+
+  if ((ltdc_swap_pending == 0U) || (ltdc_reload_complete == 0U)) {
+    return 0U;
+  }
+
+  __DMB();
+
+  /* Only swap software ownership after LTDC confirms the vertical-blank
+   * reload.  The old front buffer is now safe to clear and render into. */
+  old_front = fbuffer;
+  fbuffer = bbuffer;
+  bbuffer = old_front;
+
+  ltdc_reload_complete = 0U;
+  ltdc_swap_pending = 0U;
+
+  Framebuffer_Clear(bbuffer);
+  return 1U;
+}
+
+void MPU_Conf(void)
+{
+  MPU_Region_InitTypeDef MPU_InitStruct = {0};
+
+  HAL_MPU_Disable();
+
+  /* Region 0: the complete 32 MiB SDRAM is write-back cacheable.  CPU-only
+   * data, including the depth buffer at 0xC0800000, retains full D-cache
+   * performance. */
+  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+  MPU_InitStruct.Number = MPU_REGION_NUMBER0;
+  MPU_InitStruct.BaseAddress = SDRAM_BASE_ADDRESS;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+  MPU_InitStruct.SubRegionDisable = 0x00U;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  /* Region 1 has higher priority and overlays both framebuffer slots.
+   * TEX=1,C=0,B=0 selects Normal non-cacheable memory, avoiding stale or
+   * dirty cache lines when CPU, DMA2D and LTDC share the same buffers. */
+  MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+  MPU_InitStruct.BaseAddress = FRAMEBUFFER0_ADDRESS;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_8MB;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
 float cz = 0.0;
@@ -321,8 +426,20 @@ MPU_Conf();
   MX_GPIO_Init();
   MX_RTC_Init();
   MX_FMC_Init();
-  MX_LTDC_Init();
   MX_DMA2D_Init();
+
+  /* Clear both buffers before LTDC starts fetching from external SDRAM. */
+  fbuffer = FRAMEBUFFER0_ADDRESS;
+  bbuffer = FRAMEBUFFER1_ADDRESS;
+
+  if (Framebuffer_SizeBytes() > FRAMEBUFFER_SLOT_SIZE_BYTES) {
+    Error_Handler();
+  }
+
+  Framebuffer_Clear(fbuffer);
+  Framebuffer_Clear(bbuffer);
+
+  MX_LTDC_Init();
   MX_I2C1_Init();
   MX_I2S1_Init();
   MX_DMA_Init();
@@ -346,8 +463,7 @@ MPU_Conf();
   */
 
   uint8_t z = 0x00;
-  uint32_t pCLUT[256], i, t;
-  uint32_t r,g;
+  uint32_t pCLUT[256], i;
 /*
   for(i=0;i<256;i++){
       r = ((32.0/256.0)*(float)i)*8.0;
@@ -362,7 +478,7 @@ MPU_Conf();
     z++;
   }
 
-  HAL_LTDC_ConfigCLUT(&hltdc, &pCLUT, 256, 0);
+  HAL_LTDC_ConfigCLUT(&hltdc, pCLUT, 256U, 0U);
   HAL_LTDC_EnableCLUT(&hltdc, 0);
   HAL_LTDC_DisableDither(&hltdc);
 
@@ -372,12 +488,7 @@ MPU_Conf();
 
   uint32_t tn = 0,to = 0, te = 0, tmax = 0, tmin = 1000;
 
-  uint8_t txtbuf[100];
-
-  fbuffer = 0xc0000000 + (1024*1024*0);
-  bbuffer = 0xc0000000 + (1024*1024*4);
-
-  memset(0xc0000000, 0, 1024*1024*32);
+  char txtbuf[100];
 
   dsp3D_init();
 
@@ -406,7 +517,7 @@ MPU_Conf();
     output[i][1] = (int16_t) (clip(buffer[i][1]) * 0x7fff);
   }
 
-  HAL_I2S_Transmit_IT(&hi2s1, &output, rendered_samples*2);
+  HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)(void *)output, (uint16_t)(rendered_samples * 2));
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -415,35 +526,45 @@ MPU_Conf();
 
     MX_USB_HOST_Process();
 
-    //if(modticks_old != modticks)
-    //  redraw = 1;
+    /* The vertical-blank swap is asynchronous.  Keep servicing USB while
+     * waiting, but never render into a buffer still owned by LTDC. */
+    if (Framebuffer_FinishPresent() != 0U) {
+      redraw = 1;
+    }
+
+    if (ltdc_swap_pending != 0U) {
+      continue;
+    }
+
     tn = HAL_GetTick();
 
     if(redraw == 1) {
 
-        uint8_t *screen = bbuffer;
-        screen[0] = 0xff;
-
-        redraw = 1;
+        redraw = 0;
 
         //dsp3D_setMeshRotation(rx, ry, rz);
         
-        cz += 0.0005;
+        cz += 0.010;
         dsp3D_setMeshRotation(cz, cz, cz);
 
-        sprintf(txtbuf, "%dms (min %dms/max %dms) %d FPS",te, tmin, tmax, (uint32_t)(1.0/(float)te*1000.0));
+        const uint32_t fps = (te != 0U) ? (1000U / te) : 0U;
+        snprintf(txtbuf, sizeof(txtbuf), "%lums (min %lums/max %lums) %lu FPS",
+                 (unsigned long)te, (unsigned long)tmin, (unsigned long)tmax,
+                 (unsigned long)fps);
         blitstring2(0,1, txtbuf);
 
-        sprintf(txtbuf, "numVert  %d",(uint32_t)MODELNAME[0]);
+        snprintf(txtbuf, sizeof(txtbuf), "numVert  %lu", (unsigned long)(uint32_t)MODELNAME[0]);
         blitstring2(0,2, txtbuf);
 
-        sprintf(txtbuf, "numFaces %d",(uint32_t)MODELNAME[1]);
+        snprintf(txtbuf, sizeof(txtbuf), "numFaces %lu", (unsigned long)(uint32_t)MODELNAME[1]);
         blitstring2(0,3, txtbuf);
 
-        sprintf(txtbuf, "CPU %dMHz",HAL_RCC_GetSysClockFreq()/1000000);
+        snprintf(txtbuf, sizeof(txtbuf), "CPU %luMHz",
+                 (unsigned long)(HAL_RCC_GetSysClockFreq() / 1000000U));
         blitstring2(0,4, txtbuf);
 
-        sprintf(txtbuf, "X=%d, Y=%d %d %d", MouseX, MouseY, modticks, rendered_samples);
+        snprintf(txtbuf, sizeof(txtbuf), "X=%d, Y=%d %lu %d",
+                 (int)MouseX, (int)MouseY, (unsigned long)modticks, rendered_samples);
         blitstring2(0,5, txtbuf);
 
         modticks_old = modticks;
@@ -467,17 +588,21 @@ HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
         HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
         HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-        sprintf(txtbuf, "%.2u:%.2u:%.2u",sTime.Hours,sTime.Minutes,sTime.Seconds);
+        snprintf(txtbuf, sizeof(txtbuf), "%02u:%02u:%02u",
+                 (unsigned int)sTime.Hours, (unsigned int)sTime.Minutes,
+                 (unsigned int)sTime.Seconds);
         blitstring2(0,6, txtbuf);
 
-        sprintf(txtbuf, "%.2u.%.2u.%.2u",sDate.Date, sDate.Month, sDate.Year);
+        snprintf(txtbuf, sizeof(txtbuf), "%02u.%02u.%02u",
+                 (unsigned int)sDate.Date, (unsigned int)sDate.Month,
+                 (unsigned int)sDate.Year);
         blitstring2(0,7, txtbuf);
 
-        sprintf(txtbuf, "0123456789ABCD");
+        snprintf(txtbuf, sizeof(txtbuf), "0123456789ABCD");
         blitstring2(0,8, txtbuf);
 
         //dsp3D_setLightPosition(0.0, 0.0, 100.0);
-        dsp3D_renderWireframe((float *)&MODELNAME);
+        dsp3D_renderWireframe(MODELNAME);
         //dsp3D_renderFlat((float *)&MODELNAME);
         //dsp3D_renderPoints((float *)&MODELNAME);
         //dsp3D_renderGouraud((float *)&MODELNAME);
@@ -501,20 +626,7 @@ HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
         }
 
 
-        HAL_LTDC_SetAddress_NoReload(&hltdc, bbuffer, 0);
-
-        ReloadFlag = 0;
-        HAL_LTDC_Reload(&hltdc,LTDC_RELOAD_VERTICAL_BLANKING);
-
-        tmp = fbuffer;
-        fbuffer = bbuffer;
-        bbuffer = tmp;
-
-        do{
-          MX_USB_HOST_Process();
-        }while(ReloadFlag == 0);
-    
-        memset(bbuffer, 0, LTDCSYNC[LTDC_VID_FORMAT].ahw*LTDCSYNC[LTDC_VID_FORMAT].avh);
+        Framebuffer_QueuePresent();
     }
 
     /* USER CODE END WHILE */

@@ -39,13 +39,13 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/ltdc.c \
-Src/rtc.c \
-Src/dma.c \
+Core/Src/rtc.c \
+Core/Src/dma.c \
 Core/Src/stm32h7xx_it.c \
 Core/Src/stm32h7xx_hal_msp.c \
 Core/Src/tda998x.c \
-Core/Stc/hdh48_3_small.c \
-Core/Stc/hdh48_3.c \
+Core/Src/hdh48_3_small.c \
+Core/Src/hdh48_3.c \
 Core/Src/teapot.c \
 Core/Src/dsp3D.c \
 Core/Src/dsp3D_LL.c \
@@ -174,7 +174,7 @@ C_INCLUDES =  \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections $(FPU_FLAGS)
-CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections $(FPU_FLAGS)
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -std=gnu11 -Wall -fdata-sections -ffunction-sections $(FPU_FLAGS)
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2

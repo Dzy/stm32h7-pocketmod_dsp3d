@@ -223,6 +223,11 @@ extern const LTDCSYNC_t LTDCSYNC[];
 #define REG_IF4_HB0               REG(0x10, 0x80)     /* read/write */
 #define REG_IF5_HB0               REG(0x10, 0xa0)     /* read/write */
 
+#define HDMI_INFOFRAME_TYPE_AVI   0x82U
+#define HDMI_AVI_VERSION          0x02U
+#define HDMI_AVI_LENGTH           13U
+#define HDMI_AVI_RGB_QUANT_FULL   (2U << 2)
+
 
 /* Page 11h: audio settings and content info packets */
 #define REG_AIP_CNTRL_0           REG(0x11, 0x00)     /* read/write */
@@ -310,23 +315,23 @@ void tda19988_testmode( void ) {
 
     master_test[0] = 0xFF;
     master_test[1] = 0x87;
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_CEC, &master_test, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_CEC, master_test, 2, 1000);
 
     master_test[0] = 0xFF;
     master_test[1] = 0x00;
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, master_test, 2, 1000);
 
     master_test[0] = 0xA0;
     master_test[1] = 0x07;    // pre-defined video formats
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, master_test, 2, 1000);
     
     master_test[0] = 0xE4;
     master_test[1] = 0xC0;  // generate test pattern
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, master_test, 2, 1000);
 
     master_test[0] = 0xF0;
     master_test[1] = 0x00;
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, &master_test, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA19988_HDMI, master_test, 2, 1000);
 
 }
 
@@ -335,11 +340,11 @@ void w_reg(uint16_t reg, uint8_t val) {
     uint8_t buf[2];
     buf[0] = REG_CURPAGE;
     buf[1] = REG2PAGE(reg);
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 2, 1000);
 
     buf[0] = REG2ADDR(reg);
     buf[1] = val;
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 2, 1000);
 
 }
 
@@ -347,15 +352,15 @@ void w16_reg(uint16_t reg, uint16_t val) {
     uint8_t buf[2];
     buf[0] = REG_CURPAGE;
     buf[1] = REG2PAGE(reg);
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 2, 1000);
 
     buf[0] = REG2ADDR(reg);
     buf[1] = val>>8;
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 2, 1000);
 
     buf[0] = REG2ADDR(reg+1);
     buf[1] = val;
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 2, 1000);
 }
 
 uint8_t r_reg(uint16_t reg) {
@@ -363,11 +368,11 @@ uint8_t r_reg(uint16_t reg) {
     uint8_t buf[2];
     buf[0] = REG_CURPAGE;
     buf[1] = REG2PAGE(reg);
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 2, 1000);
 
     buf[0] = REG2ADDR(reg);
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &buf, 1, 1000);
-    HAL_I2C_Master_Receive(&hi2c1, I2C_ADDRESS_TDA, &buf, 1, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, buf, 1, 1000);
+    HAL_I2C_Master_Receive(&hi2c1, I2C_ADDRESS_TDA, buf, 1, 1000);
 
     return buf[0];
 }
@@ -379,10 +384,10 @@ uint16_t r_reg_range(uint16_t reg, uint8_t *buf, uint16_t cnt) {
     uint8_t tmp[2];
     tmp[0] = REG_CURPAGE;
     tmp[1] = REG2PAGE(reg);
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &tmp, 2, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, tmp, 2, 1000);
 
     tmp[0] = REG2ADDR(reg);
-    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, &tmp, 1, 1000);
+    HAL_I2C_Master_Transmit(&hi2c1, I2C_ADDRESS_TDA, tmp, 1, 1000);
     HAL_I2C_Master_Receive(&hi2c1, I2C_ADDRESS_TDA, buf, cnt, 1000);
 
     return buf[0];
@@ -404,6 +409,51 @@ void c_reg(uint16_t reg, uint8_t val){
     old_val = r_reg(reg);
     old_val &= ~val;
     w_reg(reg, old_val);
+}
+
+/*
+ * Program the CTA-861 AVI InfoFrame into packet slot IF2.  The TDA9983B
+ * expects the three-byte header, checksum and 13-byte payload consecutively
+ * from page 10h address 40h.  VESA/DMT modes have VIC 0, so IF2 is disabled
+ * for those modes.
+ */
+static void tda_write_avi_infoframe(void)
+{
+    const LTDCSYNC_t *mode = &LTDCSYNC[LTDC_VID_FORMAT];
+    uint8_t frame[4U + HDMI_AVI_LENGTH] = {0};
+    uint8_t checksum = 0U;
+    uint32_t i;
+
+    /* Never transmit a partially updated InfoFrame. */
+    c_reg(REG_DIP_IF_FLAGS, DIP_IF_FLAGS_IF2);
+
+    if (mode->hdmi_vic == 0U)
+        return;
+
+    frame[0] = HDMI_INFOFRAME_TYPE_AVI;
+    frame[1] = HDMI_AVI_VERSION;
+    frame[2] = HDMI_AVI_LENGTH;
+    frame[3] = 0U; /* checksum is calculated below */
+
+    /* PB1: RGB, no bar data, no active-format flag, no scan information. */
+    frame[4] = 0U;
+    /* PB2: CTA picture aspect ratio; colorimetry and active aspect unspecified. */
+    frame[5] = (uint8_t)((mode->hdmi_aspect & 0x03U) << 4);
+    /* PB3: RGB quantization range explicitly full; no scaling information. */
+    frame[6] = HDMI_AVI_RGB_QUANT_FULL;
+    /* PB4/PB5: CTA VIC and no pixel repetition. */
+    frame[7] = (uint8_t)(mode->hdmi_vic & 0x7fU);
+    frame[8] = 0U;
+    /* PB6..PB13 remain zero: no bar coordinates. */
+
+    for (i = 0U; i < (uint32_t)sizeof(frame); ++i)
+        checksum = (uint8_t)(checksum + frame[i]);
+    frame[3] = (uint8_t)(0U - checksum);
+
+    for (i = 0U; i < (uint32_t)sizeof(frame); ++i)
+        w_reg((uint16_t)(REG_IF2_HB0 + i), frame[i]);
+
+    s_reg(REG_DIP_IF_FLAGS, DIP_IF_FLAGS_IF2);
 }
 
 void read_edid(void) {
@@ -595,7 +645,6 @@ void tda_init(void) {
 
 
     uint32_t pixel_clock;
-    uint16_t line_clocks, lines;
     uint8_t reg, rep, div, sel_clk;
 
 
@@ -641,9 +690,6 @@ void tda_init(void) {
 
     /* shutdown audio */
     w_reg(REG_ENA_AP, 0);
-
-    line_clocks = (LTDCSYNC[LTDC_VID_FORMAT].hsw + LTDCSYNC[LTDC_VID_FORMAT].ahw + LTDCSYNC[LTDC_VID_FORMAT].hbp + LTDCSYNC[LTDC_VID_FORMAT].hfp); 
-    lines =       (LTDCSYNC[LTDC_VID_FORMAT].vsh + LTDCSYNC[LTDC_VID_FORMAT].avh + LTDCSYNC[LTDC_VID_FORMAT].vbp + LTDCSYNC[LTDC_VID_FORMAT].vfp);
 
     /* mute the audio FIFO */
     s_reg(REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_FIFO);
@@ -784,6 +830,9 @@ void tda_init(void) {
     w_reg(REG_TBG_CNTRL_1, reg);
     w_reg(REG_ENC_CNTRL, ENC_CNTRL_CTL_CODE(1));
     s_reg(REG_TX33, TX33_HDMI);
+
+    /* Advertise CTA VIC, 16:9 aspect ratio and RGB full range to the sink. */
+    tda_write_avi_infoframe();
 
     HAL_Delay(400);
 

@@ -207,8 +207,8 @@ uint32_t HID_WriteItem(HID_Report_ItemTypedef *ri, uint32_t value, uint8_t ndx)
 
   for (x = 0U; x < ((ri->size & 0x7U) ? (ri->size / 8U) + 1U : (ri->size / 8U)); x++)
   {
-    *(ri->data + x) = (uint8_t)((*(ri->data + x) & ~(mask >> (x * 8U))) |
-                                ((value >> (x * 8U)) & (mask >> (x * 8U))));
+    *(data + x) = (uint8_t)((*(data + x) & ~(mask >> (x * 8U))) |
+                            ((value >> (x * 8U)) & (mask >> (x * 8U))));
   }
 
   return 0U;
