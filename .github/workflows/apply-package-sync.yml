@@ -11,7 +11,7 @@ permissions:
 jobs:
   sync:
     if: github.actor != 'github-actions[bot]'
-    runs-on: macos-15
+    runs-on: ubuntu-slim
     steps:
       - name: Check out synchronization branch
         uses: actions/checkout@v4
