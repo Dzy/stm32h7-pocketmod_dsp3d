@@ -69,7 +69,7 @@ Tested on ST's 32F746-Discovery board and ST's 32F769-Discovery board
  * @param[in]  y     y axis coordinate
  * @param[in]  z     z axis coordinate
  */
-void __inline dsp3D_setCameraPosition(float32_t x, float32_t y, float32_t z);
+void dsp3D_setCameraPosition(float32_t x, float32_t y, float32_t z);
 
 /**
  * @brief      Set the point to which the camera is pointing to
@@ -78,7 +78,7 @@ void __inline dsp3D_setCameraPosition(float32_t x, float32_t y, float32_t z);
  * @param[in]  y     y axis coordinate
  * @param[in]  z     z axis coordinate
  */
-void __inline dsp3D_setCameraTarget(float32_t x, float32_t y, float32_t z);
+void dsp3D_setCameraTarget(float32_t x, float32_t y, float32_t z);
 
 /**
  * @brief      Set the position of the mesh within the world
@@ -87,7 +87,7 @@ void __inline dsp3D_setCameraTarget(float32_t x, float32_t y, float32_t z);
  * @param[in]  y     y axis coordinate
  * @param[in]  z     z axis coordinate
  */
-void __inline dsp3D_setMeshPosition(float32_t x, float32_t y, float32_t z);	
+void dsp3D_setMeshPosition(float32_t x, float32_t y, float32_t z);	
 
 /**
  * @brief      Set the rotation of the mesh
@@ -96,7 +96,7 @@ void __inline dsp3D_setMeshPosition(float32_t x, float32_t y, float32_t z);
  * @param[in]  pitch  The pitch
  * @param[in]  roll   The roll
  */
-void __inline dsp3D_setMeshRotation(float32_t yaw, float32_t pitch, float32_t roll);
+void dsp3D_setMeshRotation(float32_t yaw, float32_t pitch, float32_t roll);
 
 /**
  * @brief      Set the position of the light within the world
@@ -106,52 +106,52 @@ void __inline dsp3D_setMeshRotation(float32_t yaw, float32_t pitch, float32_t ro
  * @param[in]  y     y axis coordinate
  * @param[in]  z     z axis coordinate
  */
-void __inline dsp3D_setLightPosition(float32_t x, float32_t y, float32_t z);	
+void dsp3D_setLightPosition(float32_t x, float32_t y, float32_t z);	
 
 /**
  * @brief      Init the dsp3D engine
  */
-void __inline dsp3D_init(void);
+void dsp3D_init(void);
 
 /**
  * @brief      Render the mesh with Gouraud shading
  *
  * @param      meshPointer  The mesh pointer
  */
-void __inline dsp3D_renderGouraud(float32_t * dsp3dModel);
+void dsp3D_renderGouraud(float32_t * dsp3dModel);
 
 /**
  * @brief      Render the mesh as flat surfaces
  *
  * @param      meshPointer  The mesh pointer
  */
-void __inline dsp3D_renderFlat(float32_t * dsp3dModel);
+void dsp3D_renderFlat(float32_t * dsp3dModel);
 
 /**
  * @brief      Render the mesh as wireframe
  *
  * @param      meshPointer  The mesh pointer
  */
-void __inline dsp3D_renderWireframe(float32_t * dsp3dModel);
+void dsp3D_renderWireframe(float32_t * dsp3dModel);
 
 /**
  * @brief      Render only the vertices of the mesh
  *
  * @param      meshPointer  The mesh pointer
  */
-void __inline dsp3D_renderPoints(float32_t * dsp3dModel);
+void dsp3D_renderPoints(float32_t * dsp3dModel);
 
 /**
  * @brief      Plot the rendered mesh on the current screen
  */
-void __inline dsp3D_present(void);
+void dsp3D_present(void);
 
 /**
  * @brief      Enable or disable backface culling
  *
  * @param      state  The desired state
  */
-void __inline dsp3D_setBackFaceCulling(uint32_t state);
+void dsp3D_setBackFaceCulling(uint32_t state);
 
 /**
  * @brief      Render a single vertex within the world
@@ -160,6 +160,6 @@ void __inline dsp3D_setBackFaceCulling(uint32_t state);
  * @param[in]  y     y axis coordinate
  * @param[in]  z     z axis coordinate
  */
-void __inline dsp3D_renderPoint(float32_t x, float32_t y, float32_t z);
+void dsp3D_renderPoint(float32_t x, float32_t y, float32_t z);
 
 #endif

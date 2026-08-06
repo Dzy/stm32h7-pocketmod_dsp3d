@@ -57,6 +57,8 @@ Tested on ST's 32F746-Discovery board and ST's 32F769-Discovery board
 #include "ltdc.h"
 extern const LTDCSYNC_t LTDCSYNC[];
 
+#undef SCREEN_WIDTH
+#undef SCREEN_HEIGHT
 #define SCREEN_WIDTH LTDCSYNC[LTDC_VID_FORMAT].ahw
 #define SCREEN_HEIGHT LTDCSYNC[LTDC_VID_FORMAT].avh
 
@@ -138,7 +140,7 @@ void dsp3D_setCameraPosition(float x, float y, float z)
 	dsp3D_generateLookAtMatrixLH(cameraPosition, cameraTarget, unitY, matrix_view);
 }
 
-void __inline dsp3D_setCameraTarget(float x, float y, float z)
+void dsp3D_setCameraTarget(float x, float y, float z)
 {
 	cameraTarget[0] = x;
 	cameraTarget[1] = y;
@@ -147,7 +149,7 @@ void __inline dsp3D_setCameraTarget(float x, float y, float z)
 	dsp3D_generateLookAtMatrixLH(cameraPosition, cameraTarget, unitY, matrix_view);
 }
 
-void __inline dsp3D_setMeshPosition(float x, float y, float z)
+void dsp3D_setMeshPosition(float x, float y, float z)
 {
 	meshPosition[0] = x;
 	meshPosition[1] = y;
@@ -165,24 +167,24 @@ void dsp3D_setMeshRotation(float yaw, float pitch, float roll)
 	dsp3D_generateRotationMatrix(meshRotation[0], meshRotation[1], meshRotation[2], matrix_rotation);
 }
 
-void __inline dsp3D_setLightPosition(float x, float y, float z)
+void dsp3D_setLightPosition(float x, float y, float z)
 {
 	lightPosition[0] = x;
 	lightPosition[1] = y;
 	lightPosition[2] = z;
 }
 
-float __inline dsp3D_clamp(float value)
+float dsp3D_clamp(float value)
 {
 	return MAX(0.0, MIN(value, 1.0));
 }
 
-float __inline dsp3D_interpolate(float min, float max, float gradient)
+float dsp3D_interpolate(float min, float max, float gradient)
 {
 	return (min + (max - min) * dsp3D_clamp(gradient));
 }
 
-float __inline dsp3D_computeNDotL(float *vertex, float *normal, float *lightPosition)
+float dsp3D_computeNDotL(float *vertex, float *normal, float *lightPosition)
 {
 	float lightDirection[3];
 	float normalNorm[3];
@@ -198,7 +200,7 @@ float __inline dsp3D_computeNDotL(float *vertex, float *normal, float *lightPosi
 	return MAX(0.0, -dotProd);
 }
 
-void __inline dsp3D_vectorNormalTransform(float *v, float *m, float *result)
+void dsp3D_vectorNormalTransform(float *v, float *m, float *result)
 {
 	float vectorNormal[3];
 
@@ -206,14 +208,14 @@ void __inline dsp3D_vectorNormalTransform(float *v, float *m, float *result)
 	dsp3D_transformVertex(vectorNormal, m, result);
 }
 
-void __inline dsp3D_vectorCrossProduct(float *a, float *b, float *v)
+void dsp3D_vectorCrossProduct(float *a, float *b, float *v)
 {
 	v[0] = a[1]*b[2] - a[2]*b[1];
 	v[1] = a[2]*b[0] - a[0]*b[2];
 	v[2] = a[0]*b[1] - a[1]*b[0];
 }
 
-void __inline dsp3D_vectorNorm(float *a, float *v)
+void dsp3D_vectorNorm(float *a, float *v)
 {
 	float norm;
 	arm_sqrt_f32(a[0]*a[0] + a[1]*a[1] + a[2]*a[2], &norm);
@@ -227,7 +229,7 @@ void __inline dsp3D_vectorNorm(float *a, float *v)
 }
 
 // OPTIMIZE IT!
-void __inline dsp3D_transformVertex(float *v, float *m, float *tv)
+void dsp3D_transformVertex(float *v, float *m, float *tv)
 {
 	float w;
 	
@@ -242,7 +244,7 @@ void __inline dsp3D_transformVertex(float *v, float *m, float *tv)
 	tv[2] *= w;
 }
 
-void __inline dsp3D_generateLookAtMatrixLH(float *cameraPosition, float *cameraTarget, float *cameraUpVector, float *m)
+void dsp3D_generateLookAtMatrixLH(float *cameraPosition, float *cameraTarget, float *cameraUpVector, float *m)
 {
 	float xaxis[3];
 	float yaxis[3];
@@ -282,7 +284,7 @@ void __inline dsp3D_generateLookAtMatrixLH(float *cameraPosition, float *cameraT
 	m[15] = 1;
 }
 
-void __inline dsp3D_generatePerspectiveFovMatrixLH(float fov, float aspect, float znear, float zfar, float* m)
+void dsp3D_generatePerspectiveFovMatrixLH(float fov, float aspect, float znear, float zfar, float* m)
 {
 	int32_t x, y;
 	float yScale, q;
@@ -301,7 +303,7 @@ void __inline dsp3D_generatePerspectiveFovMatrixLH(float fov, float aspect, floa
 	m[14] = - q * znear;
 }
 
-void __inline dsp3D_generateRotationMatrix(float yaw, float pitch, float roll, float *m)
+void dsp3D_generateRotationMatrix(float yaw, float pitch, float roll, float *m)
 {
 	float s_y = arm_sin_f32(yaw * 0.5);
 	float c_y = arm_cos_f32(yaw * 0.5);
@@ -333,7 +335,7 @@ void __inline dsp3D_generateRotationMatrix(float yaw, float pitch, float roll, f
 	m[15] = 1;
 }
 
-void __inline dsp3D_generateTranslationMatrix(float xaxis, float yaxis, float zaxis, float *m)
+void dsp3D_generateTranslationMatrix(float xaxis, float yaxis, float zaxis, float *m)
 {
 	int32_t x, y;
 	
@@ -349,7 +351,7 @@ void __inline dsp3D_generateTranslationMatrix(float xaxis, float yaxis, float za
 	m[14] = zaxis;
 }
 
-void __inline dsp3D_generateScalingMatrix(float xaxis, float yaxis, float zaxis, float *m)
+void dsp3D_generateScalingMatrix(float xaxis, float yaxis, float zaxis, float *m)
 {
 	int32_t x,y;
 	
@@ -363,7 +365,7 @@ void __inline dsp3D_generateScalingMatrix(float xaxis, float yaxis, float zaxis,
 	m[15] = 1;
 }
 
-void __inline dsp3D_projectVertex(float *vertex, float *m)
+void dsp3D_projectVertex(float *vertex, float *m)
 {
 	float coordinates[4];
 	
@@ -374,7 +376,7 @@ void __inline dsp3D_projectVertex(float *vertex, float *m)
 	m[2] = coordinates[2];
 }
 
-void __inline dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, float *m)
+void dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, float *m)
 {
 	float coordinates[4];
 	float pointWorld[4];
@@ -395,13 +397,13 @@ void __inline dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, fl
 	m[8] = pointNormalWorld[2];
 }
 
-void __inline dsp3D_drawPoint(int32_t x, int32_t y, color32_t color)
+void dsp3D_drawPoint(int32_t x, int32_t y, color32_t color)
 {
 	//if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
 		dsp3D_LL_drawPoint(x, y, color);
 }
 
-void __inline dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_t color)
+void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_t color)
 {
 	if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
 	{
@@ -415,7 +417,7 @@ void __inline dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_
 	}
 }
 
-void __inline dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, color32_t color)
+void dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, color32_t color)
 {
 	int32_t dx = ABS(x1 - x0);
 	int32_t sx = x0 < x1 ? 1 : -1;
@@ -448,7 +450,7 @@ void __inline dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, col
 	}
 }
 
-void __inline dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
+void dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
 {
     int32_t x, sx, ex;
     uint8_t a, r, g, b;
@@ -495,7 +497,7 @@ void __inline dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, f
     }
 }
 
-void __inline dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
+void dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
 {
     int32_t x, sx, ex;
     uint8_t a, r, g, b;
@@ -537,7 +539,7 @@ void __inline dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float
     }
 }
 
-void __inline dsp3D_swapArray(float *a, float *b)
+void dsp3D_swapArray(float *a, float *b)
 {
 	float temp[9];
 	uint32_t index;
@@ -550,21 +552,24 @@ void __inline dsp3D_swapArray(float *a, float *b)
 	}
 }
 
-void __inline dsp3D_drawFaceGouraud(float *v1, float *v2, float *v3, color32_t color)
+void dsp3D_drawFaceGouraud(float *v1, float *v2, float *v3, color32_t color)
 {
 	float ndotl[4];
 	float nl1, nl2, nl3;
 	float dP1P2, dP1P3;
 	int32_t y;
 
-	if (v1[1] > v2[1])
-    	dsp3D_swapArray(v1, v2);
+	if (v1[1] > v2[1]) {
+		dsp3D_swapArray(v1, v2);
+	}
 
-    if (v2[1] > v3[1])
-    	dsp3D_swapArray(v2, v3);
+	if (v2[1] > v3[1]) {
+		dsp3D_swapArray(v2, v3);
+	}
 
-    if (v1[1] > v2[1])
-    	dsp3D_swapArray(v1, v2);
+	if (v1[1] > v2[1]) {
+		dsp3D_swapArray(v1, v2);
+	}
 	
 	nl1 = dsp3D_computeNDotL(&v1[3], &v1[6], lightPosition);
 	nl2 = dsp3D_computeNDotL(&v2[3], &v2[6], lightPosition);
@@ -622,7 +627,7 @@ void __inline dsp3D_drawFaceGouraud(float *v1, float *v2, float *v3, color32_t c
     }
 }
 
-void __inline dsp3D_drawFaceFlat(float *v1, float *v2, float *v3, color32_t color)
+void dsp3D_drawFaceFlat(float *v1, float *v2, float *v3, color32_t color)
 {
 	float ndotl;
 	float vnFace[3];
@@ -630,14 +635,17 @@ void __inline dsp3D_drawFaceFlat(float *v1, float *v2, float *v3, color32_t colo
 	float dP1P2, dP1P3;
 	int32_t y;
 
-	if (v1[1] > v2[1])
-    	dsp3D_swapArray(v1, v2);
+	if (v1[1] > v2[1]) {
+		dsp3D_swapArray(v1, v2);
+	}
 
-    if (v2[1] > v3[1])
-    	dsp3D_swapArray(v2, v3);
+	if (v2[1] > v3[1]) {
+		dsp3D_swapArray(v2, v3);
+	}
 
-    if (v1[1] > v2[1])
-    	dsp3D_swapArray(v1, v2);
+	if (v1[1] > v2[1]) {
+		dsp3D_swapArray(v1, v2);
+	}
 
     vnFace[0] = (v1[6] + v2[6] + v3[6]) / 3.0;
 	vnFace[1] = (v1[7] + v2[7] + v3[7]) / 3.0;
@@ -673,7 +681,7 @@ void __inline dsp3D_drawFaceFlat(float *v1, float *v2, float *v3, color32_t colo
                 dsp3D_processScanLineFlat(y, ndotl, v2, v3, v1, v3, color);
 }
 
-void __inline dsp3D_calculateFaceNormal(float *a, float *b, float *c, float *m, float *n)
+void dsp3D_calculateFaceNormal(float *a, float *b, float *c, float *m, float *n)
 {
 	float h[3];
 	float hn[3];
@@ -714,7 +722,6 @@ void dsp3D_renderGouraud(float * dsp3dModel)
 	uint32_t i;
 	uint32_t a, b, c;
 	uint32_t numVert, numFaces;
-	uint8_t RGBr, RGBg, RGBb;
 	
 	float vertex_transform_a[9];
 	float vertex_transform_b[9];
@@ -797,7 +804,6 @@ void dsp3D_renderFlat(float * dsp3dModel)
 	uint32_t i;
 	uint32_t a, b, c;
 	uint32_t numVert, numFaces;
-	uint8_t RGBr, RGBg, RGBb;
 	
 	float vertex_transform_a[9];
 	float vertex_transform_b[9];
@@ -881,7 +887,6 @@ void dsp3D_renderWireframe(float * dsp3dModel)
 	uint32_t i;
 	uint32_t a, b, c;
 	uint32_t numVert, numFaces;
-	uint8_t RGBr, RGBg, RGBb;
 	
 	float coord_a[4];
 	float coord_b[4];
@@ -956,7 +961,7 @@ void dsp3D_renderPoints(float * dsp3dModel)
 		lastRenderingType = 1;
 }
 
-void __inline dsp3D_renderPoint(float x, float y, float z)
+void dsp3D_renderPoint(float x, float y, float z)
 {
 	float vector[3];
 	float coord[2];

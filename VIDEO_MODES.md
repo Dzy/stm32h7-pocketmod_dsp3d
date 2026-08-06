@@ -26,6 +26,12 @@ Removed after hardware testing:
 - old filtered index 10: 1920x1080p30, Lenovo G24e-20 reports `Input Not Supported`
 - old filtered index 13: 1920x1080p24, below the Lenovo G24e-20 vertical-frequency range
 
-For CTA modes, TDA9983B packet slot IF2 transmits an AVI InfoFrame with RGB input format, 16:9 picture aspect ratio, the mode-specific CTA VIC, full-range RGB quantization and no pixel repetition.
+For CTA modes, TDA9983B packet slot IF2 now transmits an AVI InfoFrame with:
+
+- RGB input format
+- 16:9 picture aspect ratio
+- the mode-specific CTA VIC
+- full-range RGB quantization
+- no pixel repetition
 
 VESA DMT modes use VIC 0 and disable AVI IF2. USB host, PocketMod/I2S audio and HDMI audio are retained.

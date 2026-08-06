@@ -5,13 +5,7 @@
 extern "C" {
 #endif
 
-/* The transmitter implementation keeps the original linker symbol tda_init.
- * Calls through this header also program the mode-specific AVI InfoFrame after
- * the existing video and HDMI-audio initialization has completed.
- */
-void tda_init_hw(void) __asm__("tda_init");
-void tda_apply_avi_infoframe(void);
-#define tda_init() do { tda_init_hw(); tda_apply_avi_infoframe(); } while (0)
+void tda_init(void);
 
 #ifdef __cplusplus
 }

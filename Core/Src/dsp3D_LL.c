@@ -47,10 +47,13 @@ Customize thw following to your needs
 
 #include "dsp3D_LL.h"
 
+#include <stdint.h>
+#include <string.h>
+
 
 extern const LTDCSYNC_t LTDCSYNC[];
 
-extern uint32_t fbuffer, bbuffer, tmp;
+extern uint32_t bbuffer;
 
 //uint32_t zbuffer = 0xc0000000 + 1024*1024*5;//1024*768;
 
@@ -62,83 +65,45 @@ void dsp3D_LL_init(void)
 
 }
 
-void __inline dsp3D_LL_drawPointF(uint16_t x, uint16_t y)
+void dsp3D_LL_drawPointF(int32_t x, int32_t y)
 {
-	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
+  const uint32_t width = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+  const uint32_t height = LTDCSYNC[LTDC_VID_FORMAT].avh;
 
-pixel[0] = 255;
-return;
+  /* The unsigned comparisons reject negative coordinates as well. */
+  if (((uint32_t)x >= width) || ((uint32_t)y >= height)) {
+    return;
+  }
 
-//	uint16_t clippedc = pixel[0];
-//
-//	clippedc += 32;
-//
-//	if (clippedc>255)
-//		clippedc = 255;
-//
-//	pixel[0] = ((uint8_t) clippedc);
-//
+  uint8_t *pixel = (uint8_t *)(uintptr_t)(bbuffer +
+                    ((uint32_t)y * width) + (uint32_t)x);
+  *pixel = 255U;
 }
 
-void __inline dsp3D_LL_drawPoint(uint32_t x, uint32_t y, color32_t color)
+void dsp3D_LL_drawPoint(int32_t x, int32_t y, color32_t color)
 {
+  const uint32_t width = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+  const uint32_t height = LTDCSYNC[LTDC_VID_FORMAT].avh;
 
-/*
-	if(x < minX)
-		minX = x;
-	if(x > maxX)
-		maxX = x;
-	if(y < minY)
-		minY = y;
-	if(y > maxY)
-		maxY = y;
-*/
+  if (((uint32_t)x >= width) || ((uint32_t)y >= height)) {
+    return;
+  }
 
-
-	//volatile uint8_t *pixel = bbuffer + ((y * SCREEN_WIDTH) + x);
-
-	//if(x<LTDCSYNC[LTDC_VID_FORMAT].ahw)
-	{
-	//if(y<LTDCSYNC[LTDC_VID_FORMAT].avh)
-	{
-
-	uint8_t *pixel = bbuffer + ((y * LTDCSYNC[LTDC_VID_FORMAT].ahw) + x);
-pixel[0] = 255;
-return;
-#if 0
-	//__DSB();
-	*pixel = (uint8_t)color;
-	//__DSB();
-#else
-	//__DSB();
-	uint16_t clippedc = pixel[0];
-	//__DSB();
-	clippedc += 32;
-
-	if (clippedc>255)
-		clippedc = 255;
-
-	pixel[0] = ((uint8_t) clippedc);
-#endif
-/*
-    uint8_t *pixel = bbuffer + ((y * SCREEN_WIDTH) + x);
-
-    pixel[0] += 40; //(uint8_t)color;
-*/
-	// YOUR IMPLEMENTATION
-}
+  uint8_t *pixel = (uint8_t *)(uintptr_t)(bbuffer +
+                    ((uint32_t)y * width) + (uint32_t)x);
+  *pixel = (uint8_t)color;
 }
 
-}
-
-void __inline dsp3D_LL_clearScreen(color32_t color)
+void dsp3D_LL_clearScreen(color32_t color)
 {
-	// YOUR IMPLEMENTATION
+	memset((void *)(uintptr_t)bbuffer, (int)(uint8_t)color,
+	       (size_t)LTDCSYNC[LTDC_VID_FORMAT].ahw *
+	       (size_t)LTDCSYNC[LTDC_VID_FORMAT].avh);
 }
 
-void __inline dsp3D_LL_switchScreen(void)
+void dsp3D_LL_switchScreen(void)
 {
-	// YOUR IMPLEMENTATION
+	/* Buffer switching and LTDC reload are handled by main.c. */
 }
 
 /*
@@ -157,35 +122,31 @@ void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float32_t z, color32_t col
 }
 */
 
-void __inline dsp3D_LL_writeToDepthBuffer(uint32_t pos, float32_t value)
+void dsp3D_LL_writeToDepthBuffer(uint32_t pos, float32_t value)
 {
 	// YOUR IMPLEMENTATION
 
-	volatile float32_t *zbuffer;
-	zbuffer = 0xc0000000+(1024*1024*8) + pos;
+	volatile float32_t *zbuffer =
+		(volatile float32_t *)(uintptr_t)(DEPTH_BUFFER_ADDRESS + pos);
 
 	*zbuffer = value;
 
 }
 
-float32_t __inline dsp3D_LL_readFromDepthBuffer(uint32_t pos)
+float32_t dsp3D_LL_readFromDepthBuffer(uint32_t pos)
 {
 	// YOUR IMPLEMENTATION
 
-	volatile float32_t *zbuffer;
-	
-	zbuffer = 0xc0000000+(1024*1024*8) + pos;
+	volatile const float32_t *zbuffer =
+		(volatile const float32_t *)(uintptr_t)(DEPTH_BUFFER_ADDRESS + pos);
 //__DSB();
 	return *zbuffer;
 
 }
 
-void __inline dsp3D_LL_clearDepthBuffer(void)
+void dsp3D_LL_clearDepthBuffer(void)
 {
 	uint32_t x, y;
-
-	uint32_t zbuffer;
-	zbuffer = 0xc0000000+(1024*1024*8);
 
 	for(x = 0; x < LTDCSYNC[LTDC_VID_FORMAT].ahw; x++)
 		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
