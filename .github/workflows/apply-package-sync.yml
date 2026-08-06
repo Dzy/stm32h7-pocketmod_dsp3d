@@ -45,3 +45,5 @@ jobs:
           git diff --cached --check
           git commit -m "Sync repository with packaged project"
           git push origin HEAD:fix/sync-packaged-project
+
+# This staging workflow removes itself after applying the verified package patch.
