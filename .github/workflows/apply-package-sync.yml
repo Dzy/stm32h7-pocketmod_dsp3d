@@ -1,0 +1,47 @@
+name: Apply packaged project sync
+
+on:
+  push:
+    branches:
+      - fix/sync-packaged-project
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out synchronization branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/sync-packaged-project
+          fetch-depth: 0
+
+      - name: Apply packaged project
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/sync/package-sync.part00 \
+              .github/sync/package-sync.part01 \
+              .github/sync/package-sync.part02 \
+              .github/sync/package-sync.part03 \
+              .github/sync/package-sync.part04 \
+              .github/sync/package-sync.part05 \
+              | base64 --decode > /tmp/package-sync.patch.gz
+          gzip -dc /tmp/package-sync.patch.gz > /tmp/package-sync.patch
+          echo "2f1a2154877fc11e2adcabd077490f13955936a31db763acd73019271109ca03  /tmp/package-sync.patch" | sha256sum -c -
+          git apply --check /tmp/package-sync.patch
+          git apply --whitespace=nowarn /tmp/package-sync.patch
+
+          rm -rf build Drivers/CMSIS/Lib/ARM Drivers/CMSIS/Lib/IAR
+          rm -rf .github/sync
+          rm -f .github/workflows/apply-package-sync.yml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Sync repository with packaged project"
+          git push origin HEAD:fix/sync-packaged-project
