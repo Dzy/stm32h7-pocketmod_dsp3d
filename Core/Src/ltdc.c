@@ -124,13 +124,13 @@ void HAL_LTDC_MspInit(LTDC_HandleTypeDef* ltdcHandle)
 
     PA6     ------> LTDC_G2
     PC9     ------> LTDC_G3
-    PB10     ------> LTDC_G4
+    PB10    ------> LTDC_G4
     PH4     ------> LTDC_G5
     PI11    ------> LTDC_G6
     PD3     ------> LTDC_G7
 
     PA8     ------> LTDC_B3
-    PG12     ------> LTDC_B4
+    PG12    ------> LTDC_B4
     PA3     ------> LTDC_B5
     PB8     ------> LTDC_B6
     PB9     ------> LTDC_B7
