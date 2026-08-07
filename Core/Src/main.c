@@ -49,12 +49,12 @@
 
 /* USER CODE END Includes */
 
-#define POCKETMOD_IMPLEMENTATION
-#include "pocketmod.h"
+//#define POCKETMOD_IMPLEMENTATION
+//#include "pocketmod.h"
 
-pocketmod_context context;
+//pocketmod_context context;
 
-#include "doyouwantme_mod.h"
+//#include "doyouwantme_mod.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
@@ -86,21 +86,64 @@ extern const LTDCSYNC_t LTDCSYNC[];
 static void blitchar(uint32_t xpos, uint32_t ypos, uint8_t c);
 static void blitchar2(uint32_t xpos, uint32_t ypos, uint8_t c);
 
-static void blitchar(uint32_t xpos, uint32_t ypos, uint8_t c)
+static void blit_l8_glyph(const uint8_t *font,
+                          uint32_t glyph_width,
+                          uint32_t glyph_storage_height,
+                          uint32_t glyph_draw_height,
+                          uint32_t xpos,
+                          uint32_t ypos,
+                          uint8_t c)
 {
-  if ((c < (uint8_t)' ') || (c > (uint8_t)'~')) {
+  const uint32_t first_char = (uint32_t)' ';
+  const uint32_t last_char = (uint32_t)'z';
+  const uint32_t screen_width = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+  const uint32_t screen_height = LTDCSYNC[LTDC_VID_FORMAT].avh;
+  const uint32_t dst_x = xpos * glyph_width;
+  const uint32_t dst_y = ypos * glyph_draw_height;
+
+  /* Both font arrays contain 91 glyphs: ASCII 0x20 through 0x7A. */
+  if (((uint32_t)c < first_char) || ((uint32_t)c > last_char)) {
     c = (uint8_t)'?';
   }
 
-  hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw - 16U;
-  HAL_DMA2D_Init(&hdma2d);
+  if ((dst_x >= screen_width) || (dst_y >= screen_height)) {
+    return;
+  }
 
-  HAL_DMA2D_Start(&hdma2d,
-                  (uint32_t)(uintptr_t)&hdh48_3_small[(8U * 26U) * (uint32_t)(c - (uint8_t)' ')],
-                  bbuffer + (ypos * 24U * LTDCSYNC[LTDC_VID_FORMAT].ahw) + (xpos * 16U),
-                  16U,
-                  24U);
-  HAL_DMA2D_PollForTransfer(&hdma2d, 100U);
+  const uint32_t copy_width =
+      ((screen_width - dst_x) < glyph_width) ? (screen_width - dst_x) : glyph_width;
+  const uint32_t copy_height =
+      ((screen_height - dst_y) < glyph_draw_height) ?
+          (screen_height - dst_y) : glyph_draw_height;
+  const uint32_t glyph_stride = glyph_width * glyph_storage_height;
+  const uint8_t *src = font + glyph_stride * ((uint32_t)c - first_char);
+  uint8_t *dst = (uint8_t *)(uintptr_t)bbuffer + dst_y * screen_width + dst_x;
+
+  /*
+   * LTDC uses an L8 framebuffer: one source byte must become exactly one
+   * framebuffer byte. DMA2D has no L8 output format, so an L8-to-RGB565
+   * transfer performs color conversion and cannot be used as a byte copy.
+   * These glyphs are small; a row-wise copy is deterministic and pixel-exact.
+   */
+  for (uint32_t row = 0U; row < copy_height; ++row) {
+    memcpy(dst, src, copy_width);
+    src += glyph_width;
+    dst += screen_width;
+  }
+}
+
+static void blitchar(uint32_t xpos, uint32_t ypos, uint8_t c)
+{
+  blit_l8_glyph(hdh48_3_small, 16U, 26U, 24U, xpos, ypos, c);
+}
+
+static void blitstring(uint32_t xpos, uint32_t ypos, const char *ptr)
+{
+  while (*ptr != '\0') {
+    blitchar(xpos, ypos, (uint8_t)*ptr);
+    xpos++;
+    ptr++;
+  }
 }
 
 static void blitstring2(uint32_t xpos, uint32_t ypos, const char *ptr)
@@ -114,19 +157,7 @@ static void blitstring2(uint32_t xpos, uint32_t ypos, const char *ptr)
 
 static void blitchar2(uint32_t xpos, uint32_t ypos, uint8_t c)
 {
-  if ((c < (uint8_t)' ') || (c > (uint8_t)'~')) {
-    c = (uint8_t)'?';
-  }
-
-  hdma2d.Init.OutputOffset = LTDCSYNC[LTDC_VID_FORMAT].ahw - 32U;
-  HAL_DMA2D_Init(&hdma2d);
-
-  HAL_DMA2D_Start(&hdma2d,
-                  (uint32_t)(uintptr_t)&hdh48_3[(32U * 52U) * (uint32_t)(c - (uint8_t)' ')],
-                  bbuffer + (ypos * 48U * LTDCSYNC[LTDC_VID_FORMAT].ahw) + (xpos * 32U),
-                  32U,
-                  48U);
-  HAL_DMA2D_PollForTransfer(&hdma2d, 1000U);
+  blit_l8_glyph(hdh48_3, 32U, 52U, 48U, xpos, ypos, c);
 }
 
 int _write(int file, char *data, int len)
@@ -203,17 +234,17 @@ uint32_t modticks = 0, modticks_old = 0;
 
 void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
-  (void)hi2s;
-  modticks++;
-  rendered_bytes = pocketmod_render(&context, buffer, 256);
-  rendered_samples = rendered_bytes / sizeof(float[2]);
+  //(void)hi2s;
+  //modticks++;
+  //rendered_bytes = pocketmod_render(&context, buffer, 256);
+  //rendered_samples = rendered_bytes / sizeof(float[2]);
 
-  for (int i = 0; i < rendered_samples; i++) {
-    output[i][0] = (int16_t) (clip(buffer[i][0]) * 0x7fff);
-    output[i][1] = (int16_t) (clip(buffer[i][1]) * 0x7fff);
-  }
+  //for (int i = 0; i < rendered_samples; i++) {
+  //  output[i][0] = (int16_t) (clip(buffer[i][0]) * 0x7fff);
+  //  output[i][1] = (int16_t) (clip(buffer[i][1]) * 0x7fff);
+  //}
 
-  HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)(void *)output, (uint16_t)(rendered_samples * 2));
+  //HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)(void *)output, (uint16_t)(rendered_samples * 2));
 }
 
 
@@ -392,11 +423,11 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-MPU_Conf();
+  MPU_Conf();
 
-  if (!pocketmod_init(&context, &doyouwantme_mod, sizeof(doyouwantme_mod), 48000)) {
+  //if (!pocketmod_init(&context, &doyouwantme_mod, sizeof(doyouwantme_mod), 48000)) {
     //while(1);
-  }
+  //}
 
   /* USER CODE END 1 */
   
@@ -419,6 +450,19 @@ MPU_Conf();
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+
+  /* High-speed GPIO interfaces such as FMC benefit from the STM32H7 I/O
+   * compensation cell.  CSI and SYSCFG clocks are prerequisites. */
+  __HAL_RCC_CSI_ENABLE();
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  HAL_EnableCompensationCell();
+
+  /* FMC timing at 108 MHz relies on the characterized high-speed I/O
+   * conditions.  Do not start FMC traffic until the compensation cell is
+   * actually ready. */
+  while ((SYSCFG->CCCSR & SYSCFG_CCCSR_READY) == 0U)
+  {
+  }
 
   /* USER CODE END SysInit */
 
@@ -492,9 +536,6 @@ MPU_Conf();
 
   dsp3D_init();
 
-  dsp3D_setCameraPosition(0.0, 0.0, 20.0);
-  dsp3D_setBackFaceCulling(0);
-
   /* USER CODE END 2 */
 
 
@@ -509,15 +550,15 @@ MPU_Conf();
     }
 */
 
-  rendered_bytes = pocketmod_render(&context, buffer, 256);
-  rendered_samples = rendered_bytes / sizeof(float[2]);
+  //rendered_bytes = pocketmod_render(&context, buffer, 256);
+  //rendered_samples = rendered_bytes / sizeof(float[2]);
 
-  for (int i = 0; i < rendered_samples; i++) {
-    output[i][0] = (int16_t) (clip(buffer[i][0]) * 0x7fff);
-    output[i][1] = (int16_t) (clip(buffer[i][1]) * 0x7fff);
-  }
+  //for (int i = 0; i < rendered_samples; i++) {
+  //  output[i][0] = (int16_t) (clip(buffer[i][0]) * 0x7fff);
+  //  output[i][1] = (int16_t) (clip(buffer[i][1]) * 0x7fff);
+  //}
 
-  HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)(void *)output, (uint16_t)(rendered_samples * 2));
+  //HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)(void *)output, (uint16_t)(rendered_samples * 2));
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -601,10 +642,22 @@ HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
         snprintf(txtbuf, sizeof(txtbuf), "0123456789ABCD");
         blitstring2(0,8, txtbuf);
 
+        dsp3D_setCameraPosition(0.0, 0.0, 20.0);
+        dsp3D_setBackFaceCulling(1);
+
         //dsp3D_setLightPosition(0.0, 0.0, 100.0);
-        dsp3D_renderWireframe(MODELNAME);
+
+        dsp3D_setPhongMaterial(
+          0.08f,   /* ambient */
+          0.72f,   /* diffuse */
+          0.35f,   /* specular */
+          16       /* shininess */
+        );
+
+        //dsp3D_renderWireframe(MODELNAME);
         //dsp3D_renderFlat((float *)&MODELNAME);
         //dsp3D_renderPoints((float *)&MODELNAME);
+        dsp3D_renderPhong((float *)&MODELNAME);
         //dsp3D_renderGouraud((float *)&MODELNAME);
 
         dsp3D_present();
@@ -698,13 +751,22 @@ void SystemClock_Config(void)
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_USB|RCC_PERIPHCLK_FMC;
 
+  /* PLL2 serves both ADC and FMC.  With the 8 MHz HSE:
+   *   VCO   = 8 / 1 * 54 = 432 MHz
+   *   PLL2P = 432 / 6     = 72 MHz  (ADC: unchanged)
+   *   PLL2R = 432 / 2     = 216 MHz (FMC kernel)
+   *   SDRAM = PLL2R / 2   = 108 MHz
+   *
+   * 108 MHz keeps STM32H743 Rev V below the characterized 110 MHz
+   * FMC_SDCLK limit while retaining substantially more bandwidth than
+   * dropping the bus to 100 MHz. */
   PeriphClkInitStruct.PLL2.PLL2M = 1;
-  PeriphClkInitStruct.PLL2.PLL2N = 36; //19
-  PeriphClkInitStruct.PLL2.PLL2P = 4;  //2
-  PeriphClkInitStruct.PLL2.PLL2Q = 4;  //2
-  PeriphClkInitStruct.PLL2.PLL2R = 4;  //2
+  PeriphClkInitStruct.PLL2.PLL2N = 54;
+  PeriphClkInitStruct.PLL2.PLL2P = 6;
+  PeriphClkInitStruct.PLL2.PLL2Q = 6;
+  PeriphClkInitStruct.PLL2.PLL2R = 2;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
-  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
 
   PeriphClkInitStruct.PLL3.PLL3M = 8;
@@ -716,7 +778,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
   PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
 
-  PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_D1HCLK;
+  PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_PLL;

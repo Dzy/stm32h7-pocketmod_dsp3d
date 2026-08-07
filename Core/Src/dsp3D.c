@@ -40,7 +40,8 @@ based devices. It takes full advantage of the CMSIS DSP library to provide a
 fast operation. A device equipped also with a hardware floating point unit is
 recommended.
 
-Four rendering methods are available:
+Five rendering methods are available:
+	- Phong rendering
 	- Gouraud rendering
 	- Flat surface rendering
 	- Wireframe rendering
@@ -53,6 +54,7 @@ Tested on ST's 32F746-Discovery board and ST's 32F769-Discovery board
 ******************************************************************************/
 
 #include "dsp3D.h"
+#include <stddef.h>
 
 #include "ltdc.h"
 extern const LTDCSYNC_t LTDCSYNC[];
@@ -66,10 +68,136 @@ extern const LTDCSYNC_t LTDCSYNC[];
 #define ASSEMBLE_ARGB(A,R,G,B) (A << 24 | R << 16 | G << 8 | B)
 #define SCREEN_ASPECT_RATIO		((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)
 
+/* Projection depth range for the side-view Utah teapot.  With the demo
+ * camera at z=10 and the centered model extending approximately +/-2 along
+ * view Z, the visible geometry lies around view Z=8..12.  The 5..15 range
+ * keeps the complete model inside the projection frustum and gives the float
+ * z-buffer useful precision. */
+#define DSP3D_ZNEAR              (5.0f)
+#define DSP3D_ZFAR               (15.0f)
+
 #define ABS(x)   		((x) > 0 ? (x) : -(x))
 #define MIN(x, y)		((x) > (y) ? (y) : (x))
 #define MAX(x, y)		((x) < (y) ? (y) : (x))
 #define ROUND(x) 		((x)>=0?(int32_t)((x)+0.5):(int32_t)((x)-0.5))
+
+/* Integer ceil without a libm call. C conversion truncates toward zero. */
+static inline __attribute__((always_inline)) int32_t dsp3D_ceilToInt(float value)
+{
+	const int32_t truncated = (int32_t)value;
+	return (value > (float)truncated) ? (truncated + 1) : truncated;
+}
+
+/* Exact triangle coverage uses 28.4-style fixed-point screen coordinates.
+ * Four fractional bits give 1/16-pixel subpixel precision and, unlike float
+ * edge comparisons, give deterministic shared-edge ownership. */
+#define DSP3D_SUBPIXEL_BITS       4
+#define DSP3D_SUBPIXEL_SCALE      (1 << DSP3D_SUBPIXEL_BITS)
+#define DSP3D_SUBPIXEL_HALF       (DSP3D_SUBPIXEL_SCALE >> 1)
+#define DSP3D_RASTER_COORD_LIMIT  1000000.0f
+
+#define DSP3D_SHADE_FLAT          0U
+#define DSP3D_SHADE_GOURAUD       1U
+#define DSP3D_SHADE_PHONG         2U
+
+typedef struct {
+	float dx;
+	float dy;
+	float c;
+} dsp3D_AttributePlane;
+
+static float phongAmbient = 0.08f;
+static float phongDiffuse = 0.72f;
+static float phongSpecular = 0.35f;
+static uint32_t phongShininess = 16U;
+
+static inline __attribute__((always_inline)) int32_t dsp3D_toFixed(float value)
+{
+	const float scaled = value * (float)DSP3D_SUBPIXEL_SCALE;
+	return (int32_t)(scaled + ((scaled >= 0.0f) ? 0.5f : -0.5f));
+}
+
+static inline __attribute__((always_inline)) int32_t dsp3D_floorDiv16(int32_t value)
+{
+	if (value >= 0) return value / DSP3D_SUBPIXEL_SCALE;
+	return -(((-value) + DSP3D_SUBPIXEL_SCALE - 1) / DSP3D_SUBPIXEL_SCALE);
+}
+
+static inline __attribute__((always_inline)) int32_t dsp3D_ceilDiv16(int32_t value)
+{
+	if (value >= 0) return (value + DSP3D_SUBPIXEL_SCALE - 1) / DSP3D_SUBPIXEL_SCALE;
+	return -((-value) / DSP3D_SUBPIXEL_SCALE);
+}
+
+static inline __attribute__((always_inline)) int64_t dsp3D_edgeFixed(
+	int32_t ax, int32_t ay, int32_t bx, int32_t by, int32_t px, int32_t py)
+{
+	return (int64_t)(bx - ax) * (int64_t)(py - ay) -
+	       (int64_t)(by - ay) * (int64_t)(px - ax);
+}
+
+/* For screen coordinates where +Y points down, this identifies the inclusive
+ * edges of the standard top-left fill rule after the triangle winding has
+ * been normalized to positive orient2d area. */
+static inline __attribute__((always_inline)) uint32_t dsp3D_isTopLeftEdge(
+	int32_t ax, int32_t ay, int32_t bx, int32_t by)
+{
+	const int32_t dx = bx - ax;
+	const int32_t dy = by - ay;
+	return ((dy < 0) || ((dy == 0) && (dx > 0))) ? 1U : 0U;
+}
+
+static uint32_t dsp3D_makePlane(float x0, float y0, float a0,
+                                float x1, float y1, float a1,
+                                float x2, float y2, float a2,
+                                dsp3D_AttributePlane *plane)
+{
+	const float ux = x1 - x0;
+	const float uy = y1 - y0;
+	const float vx = x2 - x0;
+	const float vy = y2 - y0;
+	const float det = ux * vy - vx * uy;
+	if ((det > -1.0e-12f) && (det < 1.0e-12f)) return 0U;
+
+	const float invDet = 1.0f / det;
+	plane->dx = ((a1 - a0) * vy - (a2 - a0) * uy) * invDet;
+	plane->dy = (ux * (a2 - a0) - vx * (a1 - a0)) * invDet;
+	plane->c = a0 - plane->dx * x0 - plane->dy * y0;
+	return 1U;
+}
+
+static inline __attribute__((always_inline)) float dsp3D_evalPlane(
+	const dsp3D_AttributePlane *plane, float x, float y)
+{
+	return plane->dx * x + plane->dy * y + plane->c;
+}
+
+static inline __attribute__((always_inline)) float dsp3D_normalize3(
+	float *x, float *y, float *z)
+{
+	const float length2 = (*x) * (*x) + (*y) * (*y) + (*z) * (*z);
+	float length;
+	if (length2 <= 1.0e-20f) return 0.0f;
+	arm_sqrt_f32(length2, &length);
+	if (length <= 0.0f) return 0.0f;
+	const float invLength = 1.0f / length;
+	*x *= invLength;
+	*y *= invLength;
+	*z *= invLength;
+	return invLength;
+}
+
+static inline __attribute__((always_inline)) float dsp3D_powUnit(float x, uint32_t exponent)
+{
+	float result = 1.0f;
+	while (exponent != 0U) {
+		if ((exponent & 1U) != 0U) result *= x;
+		x *= x;
+		exponent >>= 1U;
+	}
+	return result;
+}
+
 
 float cameraPosition[3] = 			{0.0, 0.0, 10.0};
 float cameraTarget[3] = 			{0.0, 0.0, 0.0};
@@ -120,14 +248,16 @@ void dsp3D_projectVertex(float *coord, float *m);
 void dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, float *m);
 void dsp3D_drawPoint(int32_t x, int32_t y, color32_t color);
 void dsp3D_drawPointF(int16_t x, int16_t y);
+static inline __attribute__((always_inline))
 void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_t color);
 void dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, color32_t color);
-void dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color);
-void dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color);
-void dsp3D_swapArray(float *a, float *b);
 void dsp3D_drawFaceFlat(float *p1, float *p2, float *p3, color32_t color);
 void dsp3D_drawFaceGouraud(float *p1, float *p2, float *p3, color32_t color);
-void dsp3D_calculateFaceNormal(float *a, float *b, float *c, float *m, float *n);
+void dsp3D_drawFacePhong(float *p1, float *p2, float *p3, color32_t color);
+static void dsp3D_rasterizeTriangle(float *p1, float *p2, float *p3, color32_t color,
+                                    uint32_t shadingMode, float flatShade,
+                                    const float *vertexShade);
+static uint32_t dsp3D_isFaceFrontFacing(const float *a, const float *b, const float *c);
 
 void dsp3D_generateMatrices(void);
 
@@ -174,6 +304,16 @@ void dsp3D_setLightPosition(float x, float y, float z)
 	lightPosition[2] = z;
 }
 
+void dsp3D_setPhongMaterial(float ambient, float diffuse, float specular, uint32_t shininess)
+{
+	phongAmbient = dsp3D_clamp(ambient);
+	phongDiffuse = MAX(0.0f, diffuse);
+	phongSpecular = MAX(0.0f, specular);
+	if (shininess < 1U) shininess = 1U;
+	if (shininess > 64U) shininess = 64U;
+	phongShininess = shininess;
+}
+
 float dsp3D_clamp(float value)
 {
 	return MAX(0.0, MIN(value, 1.0));
@@ -196,8 +336,10 @@ float dsp3D_computeNDotL(float *vertex, float *normal, float *lightPosition)
 	dsp3D_vectorNorm(lightDirection, lightDirectionNorm);
 	arm_dot_prod_f32(normalNorm, lightDirectionNorm, 3, &dotProd);
 
-	// the minus sign should not be here!
-	return MAX(0.0, -dotProd);
+	/* lightDirection points from the surface point toward the light.
+	 * The model normals point outward, therefore the Lambert term is N dot L
+	 * without the historical sign inversion. */
+	return MAX(0.0f, dotProd);
 }
 
 void dsp3D_vectorNormalTransform(float *v, float *m, float *result)
@@ -205,7 +347,13 @@ void dsp3D_vectorNormalTransform(float *v, float *m, float *result)
 	float vectorNormal[3];
 
 	dsp3D_vectorNorm(v, vectorNormal);
-	dsp3D_transformVertex(vectorNormal, m, result);
+
+	/* A normal/direction has w=0: translation must never be added.  The
+	 * current engine exposes rotation + translation only, so the world
+	 * matrix 3x3 part is the correct normal transform. */
+	result[0] = vectorNormal[0] * m[0] + vectorNormal[1] * m[4] + vectorNormal[2] * m[8];
+	result[1] = vectorNormal[0] * m[1] + vectorNormal[1] * m[5] + vectorNormal[2] * m[9];
+	result[2] = vectorNormal[0] * m[2] + vectorNormal[1] * m[6] + vectorNormal[2] * m[10];
 }
 
 void dsp3D_vectorCrossProduct(float *a, float *b, float *v)
@@ -384,7 +532,7 @@ void dsp3D_projectVertexComplete(float *vertex, float *vertexNormal, float *m)
 	
 	dsp3D_transformVertex(vertex, matrix_transform, coordinates);
 	dsp3D_transformVertex(vertex, matrix_world, pointWorld);
-	dsp3D_transformVertex(vertexNormal, matrix_world, pointNormalWorld);
+	dsp3D_vectorNormalTransform(vertexNormal, matrix_world, pointNormalWorld);
 	
 	m[0] = coordinates[0] * (float)SCREEN_WIDTH + (float)SCREEN_WIDTH / 2.0;
 	m[1] = -coordinates[1] * (float)SCREEN_HEIGHT + (float)SCREEN_HEIGHT / 2.0;
@@ -403,22 +551,25 @@ void dsp3D_drawPoint(int32_t x, int32_t y, color32_t color)
 		dsp3D_LL_drawPoint(x, y, color);
 }
 
+static inline __attribute__((always_inline))
 void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float z, color32_t color)
 {
-	if((x > -1) && (x < SCREEN_WIDTH) && (y > -1) && (y < SCREEN_HEIGHT))
-	{
-		int32_t index = (x + y * SCREEN_WIDTH) * sizeof(float);
+  const uint32_t width = SCREEN_WIDTH;
+  const uint32_t height = SCREEN_HEIGHT;
 
-		if(dsp3D_LL_readFromDepthBuffer(index) > z)
-			return;
+  /* Unsigned comparisons reject negative coordinates without four signed
+   * branches.  pixelIndex is now a pixel index, not a byte offset. */
+  if (((uint32_t)x >= width) || ((uint32_t)y >= height)) {
+    return;
+  }
 
-		dsp3D_LL_writeToDepthBuffer(index, z);
-		dsp3D_LL_drawPoint(x, y, color);
-	}
+  const uint32_t pixelIndex = ((uint32_t)y * width) + (uint32_t)x;
+  (void)dsp3D_LL_depthTestAndDraw(pixelIndex, z, color);
 }
 
 void dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, color32_t color)
 {
+	(void)color;
 	int32_t dx = ABS(x1 - x0);
 	int32_t sx = x0 < x1 ? 1 : -1;
 	int32_t dy = ABS(y1 - y0);
@@ -450,252 +601,285 @@ void dsp3D_drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, color32_t co
 	}
 }
 
-void dsp3D_processScanLineGouraud(int32_t y, float *ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
+static void dsp3D_rasterizeTriangle(float *p1, float *p2, float *p3, color32_t color,
+                                    uint32_t shadingMode, float flatShade,
+                                    const float *vertexShade)
 {
-    int32_t x, sx, ex;
-    uint8_t a, r, g, b;
-    float z, z1, z2; 
-    float ndl, snl, enl;
-    float gradient, gradient1, gradient2;
+	const uint32_t width = SCREEN_WIDTH;
+	const uint32_t height = SCREEN_HEIGHT;
+	const uint8_t baseColor = (uint8_t)color;
+	float *v0 = p1;
+	float *v1 = p2;
+	float *v2 = p3;
+	int32_t fx0, fy0, fx1, fy1, fx2, fy2;
+	int64_t area;
+	int32_t minFx, maxFx, minFy, maxFy;
+	int32_t minX, maxX, minY, maxY;
+	dsp3D_AttributePlane zPlane;
+	dsp3D_AttributePlane shadePlane;
+	dsp3D_AttributePlane attrPlane[9]; /* N, L and H for fast finite-eye Phong. */
+	float phongAttr[3][9];
 
-    if(pa[1] != pb[1])
-    	gradient1 = (y - pa[1]) / (pb[1] - pa[1]);
-    else
-    	gradient1 = 1;
+	/* Avoid undefined float->integer conversion for a triangle that crosses
+	 * the eye plane and explodes to enormous screen coordinates.  The current
+	 * demo model is entirely between the configured near/far planes. */
+	if (!(p1[0] == p1[0]) || !(p1[1] == p1[1]) ||
+	    !(p2[0] == p2[0]) || !(p2[1] == p2[1]) ||
+	    !(p3[0] == p3[0]) || !(p3[1] == p3[1])) return;
+	if ((ABS(p1[0]) > DSP3D_RASTER_COORD_LIMIT) ||
+	    (ABS(p1[1]) > DSP3D_RASTER_COORD_LIMIT) ||
+	    (ABS(p2[0]) > DSP3D_RASTER_COORD_LIMIT) ||
+	    (ABS(p2[1]) > DSP3D_RASTER_COORD_LIMIT) ||
+	    (ABS(p3[0]) > DSP3D_RASTER_COORD_LIMIT) ||
+	    (ABS(p3[1]) > DSP3D_RASTER_COORD_LIMIT)) return;
 
-    if(pc[1] != pd[1])
-    	gradient2 = (y - pc[1]) / (pd[1] - pc[1]);
-    else
-    	gradient2 = 1;
-            
-    sx = dsp3D_interpolate(pa[0], pb[0], gradient1);
-    ex = dsp3D_interpolate(pc[0], pd[0], gradient2);
+	fx0 = dsp3D_toFixed(v0[0]); fy0 = dsp3D_toFixed(v0[1]);
+	fx1 = dsp3D_toFixed(v1[0]); fy1 = dsp3D_toFixed(v1[1]);
+	fx2 = dsp3D_toFixed(v2[0]); fy2 = dsp3D_toFixed(v2[1]);
+	area = dsp3D_edgeFixed(fx0, fy0, fx1, fy1, fx2, fy2);
+	if (area == 0) return;
 
-    z1 = dsp3D_interpolate(pa[2], pb[2], gradient1);
-    z2 = dsp3D_interpolate(pc[2], pd[2], gradient2);
+	/* Normalize the projected winding for one branch-free inside rule. */
+	if (area < 0) {
+		float *tmpv = v1; v1 = v2; v2 = tmpv;
+		int32_t tmp;
+		tmp = fx1; fx1 = fx2; fx2 = tmp;
+		tmp = fy1; fy1 = fy2; fy2 = tmp;
+		area = -area;
+	}
 
-    snl = dsp3D_interpolate(ndotl[0], ndotl[1], gradient1);
-    enl = dsp3D_interpolate(ndotl[2], ndotl[3], gradient2);
+	minFx = MIN(fx0, MIN(fx1, fx2)); maxFx = MAX(fx0, MAX(fx1, fx2));
+	minFy = MIN(fy0, MIN(fy1, fy2)); maxFy = MAX(fy0, MAX(fy1, fy2));
+	/* The hot loop deliberately uses 32-bit edge accumulators on Cortex-M7.
+	 * Bound the worst determinant inside the triangle bounding box before
+	 * narrowing the exact 64-bit setup values. The Utah mesh is far inside
+	 * this limit (measured max fixed-point triangle area ~2.7 million). */
+	const int64_t spanX = (int64_t)maxFx - (int64_t)minFx;
+	const int64_t spanY = (int64_t)maxFy - (int64_t)minFy;
+	if ((2LL * spanX * spanY) > 2000000000LL) return;
+	minX = dsp3D_ceilDiv16(minFx - DSP3D_SUBPIXEL_HALF);
+	maxX = dsp3D_floorDiv16(maxFx - DSP3D_SUBPIXEL_HALF);
+	minY = dsp3D_ceilDiv16(minFy - DSP3D_SUBPIXEL_HALF);
+	maxY = dsp3D_floorDiv16(maxFy - DSP3D_SUBPIXEL_HALF);
+	if (minX < 0) minX = 0;
+	if (minY < 0) minY = 0;
+	if (maxX >= (int32_t)width) maxX = (int32_t)width - 1;
+	if (maxY >= (int32_t)height) maxY = (int32_t)height - 1;
+	if ((minX > maxX) || (minY > maxY)) return;
 
-    for (x = sx; x < ex; x++)
-    {
-    	gradient = (float)(x - sx) / (float)(ex - sx);
+	if (dsp3D_makePlane(v0[0], v0[1], v0[2],
+	                    v1[0], v1[1], v1[2],
+	                    v2[0], v2[1], v2[2], &zPlane) == 0U) return;
 
-    	z = dsp3D_interpolate(z1, z2, gradient);
-    	ndl = dsp3D_interpolate(snl, enl, gradient);
+	if (shadingMode == DSP3D_SHADE_GOURAUD) {
+		/* vertexShade is in original p1,p2,p3 order. Resolve values after any
+		 * projected winding swap by matching the active vertex pointers. */
+		float s0 = (v0 == p1) ? vertexShade[0] : ((v0 == p2) ? vertexShade[1] : vertexShade[2]);
+		float s1 = (v1 == p1) ? vertexShade[0] : ((v1 == p2) ? vertexShade[1] : vertexShade[2]);
+		float s2 = (v2 == p1) ? vertexShade[0] : ((v2 == p2) ? vertexShade[1] : vertexShade[2]);
+		if (dsp3D_makePlane(v0[0], v0[1], s0,
+		                    v1[0], v1[1], s1,
+		                    v2[0], v2[1], s2, &shadePlane) == 0U) return;
+	}
 
-    	a = (color >> 24);
-    	r = (color >> 16);
-    	g = (color >> 8);
-    	b = (color);
-    	
-    	r = (uint8_t)((float)r * ndl);
-    	g = (uint8_t)((float)g * ndl);
-    	b = (uint8_t)((float)b * ndl);
+	if (shadingMode == DSP3D_SHADE_PHONG) {
+		float *vv[3] = {v0, v1, v2};
+		for (uint32_t i = 0U; i < 3U; ++i) {
+			float nx = vv[i][6], ny = vv[i][7], nz = vv[i][8];
+			float lx = lightPosition[0] - vv[i][3];
+			float ly = lightPosition[1] - vv[i][4];
+			float lz = lightPosition[2] - vv[i][5];
+			float vx = cameraPosition[0] - vv[i][3];
+			float vy = cameraPosition[1] - vv[i][4];
+			float vz = cameraPosition[2] - vv[i][5];
+			dsp3D_normalize3(&nx, &ny, &nz);
+			dsp3D_normalize3(&lx, &ly, &lz);
+			dsp3D_normalize3(&vx, &vy, &vz);
+			float hx = lx + vx, hy = ly + vy, hz = lz + vz;
+			dsp3D_normalize3(&hx, &hy, &hz);
+			phongAttr[i][0] = nx; phongAttr[i][1] = ny; phongAttr[i][2] = nz;
+			phongAttr[i][3] = lx; phongAttr[i][4] = ly; phongAttr[i][5] = lz;
+			phongAttr[i][6] = hx; phongAttr[i][7] = hy; phongAttr[i][8] = hz;
+		}
+		for (uint32_t a = 0U; a < 9U; ++a) {
+			if (dsp3D_makePlane(v0[0], v0[1], phongAttr[0][a],
+			                    v1[0], v1[1], phongAttr[1][a],
+			                    v2[0], v2[1], phongAttr[2][a], &attrPlane[a]) == 0U) return;
+		}
+	}
 
-    	dsp3D_drawPointDepthBuffer(x, y, z, ASSEMBLE_ARGB(a, r, g, b));
-    }
-}
+	/* Edge functions for barycentric coverage. For a non-top-left edge, bias
+	 * by exactly one determinant unit. This gives adjacent triangles exact,
+	 * mutually exclusive ownership of a shared edge. */
+	const int32_t bias0 = dsp3D_isTopLeftEdge(fx1, fy1, fx2, fy2) ? 0 : -1;
+	const int32_t bias1 = dsp3D_isTopLeftEdge(fx2, fy2, fx0, fy0) ? 0 : -1;
+	const int32_t bias2 = dsp3D_isTopLeftEdge(fx0, fy0, fx1, fy1) ? 0 : -1;
+	const int32_t stepX0 = -(fy2 - fy1) * DSP3D_SUBPIXEL_SCALE;
+	const int32_t stepX1 = -(fy0 - fy2) * DSP3D_SUBPIXEL_SCALE;
+	const int32_t stepX2 = -(fy1 - fy0) * DSP3D_SUBPIXEL_SCALE;
+	const int32_t stepY0 =  (fx2 - fx1) * DSP3D_SUBPIXEL_SCALE;
+	const int32_t stepY1 =  (fx0 - fx2) * DSP3D_SUBPIXEL_SCALE;
+	const int32_t stepY2 =  (fx1 - fx0) * DSP3D_SUBPIXEL_SCALE;
+	const int32_t startPx = minX * DSP3D_SUBPIXEL_SCALE + DSP3D_SUBPIXEL_HALF;
+	const int32_t startPy = minY * DSP3D_SUBPIXEL_SCALE + DSP3D_SUBPIXEL_HALF;
+	int32_t rowE0 = (int32_t)(dsp3D_edgeFixed(fx1, fy1, fx2, fy2, startPx, startPy) + bias0);
+	int32_t rowE1 = (int32_t)(dsp3D_edgeFixed(fx2, fy2, fx0, fy0, startPx, startPy) + bias1);
+	int32_t rowE2 = (int32_t)(dsp3D_edgeFixed(fx0, fy0, fx1, fy1, startPx, startPy) + bias2);
 
-void dsp3D_processScanLineFlat(int32_t y, float ndotl, float* pa, float* pb, float* pc, float* pd, color32_t color)
-{
-    int32_t x, sx, ex;
-    uint8_t a, r, g, b;
-    float z, z1, z2;
-    float gradient, gradient1, gradient2;
+	const float startXf = (float)minX + 0.5f;
+	const float startYf = (float)minY + 0.5f;
+	float rowZ = dsp3D_evalPlane(&zPlane, startXf, startYf);
+	float rowShade = (shadingMode == DSP3D_SHADE_GOURAUD) ?
+	                 dsp3D_evalPlane(&shadePlane, startXf, startYf) : flatShade;
+	float rowAttr[9];
+	if (shadingMode == DSP3D_SHADE_PHONG) {
+		for (uint32_t a = 0U; a < 9U; ++a)
+			rowAttr[a] = dsp3D_evalPlane(&attrPlane[a], startXf, startYf);
+	}
 
-    if(pa[1] != pb[1])
-    	gradient1 = (y - pa[1]) / (pb[1] - pa[1]);
-    else
-    	gradient1 = 1;
+	const uint16_t frameGeneration = dsp3D_LL_depthFrameGeneration;
+	for (int32_t y = minY; y <= maxY; ++y) {
+		int32_t e0 = rowE0, e1 = rowE1, e2 = rowE2;
+		float z = rowZ;
+		float shade = rowShade;
+		float attr[9];
+		if (shadingMode == DSP3D_SHADE_PHONG)
+			for (uint32_t a = 0U; a < 9U; ++a) attr[a] = rowAttr[a];
 
-    if(pc[1] != pd[1])
-    	gradient2 = (y - pc[1]) / (pd[1] - pc[1]);
-    else
-    	gradient2 = 1;
-            
-    sx = dsp3D_interpolate(pa[0], pb[0], gradient1);
-    ex = dsp3D_interpolate(pc[0], pd[0], gradient2);
+		uint32_t pixelIndex = (uint32_t)y * width + (uint32_t)minX;
+		float32_t *depth = dsp3D_LL_depthBuffer + pixelIndex;
+		uint16_t *generation = dsp3D_LL_depthGeneration + pixelIndex;
+		uint8_t *framebuffer = ((uint8_t *)(uintptr_t)bbuffer) + pixelIndex;
 
-    z1 = dsp3D_interpolate(pa[2], pb[2], gradient1);
-    z2 = dsp3D_interpolate(pc[2], pd[2], gradient2);
+		for (int32_t x = minX; x <= maxX; ++x) {
+			if ((e0 >= 0) && (e1 >= 0) && (e2 >= 0)) {
+				/* Smaller projected z is nearer. Equal depth retains the first
+				 * owner, making coplanar/shared geometry deterministic. */
+				if ((*generation != frameGeneration) || (z < *depth)) {
+					float intensity;
+					if (shadingMode == DSP3D_SHADE_FLAT) {
+						intensity = flatShade;
+					} else if (shadingMode == DSP3D_SHADE_GOURAUD) {
+						intensity = shade;
+					} else {
+						float nx = attr[0], ny = attr[1], nz = attr[2];
+						/* The normal is the only vector that must be normalized per
+						 * pixel. L and H are unit vectors at the vertices and are
+						 * linearly interpolated, a fast finite-distance approximation
+						 * in the spirit of Bishop/Weimer's Fast Phong formulation. */
+						dsp3D_normalize3(&nx, &ny, &nz);
+						float ndotl = nx * attr[3] + ny * attr[4] + nz * attr[5];
+						if (ndotl < 0.0f) ndotl = 0.0f;
+						if (ndotl > 1.0f) ndotl = 1.0f;
+						float ndoth = nx * attr[6] + ny * attr[7] + nz * attr[8];
+						if (ndoth < 0.0f) ndoth = 0.0f;
+						if (ndoth > 1.0f) ndoth = 1.0f;
+						const float spec = (ndotl > 0.0f) ?
+						                   dsp3D_powUnit(ndoth, phongShininess) : 0.0f;
+						intensity = phongAmbient + phongDiffuse * ndotl + phongSpecular * spec;
+					}
+					if (intensity < 0.0f) intensity = 0.0f;
+					if (intensity > 1.0f) intensity = 1.0f;
+					*depth = z;
+					*generation = frameGeneration;
+					*framebuffer = (uint8_t)((float)baseColor * intensity);
+				}
+			}
 
-    for (x = sx; x < ex; x++)
-    {
-    	gradient = (float)(x - sx) / (float)(ex - sx);
+			e0 += stepX0; e1 += stepX1; e2 += stepX2;
+			z += zPlane.dx;
+			if (shadingMode == DSP3D_SHADE_GOURAUD) shade += shadePlane.dx;
+			if (shadingMode == DSP3D_SHADE_PHONG)
+				for (uint32_t a = 0U; a < 9U; ++a) attr[a] += attrPlane[a].dx;
+			++depth; ++generation; ++framebuffer;
+		}
 
-    	z = dsp3D_interpolate(z1, z2, gradient);
-
-    	a = (color >> 24);
-    	r = (color >> 16);
-    	g = (color >> 8);
-    	b = (color);
-
-    	r = (float)r * ndotl;
-    	g = (float)g * ndotl;
-    	b = (float)b * ndotl;
-
-    	dsp3D_drawPointDepthBuffer(x, y, z, ASSEMBLE_ARGB(a, r, g, b));
-    }
-}
-
-void dsp3D_swapArray(float *a, float *b)
-{
-	float temp[9];
-	uint32_t index;
-
-	for(index = 0; index < 9; index++)
-	{
-		temp[index] = a[index];
-		a[index] = b[index];
-		b[index] = temp[index];
+		rowE0 += stepY0; rowE1 += stepY1; rowE2 += stepY2;
+		rowZ += zPlane.dy;
+		if (shadingMode == DSP3D_SHADE_GOURAUD) rowShade += shadePlane.dy;
+		if (shadingMode == DSP3D_SHADE_PHONG)
+			for (uint32_t a = 0U; a < 9U; ++a) rowAttr[a] += attrPlane[a].dy;
 	}
 }
 
 void dsp3D_drawFaceGouraud(float *v1, float *v2, float *v3, color32_t color)
 {
-	float ndotl[4];
-	float nl1, nl2, nl3;
-	float dP1P2, dP1P3;
-	int32_t y;
-
-	if (v1[1] > v2[1]) {
-		dsp3D_swapArray(v1, v2);
-	}
-
-	if (v2[1] > v3[1]) {
-		dsp3D_swapArray(v2, v3);
-	}
-
-	if (v1[1] > v2[1]) {
-		dsp3D_swapArray(v1, v2);
-	}
-	
-	nl1 = dsp3D_computeNDotL(&v1[3], &v1[6], lightPosition);
-	nl2 = dsp3D_computeNDotL(&v2[3], &v2[6], lightPosition);
-	nl3 = dsp3D_computeNDotL(&v3[3], &v3[6], lightPosition);
-
-    if ((v2[1] - v1[1]) > 0.0)
-        dP1P2 = (v2[0] - v1[0]) / (v2[1] - v1[1]);
-    else
-        dP1P2 = 0.0;
-
-    if ((v3[1] - v1[1]) > 0.0)
-        dP1P3 = (v3[0] - v1[0]) / (v3[1] - v1[1]);
-    else
-        dP1P3 = 0.0;
-
-    if (dP1P2 > dP1P3)
-    {
-        for (y = v1[1]; y <= v3[1]; y++)
-            if (y < v2[1])
-            {
-            	ndotl[0] = nl1;
-            	ndotl[1] = nl3;
-            	ndotl[2] = nl1;
-            	ndotl[3] = nl2;
-                dsp3D_processScanLineGouraud(y, ndotl, v1, v3, v1, v2, color);
-            }
-            else
-            {
-            	ndotl[0] = nl1;
-            	ndotl[1] = nl3;
-            	ndotl[2] = nl2;
-            	ndotl[3] = nl3;
-                dsp3D_processScanLineGouraud(y, ndotl, v1, v3, v2, v3, color);
-            }
-    }
-    else
-    {
-        for (y = v1[1]; y <= v3[1]; y++)
-            if (y < v2[1])
-            {
-            	ndotl[0] = nl1;
-            	ndotl[1] = nl2;
-            	ndotl[2] = nl1;
-            	ndotl[3] = nl3;
-                dsp3D_processScanLineGouraud(y, ndotl, v1, v2, v1, v3, color);
-            }
-            else
-            {
-            	ndotl[0] = nl2;
-            	ndotl[1] = nl3;
-            	ndotl[2] = nl1;
-            	ndotl[3] = nl3;
-                dsp3D_processScanLineGouraud(y, ndotl, v2, v3, v1, v3, color);
-            }
-    }
+	float vertexShade[3];
+	vertexShade[0] = dsp3D_computeNDotL(&v1[3], &v1[6], lightPosition);
+	vertexShade[1] = dsp3D_computeNDotL(&v2[3], &v2[6], lightPosition);
+	vertexShade[2] = dsp3D_computeNDotL(&v3[3], &v3[6], lightPosition);
+	dsp3D_rasterizeTriangle(v1, v2, v3, color, DSP3D_SHADE_GOURAUD, 0.0f, vertexShade);
 }
 
 void dsp3D_drawFaceFlat(float *v1, float *v2, float *v3, color32_t color)
 {
-	float ndotl;
-	float vnFace[3];
-	float centerPoint[3];
-	float dP1P2, dP1P3;
-	int32_t y;
-
-	if (v1[1] > v2[1]) {
-		dsp3D_swapArray(v1, v2);
-	}
-
-	if (v2[1] > v3[1]) {
-		dsp3D_swapArray(v2, v3);
-	}
-
-	if (v1[1] > v2[1]) {
-		dsp3D_swapArray(v1, v2);
-	}
-
-    vnFace[0] = (v1[6] + v2[6] + v3[6]) / 3.0;
-	vnFace[1] = (v1[7] + v2[7] + v3[7]) / 3.0;
-	vnFace[2] = (v1[8] + v2[8] + v3[8]) / 3.0;
-
-	centerPoint[0] = (v1[3] + v2[3] + v3[3]) / 3.0;
-	centerPoint[1] = (v1[4] + v2[4] + v3[4]) / 3.0;
-	centerPoint[2] = (v1[5] + v2[5] + v3[5]) / 3.0;
-
-	ndotl = dsp3D_computeNDotL(centerPoint, vnFace, lightPosition);
-
-    if ((v2[1] - v1[1]) > 0.0)
-        dP1P2 = (v2[0] - v1[0]) / (v2[1] - v1[1]);
-    else
-        dP1P2 = 0.0;
-
-    if ((v3[1] - v1[1]) > 0.0)
-        dP1P3 = (v3[0] - v1[0]) / (v3[1] - v1[1]);
-    else
-        dP1P3 = 0.0;
-
-    if (dP1P2 > dP1P3)
-        for (y = v1[1]; y <= v3[1]; y++)
-            if (y < v2[1])
-                dsp3D_processScanLineFlat(y, ndotl, v1, v3, v1, v2, color);
-            else
-                dsp3D_processScanLineFlat(y, ndotl, v1, v3, v2, v3, color);
-    else
-        for (y = v1[1]; y <= v3[1]; y++)
-            if (y < v2[1])
-                dsp3D_processScanLineFlat(y, ndotl, v1, v2, v1, v3, color);
-            else
-                dsp3D_processScanLineFlat(y, ndotl, v2, v3, v1, v3, color);
+	/* True flat shading uses the geometric face normal rather than averaging
+	 * the smooth vertex normals. */
+	float abx = v2[3] - v1[3], aby = v2[4] - v1[4], abz = v2[5] - v1[5];
+	float acx = v3[3] - v1[3], acy = v3[4] - v1[4], acz = v3[5] - v1[5];
+	float normal[3] = { aby * acz - abz * acy,
+	                    abz * acx - abx * acz,
+	                    abx * acy - aby * acx };
+	float center[3] = { (v1[3] + v2[3] + v3[3]) / 3.0f,
+	                    (v1[4] + v2[4] + v3[4]) / 3.0f,
+	                    (v1[5] + v2[5] + v3[5]) / 3.0f };
+	const float shade = dsp3D_computeNDotL(center, normal, lightPosition);
+	dsp3D_rasterizeTriangle(v1, v2, v3, color, DSP3D_SHADE_FLAT, shade, NULL);
 }
 
-void dsp3D_calculateFaceNormal(float *a, float *b, float *c, float *m, float *n)
+void dsp3D_drawFacePhong(float *v1, float *v2, float *v3, color32_t color)
 {
-	float h[3];
-	float hn[3];
+	dsp3D_rasterizeTriangle(v1, v2, v3, color, DSP3D_SHADE_PHONG, 0.0f, NULL);
+}
 
-	h[0] = (a[0] + b[0] + c[0]) / 3.0;
-	h[1] = (a[1] + b[1] + c[1]) / 3.0;
-	h[2] = (a[2] + b[2] + c[2]) / 3.0;
+static uint32_t dsp3D_isFaceFrontFacing(const float *a, const float *b, const float *c)
+{
+	float aw[3];
+	float bw[3];
+	float cw[3];
+	float ab[3];
+	float ac[3];
+	float normal[3];
+	float toCamera[3];
+	float facing;
 
-	dsp3D_vectorNorm(h, hn);
+	/* Transform triangle positions to world space.  Culling must compare
+	 * vectors expressed in the same coordinate system; the previous code
+	 * mixed a view-space normal with a model-space camera vector. */
+	aw[0] = a[0] * matrix_world[0] + a[1] * matrix_world[4] + a[2] * matrix_world[8]  + matrix_world[12];
+	aw[1] = a[0] * matrix_world[1] + a[1] * matrix_world[5] + a[2] * matrix_world[9]  + matrix_world[13];
+	aw[2] = a[0] * matrix_world[2] + a[1] * matrix_world[6] + a[2] * matrix_world[10] + matrix_world[14];
 
-	n[0] = hn[0] * m[0] + hn[1] * m[4] + hn[2] * m[8];
-	n[1] = hn[0] * m[1] + hn[1] * m[5] + hn[2] * m[9];
-	n[2] = hn[0] * m[2] + hn[1] * m[6] + hn[2] * m[10];
+	bw[0] = b[0] * matrix_world[0] + b[1] * matrix_world[4] + b[2] * matrix_world[8]  + matrix_world[12];
+	bw[1] = b[0] * matrix_world[1] + b[1] * matrix_world[5] + b[2] * matrix_world[9]  + matrix_world[13];
+	bw[2] = b[0] * matrix_world[2] + b[1] * matrix_world[6] + b[2] * matrix_world[10] + matrix_world[14];
 
+	cw[0] = c[0] * matrix_world[0] + c[1] * matrix_world[4] + c[2] * matrix_world[8]  + matrix_world[12];
+	cw[1] = c[0] * matrix_world[1] + c[1] * matrix_world[5] + c[2] * matrix_world[9]  + matrix_world[13];
+	cw[2] = c[0] * matrix_world[2] + c[1] * matrix_world[6] + c[2] * matrix_world[10] + matrix_world[14];
+
+	ab[0] = bw[0] - aw[0];
+	ab[1] = bw[1] - aw[1];
+	ab[2] = bw[2] - aw[2];
+	ac[0] = cw[0] - aw[0];
+	ac[1] = cw[1] - aw[1];
+	ac[2] = cw[2] - aw[2];
+
+	/* Model faces use counter-clockwise winding when viewed from outside. */
+	normal[0] = ab[1] * ac[2] - ab[2] * ac[1];
+	normal[1] = ab[2] * ac[0] - ab[0] * ac[2];
+	normal[2] = ab[0] * ac[1] - ab[1] * ac[0];
+
+	toCamera[0] = cameraPosition[0] - aw[0];
+	toCamera[1] = cameraPosition[1] - aw[1];
+	toCamera[2] = cameraPosition[2] - aw[2];
+
+	facing = normal[0] * toCamera[0] +
+	         normal[1] * toCamera[1] +
+	         normal[2] * toCamera[2];
+
+	/* Edge-on and degenerate triangles are culled. */
+	return (facing > 0.0f) ? 1U : 0U;
 }
 
 void dsp3D_init(void)
@@ -717,6 +901,55 @@ void dsp3D_init(void)
 	culling = 0;
 }
 
+void dsp3D_renderPhong(float * dsp3dModel)
+{
+	uint32_t numVert, numFaces;
+	float vertex_transform_a[9];
+	float vertex_transform_b[9];
+	float vertex_transform_c[9];
+	float vertex_a[3], vertex_b[3], vertex_c[3];
+	float vertex_norm_a[3], vertex_norm_b[3], vertex_norm_c[3];
+
+	dsp3D_generateMatrices();
+	numVert = (uint32_t)dsp3dModel[0];
+	numFaces = (uint32_t)dsp3dModel[1];
+
+	for (uint32_t i = 0U; i < numFaces; ++i) {
+		const uint32_t a = (uint32_t)dsp3dModel[2 + numVert * 6 + i * 6 + 0];
+		const uint32_t b = (uint32_t)dsp3dModel[2 + numVert * 6 + i * 6 + 1];
+		const uint32_t c = (uint32_t)dsp3dModel[2 + numVert * 6 + i * 6 + 2];
+
+		vertex_a[0] = dsp3dModel[2 + a * 6 + 0];
+		vertex_a[1] = dsp3dModel[2 + a * 6 + 1];
+		vertex_a[2] = dsp3dModel[2 + a * 6 + 2];
+		vertex_b[0] = dsp3dModel[2 + b * 6 + 0];
+		vertex_b[1] = dsp3dModel[2 + b * 6 + 1];
+		vertex_b[2] = dsp3dModel[2 + b * 6 + 2];
+		vertex_c[0] = dsp3dModel[2 + c * 6 + 0];
+		vertex_c[1] = dsp3dModel[2 + c * 6 + 1];
+		vertex_c[2] = dsp3dModel[2 + c * 6 + 2];
+		vertex_norm_a[0] = dsp3dModel[2 + a * 6 + 3];
+		vertex_norm_a[1] = dsp3dModel[2 + a * 6 + 4];
+		vertex_norm_a[2] = dsp3dModel[2 + a * 6 + 5];
+		vertex_norm_b[0] = dsp3dModel[2 + b * 6 + 3];
+		vertex_norm_b[1] = dsp3dModel[2 + b * 6 + 4];
+		vertex_norm_b[2] = dsp3dModel[2 + b * 6 + 5];
+		vertex_norm_c[0] = dsp3dModel[2 + c * 6 + 3];
+		vertex_norm_c[1] = dsp3dModel[2 + c * 6 + 4];
+		vertex_norm_c[2] = dsp3dModel[2 + c * 6 + 5];
+
+		if ((culling != 0U) &&
+		    (dsp3D_isFaceFrontFacing(vertex_a, vertex_b, vertex_c) == 0U)) continue;
+
+		dsp3D_projectVertexComplete(vertex_a, vertex_norm_a, vertex_transform_a);
+		dsp3D_projectVertexComplete(vertex_b, vertex_norm_b, vertex_transform_b);
+		dsp3D_projectVertexComplete(vertex_c, vertex_norm_c, vertex_transform_c);
+		dsp3D_drawFacePhong(vertex_transform_a, vertex_transform_b, vertex_transform_c, (color32_t)0xFFU);
+	}
+
+	if (lastRenderingType < 2U) lastRenderingType = 2U;
+}
+
 void dsp3D_renderGouraud(float * dsp3dModel)
 {
 	uint32_t i;
@@ -732,12 +965,6 @@ void dsp3D_renderGouraud(float * dsp3dModel)
 	float vertex_norm_a[3];
 	float vertex_norm_b[3];
 	float vertex_norm_c[3];
-	float face_norm[3];
-
-	float camToPointVector[3];
-	float faceNormalNormalized[3];
-	float camToPointVectorNormalized[3];
-	float cullingAngle;
 
 	dsp3D_generateMatrices();
 
@@ -757,6 +984,12 @@ void dsp3D_renderGouraud(float * dsp3dModel)
 		vertex_a[0] = dsp3dModel[2 + a * 6 + 0];
 		vertex_a[1] = dsp3dModel[2 + a * 6 + 1];
 		vertex_a[2] = dsp3dModel[2 + a * 6 + 2];
+		vertex_b[0] = dsp3dModel[2 + b * 6 + 0];
+		vertex_b[1] = dsp3dModel[2 + b * 6 + 1];
+		vertex_b[2] = dsp3dModel[2 + b * 6 + 2];
+		vertex_c[0] = dsp3dModel[2 + c * 6 + 0];
+		vertex_c[1] = dsp3dModel[2 + c * 6 + 1];
+		vertex_c[2] = dsp3dModel[2 + c * 6 + 2];
 		vertex_norm_a[0] = dsp3dModel[2 + a * 6 + 3];
 		vertex_norm_a[1] = dsp3dModel[2 + a * 6 + 4];
 		vertex_norm_a[2] = dsp3dModel[2 + a * 6 + 5];
@@ -769,30 +1002,18 @@ void dsp3D_renderGouraud(float * dsp3dModel)
 		vertex_norm_c[1] = dsp3dModel[2 + c * 6 + 4];
 		vertex_norm_c[2] = dsp3dModel[2 + c * 6 + 5];
 
-		if(culling != 0)
+		if ((culling != 0U) &&
+		    (dsp3D_isFaceFrontFacing(vertex_a, vertex_b, vertex_c) == 0U))
 		{
-			dsp3D_calculateFaceNormal(vertex_norm_a, vertex_norm_b, vertex_norm_c, matrix_worldView, face_norm);
-			arm_sub_f32(cameraPosition, vertex_a, camToPointVector, 3);
-			dsp3D_vectorNorm(face_norm, faceNormalNormalized);
-			dsp3D_vectorNorm(camToPointVector, camToPointVectorNormalized);
-			arm_dot_prod_f32(faceNormalNormalized, camToPointVectorNormalized, 3, &cullingAngle);
+			continue;
 		}
 
-		if((culling == 0) || (cullingAngle > 0.0))
-		{
-			vertex_b[0] = dsp3dModel[2 + b * 6 + 0];
-			vertex_b[1] = dsp3dModel[2 + b * 6 + 1];
-			vertex_b[2] = dsp3dModel[2 + b * 6 + 2];
-			vertex_c[0] = dsp3dModel[2 + c * 6 + 0];
-			vertex_c[1] = dsp3dModel[2 + c * 6 + 1];
-			vertex_c[2] = dsp3dModel[2 + c * 6 + 2];
-			dsp3D_projectVertexComplete(vertex_a, vertex_norm_a, vertex_transform_a);
-			dsp3D_projectVertexComplete(vertex_b, vertex_norm_b, vertex_transform_b);
-			dsp3D_projectVertexComplete(vertex_c, vertex_norm_c, vertex_transform_c);
+		dsp3D_projectVertexComplete(vertex_a, vertex_norm_a, vertex_transform_a);
+		dsp3D_projectVertexComplete(vertex_b, vertex_norm_b, vertex_transform_b);
+		dsp3D_projectVertexComplete(vertex_c, vertex_norm_c, vertex_transform_c);
 
-			//dsp3D_drawFaceGouraud(vertex_transform_a, vertex_transform_b, vertex_transform_c, ASSEMBLE_ARGB(0xFF, RGBr, RGBg, RGBb));
-            dsp3D_drawFaceGouraud(vertex_transform_a, vertex_transform_b, vertex_transform_c, -1);
-		}
+		//dsp3D_drawFaceGouraud(vertex_transform_a, vertex_transform_b, vertex_transform_c, ASSEMBLE_ARGB(0xFF, RGBr, RGBg, RGBb));
+        dsp3D_drawFaceGouraud(vertex_transform_a, vertex_transform_b, vertex_transform_c, -1);
 	}
 
 	if(lastRenderingType < 2)
@@ -814,12 +1035,6 @@ void dsp3D_renderFlat(float * dsp3dModel)
 	float vertex_norm_a[3];
 	float vertex_norm_b[3];
 	float vertex_norm_c[3];
-	float face_norm[3];
-
-	float camToPointVector[3];
-	float faceNormalNormalized[3];
-	float camToPointVectorNormalized[3];
-	float cullingAngle;
 
 	dsp3D_generateMatrices();
 
@@ -840,6 +1055,12 @@ void dsp3D_renderFlat(float * dsp3dModel)
 		vertex_a[0] = dsp3dModel[2 + a * 6 + 0];
 		vertex_a[1] = dsp3dModel[2 + a * 6 + 1];
 		vertex_a[2] = dsp3dModel[2 + a * 6 + 2];
+		vertex_b[0] = dsp3dModel[2 + b * 6 + 0];
+		vertex_b[1] = dsp3dModel[2 + b * 6 + 1];
+		vertex_b[2] = dsp3dModel[2 + b * 6 + 2];
+		vertex_c[0] = dsp3dModel[2 + c * 6 + 0];
+		vertex_c[1] = dsp3dModel[2 + c * 6 + 1];
+		vertex_c[2] = dsp3dModel[2 + c * 6 + 2];
 		vertex_norm_a[0] = dsp3dModel[2 + a * 6 + 3];
 		vertex_norm_a[1] = dsp3dModel[2 + a * 6 + 4];
 		vertex_norm_a[2] = dsp3dModel[2 + a * 6 + 5];
@@ -852,30 +1073,18 @@ void dsp3D_renderFlat(float * dsp3dModel)
 		vertex_norm_c[1] = dsp3dModel[2 + c * 6 + 4];
 		vertex_norm_c[2] = dsp3dModel[2 + c * 6 + 5];
 
-		if(culling != 0)
+		if ((culling != 0U) &&
+		    (dsp3D_isFaceFrontFacing(vertex_a, vertex_b, vertex_c) == 0U))
 		{
-			dsp3D_calculateFaceNormal(vertex_norm_a, vertex_norm_b, vertex_norm_c, matrix_worldView, face_norm);
-			arm_sub_f32(cameraPosition, vertex_a, camToPointVector, 3);
-			dsp3D_vectorNorm(face_norm, faceNormalNormalized);
-			dsp3D_vectorNorm(camToPointVector, camToPointVectorNormalized);
-			arm_dot_prod_f32(faceNormalNormalized, camToPointVectorNormalized, 3, &cullingAngle);
+			continue;
 		}
 
-		if((culling == 0) || (cullingAngle > 0.0))
-		{
-			vertex_b[0] = dsp3dModel[2 + b * 6 + 0];
-			vertex_b[1] = dsp3dModel[2 + b * 6 + 1];
-			vertex_b[2] = dsp3dModel[2 + b * 6 + 2];
-			vertex_c[0] = dsp3dModel[2 + c * 6 + 0];
-			vertex_c[1] = dsp3dModel[2 + c * 6 + 1];
-			vertex_c[2] = dsp3dModel[2 + c * 6 + 2];
-			dsp3D_projectVertexComplete(vertex_a, vertex_norm_a, vertex_transform_a);
-			dsp3D_projectVertexComplete(vertex_b, vertex_norm_b, vertex_transform_b);
-			dsp3D_projectVertexComplete(vertex_c, vertex_norm_c, vertex_transform_c);
+		dsp3D_projectVertexComplete(vertex_a, vertex_norm_a, vertex_transform_a);
+		dsp3D_projectVertexComplete(vertex_b, vertex_norm_b, vertex_transform_b);
+		dsp3D_projectVertexComplete(vertex_c, vertex_norm_c, vertex_transform_c);
 
-			//dsp3D_drawFaceFlat(vertex_transform_a, vertex_transform_b, vertex_transform_c, ASSEMBLE_ARGB(0xFF, RGBr, RGBg, RGBb));
-            dsp3D_drawFaceFlat(vertex_transform_a, vertex_transform_b, vertex_transform_c, -1);
-		}
+		//dsp3D_drawFaceFlat(vertex_transform_a, vertex_transform_b, vertex_transform_c, ASSEMBLE_ARGB(0xFF, RGBr, RGBg, RGBb));
+        dsp3D_drawFaceFlat(vertex_transform_a, vertex_transform_b, vertex_transform_c, -1);
 	}
 
 	if(lastRenderingType < 2)
@@ -980,7 +1189,7 @@ void dsp3D_renderPoint(float x, float y, float z)
 
 void dsp3D_setBackFaceCulling(uint32_t state)
 {
-	culling = state;
+	culling = (state != 0U) ? 1U : 0U;
 }
 
 void dsp3D_present(void)
@@ -997,7 +1206,7 @@ void dsp3D_present(void)
 void dsp3D_generateMatrices(void)
 {
 	dsp3D_generateLookAtMatrixLH(cameraPosition, cameraTarget, unitY, matrix_view);
-	dsp3D_generatePerspectiveFovMatrixLH(0.78, SCREEN_ASPECT_RATIO, 0.01, 1.0, matrix_projection);
+	dsp3D_generatePerspectiveFovMatrixLH(0.78f, SCREEN_ASPECT_RATIO, DSP3D_ZNEAR, DSP3D_ZFAR, matrix_projection);
 	dsp3D_generateRotationMatrix(meshRotation[0], meshRotation[1], meshRotation[2], matrix_rotation);
 	dsp3D_generateTranslationMatrix(meshPosition[0], meshPosition[1], meshPosition[2], matrix_translation);
 

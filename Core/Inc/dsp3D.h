@@ -40,7 +40,8 @@ based devices. It takes full advantage of the CMSIS DSP library to provide a
 fast operation. A device equipped also with a hardware floating point unit is
 recommended.
 
-Four rendering methods are available:
+Five rendering methods are available:
+	- Phong rendering
 	- Gouraud rendering
 	- Flat surface rendering
 	- Wireframe rendering
@@ -106,7 +107,11 @@ void dsp3D_setMeshRotation(float32_t yaw, float32_t pitch, float32_t roll);
  * @param[in]  y     y axis coordinate
  * @param[in]  z     z axis coordinate
  */
-void dsp3D_setLightPosition(float32_t x, float32_t y, float32_t z);	
+void dsp3D_setLightPosition(float32_t x, float32_t y, float32_t z);
+
+/** Configure the Phong material coefficients. Shininess is clamped to 1..64. */
+void dsp3D_setPhongMaterial(float32_t ambient, float32_t diffuse,
+                            float32_t specular, uint32_t shininess);	
 
 /**
  * @brief      Init the dsp3D engine
@@ -119,6 +124,15 @@ void dsp3D_init(void);
  * @param      meshPointer  The mesh pointer
  */
 void dsp3D_renderGouraud(float32_t * dsp3dModel);
+
+/**
+ * @brief Render the mesh with per-pixel Phong shading.
+ *
+ * Normals are interpolated per pixel. A fast finite-distance approximation
+ * interpolates unit light and half vectors across each triangle and evaluates
+ * diffuse + specular illumination after depth testing.
+ */
+void dsp3D_renderPhong(float32_t * dsp3dModel);
 
 /**
  * @brief      Render the mesh as flat surfaces
@@ -149,7 +163,10 @@ void dsp3D_present(void);
 /**
  * @brief      Enable or disable backface culling
  *
- * @param      state  The desired state
+ * Faces are considered front-facing when their vertex indices are
+ * counter-clockwise as viewed from outside the model.
+ *
+ * @param      state  Zero disables culling; any non-zero value enables it.
  */
 void dsp3D_setBackFaceCulling(uint32_t state);
 

@@ -67,6 +67,42 @@ The dsp3D_ll provides low level interface to the hardware.
 
 #define color32_t uint32_t
 
+/* Depth buffer state.  The float depth plane is followed by a 16-bit
+ * generation plane in cacheable SDRAM.  A new frame only advances the
+ * generation number; the 8 MiB float plane is not cleared every frame. */
+extern float32_t *dsp3D_LL_depthBuffer;
+extern uint16_t *dsp3D_LL_depthGeneration;
+extern uint32_t dsp3D_LL_depthPixelCount;
+extern uint16_t dsp3D_LL_depthFrameGeneration;
+extern uint32_t bbuffer;
+
+/**
+ * @brief Perform the current depth comparison and write one L8 pixel.
+ *
+ * The caller must have checked that pixelIndex is inside the active frame.
+ * Keeping this hot path forced-inline removes three function calls and the
+ * repeated byte-address conversion from every rasterized pixel.
+ */
+__STATIC_FORCEINLINE uint32_t dsp3D_LL_depthTestAndDraw(uint32_t pixelIndex,
+                                                        float32_t value,
+                                                        color32_t color)
+{
+  uint16_t *generation = &dsp3D_LL_depthGeneration[pixelIndex];
+  float32_t *depth = &dsp3D_LL_depthBuffer[pixelIndex];
+
+  /* Normalized device depth grows with distance.  The stored fragment wins
+   * on both a strictly smaller and an equal depth; this makes coplanar ties
+   * deterministic and prevents later faces from punching through. */
+  if ((*generation == dsp3D_LL_depthFrameGeneration) && (*depth <= value)) {
+    return 0U;
+  }
+
+  *depth = value;
+  *generation = dsp3D_LL_depthFrameGeneration;
+  ((uint8_t *)(uintptr_t)bbuffer)[pixelIndex] = (uint8_t)color;
+  return 1U;
+}
+
 /**
  * @brief      Initialize low level
  */

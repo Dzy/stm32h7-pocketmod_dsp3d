@@ -55,14 +55,48 @@ extern const LTDCSYNC_t LTDCSYNC[];
 
 extern uint32_t bbuffer;
 
-//uint32_t zbuffer = 0xc0000000 + 1024*1024*5;//1024*768;
-
-
-
+float32_t *dsp3D_LL_depthBuffer = NULL;
+uint16_t *dsp3D_LL_depthGeneration = NULL;
+uint32_t dsp3D_LL_depthPixelCount = 0U;
+uint16_t dsp3D_LL_depthFrameGeneration = 1U;
 
 void dsp3D_LL_init(void)
 {
+  const uint32_t width = LTDCSYNC[LTDC_VID_FORMAT].ahw;
+  const uint32_t height = LTDCSYNC[LTDC_VID_FORMAT].avh;
+  const uint64_t pixelCount = (uint64_t)width * (uint64_t)height;
+  const uintptr_t sdramEnd = (uintptr_t)SDRAM_BASE_ADDRESS +
+                             (uintptr_t)SDRAM_SIZE_BYTES;
+  uintptr_t generationAddress;
+  uintptr_t requiredEnd;
 
+  if ((pixelCount == 0U) || (pixelCount > UINT32_MAX)) {
+    Error_Handler();
+    return;
+  }
+
+  dsp3D_LL_depthPixelCount = (uint32_t)pixelCount;
+  dsp3D_LL_depthBuffer =
+      (float32_t *)(uintptr_t)DEPTH_BUFFER_ADDRESS;
+
+  generationAddress = (uintptr_t)DEPTH_BUFFER_ADDRESS +
+                      ((uintptr_t)dsp3D_LL_depthPixelCount * sizeof(float32_t));
+  generationAddress = (generationAddress + 1U) & ~(uintptr_t)1U;
+  requiredEnd = generationAddress +
+                ((uintptr_t)dsp3D_LL_depthPixelCount * sizeof(uint16_t));
+
+  if (requiredEnd > sdramEnd) {
+    dsp3D_LL_depthBuffer = NULL;
+    dsp3D_LL_depthGeneration = NULL;
+    dsp3D_LL_depthPixelCount = 0U;
+    Error_Handler();
+    return;
+  }
+
+  dsp3D_LL_depthGeneration = (uint16_t *)generationAddress;
+  memset(dsp3D_LL_depthGeneration, 0,
+         (size_t)dsp3D_LL_depthPixelCount * sizeof(uint16_t));
+  dsp3D_LL_depthFrameGeneration = 1U;
 }
 
 void dsp3D_LL_drawPointF(int32_t x, int32_t y)
@@ -124,37 +158,50 @@ void dsp3D_drawPointDepthBuffer(int32_t x, int32_t y, float32_t z, color32_t col
 
 void dsp3D_LL_writeToDepthBuffer(uint32_t pos, float32_t value)
 {
-	// YOUR IMPLEMENTATION
+  const uint32_t pixelIndex = pos / (uint32_t)sizeof(float32_t);
 
-	volatile float32_t *zbuffer =
-		(volatile float32_t *)(uintptr_t)(DEPTH_BUFFER_ADDRESS + pos);
+  if ((dsp3D_LL_depthBuffer == NULL) ||
+      (pixelIndex >= dsp3D_LL_depthPixelCount)) {
+    return;
+  }
 
-	*zbuffer = value;
-
+  dsp3D_LL_depthBuffer[pixelIndex] = value;
+  dsp3D_LL_depthGeneration[pixelIndex] = dsp3D_LL_depthFrameGeneration;
 }
 
 float32_t dsp3D_LL_readFromDepthBuffer(uint32_t pos)
 {
-	// YOUR IMPLEMENTATION
+  const uint32_t pixelIndex = pos / (uint32_t)sizeof(float32_t);
 
-	volatile const float32_t *zbuffer =
-		(volatile const float32_t *)(uintptr_t)(DEPTH_BUFFER_ADDRESS + pos);
-//__DSB();
-	return *zbuffer;
+  if ((dsp3D_LL_depthBuffer == NULL) ||
+      (pixelIndex >= dsp3D_LL_depthPixelCount) ||
+      (dsp3D_LL_depthGeneration[pixelIndex] !=
+       dsp3D_LL_depthFrameGeneration)) {
+    return FLT_MAX;
+  }
 
+  return dsp3D_LL_depthBuffer[pixelIndex];
 }
 
 void dsp3D_LL_clearDepthBuffer(void)
 {
-	uint32_t x, y;
+  uint16_t nextGeneration;
 
-	for(x = 0; x < LTDCSYNC[LTDC_VID_FORMAT].ahw; x++)
-		for(y = 0; y < LTDCSYNC[LTDC_VID_FORMAT].avh; y++)
-			dsp3D_LL_writeToDepthBuffer((x + (y * LTDCSYNC[LTDC_VID_FORMAT].ahw)) * sizeof(float32_t), FLT_MIN);
+  if (dsp3D_LL_depthGeneration == NULL) {
+    return;
+  }
 
-	//memset(zbuffer, 0x00, LTDCSYNC[LTDC_VID_FORMAT].ahw*LTDCSYNC[LTDC_VID_FORMAT].avh);
+  nextGeneration = (uint16_t)(dsp3D_LL_depthFrameGeneration + 1U);
 
-	//dsp3D_LL_writeToDepthBuffer((LTDCSYNC[LTDC_VID_FORMAT].ahw*LTDCSYNC[LTDC_VID_FORMAT].avh) * sizeof(float32_t), FLT_MIN);
+  /* A 16-bit generation wraps only once every 65,535 filled frames
+   * (about 18 minutes at 60 fps).  Only then is the compact generation
+   * plane cleared; the float depth plane is never cleared. */
+  if (nextGeneration == 0U) {
+    memset(dsp3D_LL_depthGeneration, 0,
+           (size_t)dsp3D_LL_depthPixelCount * sizeof(uint16_t));
+    nextGeneration = 1U;
+  }
 
-
+  dsp3D_LL_depthFrameGeneration = nextGeneration;
 }
+
