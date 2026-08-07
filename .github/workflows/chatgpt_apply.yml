@@ -1,0 +1,33 @@
+name: Apply staged project update
+
+on:
+  push:
+    branches:
+      - chatgpt-fmc-update
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt-fmc-update
+          fetch-depth: 0
+      - name: Apply payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .chatgpt_update/part_*.b64 | base64 -d | tar -xJf -
+          rm -f STM32H7_MyBoard.ioc
+          rm -f Core/Inc/bananasplit_mod.h Core/Inc/pocketmod.h
+          rm -rf build
+          rm -rf .chatgpt_update
+          rm -f .github/workflows/chatgpt_apply.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update project: FMC SDRAM fixes and rasterizer reference"
+          git push origin HEAD:chatgpt-fmc-update
