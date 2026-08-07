@@ -80,6 +80,22 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
+  /* Time-critical dsp3D kernels execute from the Cortex-M7 ITCM.
+     Their load image remains in Flash and startup_stm32h743xx.s copies the
+     section to 0x00000000 before C runtime initialization. */
+  _siitcm = LOADADDR(.itcm_text);
+  .itcm_text :
+  {
+    . = ALIGN(32);
+    _sitcm = .;
+    *(.itcm_text)
+    *(.itcm_text*)
+    . = ALIGN(32);
+    _eitcm = .;
+  } >ITCMRAM AT> FLASH
+
+  ASSERT(SIZEOF(.itcm_text) <= LENGTH(ITCMRAM), "ITCM hot code exceeds 64 KiB")
+
   /* The program code and other data goes into FLASH */
   .text :
   {
@@ -165,6 +181,18 @@ SECTIONS
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
   } >DTCMRAM
+
+  /* CPU-only transformed vertex cache for dsp3D.  AXI SRAM is otherwise
+     unused by this linker script and is ideal for the 256 KiB per-frame
+     geometry cache.  NOLOAD avoids wasting FLASH image space or startup time;
+     every cached record is overwritten before use. */
+  .dsp3d_cache (NOLOAD) :
+  {
+    . = ALIGN(32);
+    *(.dsp3d_cache)
+    *(.dsp3d_cache*)
+    . = ALIGN(32);
+  } >RAM_D1
 
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack :

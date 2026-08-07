@@ -64,6 +64,31 @@ Reset_Handler:
 /* Call the clock system intitialization function.*/
   bl  SystemInit
 
+/* Enable Cortex-M7 ITCM and copy the hot-code load image from Flash.
+ * ITCM occupies 0x00000000..0x0000FFFF on STM32H743.  The linker guarantees
+ * a word-aligned, word-sized section. */
+  ldr   r0, =0xE000EF90      /* SCB->ITCMCR */
+  ldr   r1, [r0]
+  orr   r1, r1, #1           /* ITCMCR.EN */
+  str   r1, [r0]
+  dsb
+  isb
+
+  ldr   r0, =_sitcm          /* destination in ITCM */
+  ldr   r1, =_eitcm
+  ldr   r2, =_siitcm         /* load image in Flash */
+  b     LoopCopyITCMInit
+
+CopyITCMInit:
+  ldr   r3, [r2], #4
+  str   r3, [r0], #4
+
+LoopCopyITCMInit:
+  cmp   r0, r1
+  bcc   CopyITCMInit
+  dsb
+  isb
+
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit

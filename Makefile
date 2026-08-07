@@ -22,7 +22,7 @@ TARGET = STM32H7_MyBoard
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -Og
+OPT = -O3
 
 
 #######################################
@@ -239,7 +239,7 @@ flash: $(BUILD_DIR)/$(TARGET).bin
 	STM32_Programmer_CLI -c port=SWD -w $< 0x08000000 -rst
 
 disasm:
-	$(OD) -j .rodata -j .text -d -Mforce-thumb $(BUILD_DIR)/$(TARGET).elf > $(TARGET).asm
+	$(OD) -j .rodata -j .text -j .itcm_text -d -Mforce-thumb $(BUILD_DIR)/$(TARGET).elf > $(TARGET).asm
 
 #######################################
 # dependencies

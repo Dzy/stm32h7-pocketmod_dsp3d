@@ -413,6 +413,27 @@ void MPU_Conf(void)
 }
 
 float cz = 0.0;
+
+typedef enum {
+  DEMO_RENDER_POINTS = 0U,
+  DEMO_RENDER_WIREFRAME,
+  DEMO_RENDER_FLAT,
+  DEMO_RENDER_GOURAUD,
+  DEMO_RENDER_PHONG,
+  DEMO_RENDER_COUNT
+} DemoRendererMode;
+
+static const char *DemoRenderer_Name(DemoRendererMode mode)
+{
+  switch (mode) {
+    case DEMO_RENDER_POINTS:    return "POINTS";
+    case DEMO_RENDER_WIREFRAME: return "WIREFRAME";
+    case DEMO_RENDER_FLAT:      return "FLAT";
+    case DEMO_RENDER_GOURAUD:   return "GOURAUD";
+    case DEMO_RENDER_PHONG:     return "PHONG";
+    default:                    return "?";
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -536,6 +557,18 @@ int main(void)
 
   dsp3D_init();
 
+  /* Static scene state: configure once instead of rebuilding the same view
+   * matrix/material state on every frame. */
+  dsp3D_setCameraPosition(0.0f, 0.0f, 20.0f);
+  dsp3D_setBackFaceCulling(1U);
+  dsp3D_setPhongMaterial(0.08f, 0.72f, 0.35f, 16U);
+
+  /* Cycle through the rasterizers from cheapest to most complex.  Use a
+   * private epoch so the demo always starts with points regardless of how
+   * long hardware initialization took. */
+  const uint32_t rendererEpoch = HAL_GetTick();
+  DemoRendererMode previousRenderer = DEMO_RENDER_COUNT;
+
   /* USER CODE END 2 */
 
 
@@ -588,6 +621,16 @@ int main(void)
         cz += 0.010;
         dsp3D_setMeshRotation(cz, cz, cz);
 
+        const DemoRendererMode rendererMode = (DemoRendererMode)
+          (((tn - rendererEpoch) / 10000U) % (uint32_t)DEMO_RENDER_COUNT);
+        if (rendererMode != previousRenderer) {
+          /* Keep min/max/FPS meaningful for the currently displayed mode. */
+          previousRenderer = rendererMode;
+          te = 0U;
+          tmax = 0U;
+          tmin = 1000U;
+        }
+
         const uint32_t fps = (te != 0U) ? (1000U / te) : 0U;
         snprintf(txtbuf, sizeof(txtbuf), "%lums (min %lums/max %lums) %lu FPS",
                  (unsigned long)te, (unsigned long)tmin, (unsigned long)tmax,
@@ -639,26 +682,31 @@ HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD);
                  (unsigned int)sDate.Year);
         blitstring2(0,7, txtbuf);
 
-        snprintf(txtbuf, sizeof(txtbuf), "0123456789ABCD");
+        const uint32_t rendererSeconds = 10U - (((tn - rendererEpoch) / 1000U) % 10U);
+        snprintf(txtbuf, sizeof(txtbuf), "Renderer %-9s %lus",
+                 DemoRenderer_Name(rendererMode), (unsigned long)rendererSeconds);
         blitstring2(0,8, txtbuf);
 
-        dsp3D_setCameraPosition(0.0, 0.0, 20.0);
-        dsp3D_setBackFaceCulling(1);
+        //dsp3D_setLightPosition(0.0f, 0.0f, 100.0f);
 
-        //dsp3D_setLightPosition(0.0, 0.0, 100.0);
-
-        dsp3D_setPhongMaterial(
-          0.08f,   /* ambient */
-          0.72f,   /* diffuse */
-          0.35f,   /* specular */
-          16       /* shininess */
-        );
-
-        //dsp3D_renderWireframe(MODELNAME);
-        //dsp3D_renderFlat((float *)&MODELNAME);
-        //dsp3D_renderPoints((float *)&MODELNAME);
-        dsp3D_renderPhong((float *)&MODELNAME);
-        //dsp3D_renderGouraud((float *)&MODELNAME);
+        switch (rendererMode) {
+          case DEMO_RENDER_POINTS:
+            dsp3D_renderPoints((float *)&MODELNAME);
+            break;
+          case DEMO_RENDER_WIREFRAME:
+            dsp3D_renderWireframe((float *)&MODELNAME);
+            break;
+          case DEMO_RENDER_FLAT:
+            dsp3D_renderFlat((float *)&MODELNAME);
+            break;
+          case DEMO_RENDER_GOURAUD:
+            dsp3D_renderGouraud((float *)&MODELNAME);
+            break;
+          case DEMO_RENDER_PHONG:
+          default:
+            dsp3D_renderPhong((float *)&MODELNAME);
+            break;
+        }
 
         dsp3D_present();
 
