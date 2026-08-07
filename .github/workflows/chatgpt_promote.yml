@@ -1,0 +1,53 @@
+name: Verify and promote fixed project
+
+on:
+  push:
+    branches:
+      - chatgpt-fmc-update
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt-fmc-update
+          fetch-depth: 0
+      - name: Reconstruct, verify, and update main
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_TREE="3f5c8236e75f00a2f6606b339d45704c237a0608"
+          PAYLOAD_SHA256="f2a7b040bec5322737d4ccff03090fc010c106a01936894bd81b8ff6cf3945e5"
+
+          if compgen -G '.chatgpt_update/part_*.b64' > /dev/null; then
+            cat .chatgpt_update/part_*.b64 > /tmp/payload.b64
+            base64 -d /tmp/payload.b64 > /tmp/payload.tar.xz
+            echo "${PAYLOAD_SHA256}  /tmp/payload.tar.xz" | sha256sum -c -
+            tar -xJf /tmp/payload.tar.xz
+          fi
+
+          rm -f STM32H7_MyBoard.ioc
+          rm -f Core/Inc/bananasplit_mod.h Core/Inc/pocketmod.h
+          rm -rf build
+          rm -rf .chatgpt_update
+          rm -f .github/workflows/chatgpt_apply.yml
+          rm -f .github/workflows/chatgpt_promote.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+
+          git add -A
+          TREE="$(git write-tree)"
+          echo "Verified worktree tree: ${TREE}"
+          test "${TREE}" = "${EXPECTED_TREE}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          MAIN_SHA="$(git rev-parse origin/main)"
+          NEW_COMMIT="$(printf '%s\n' 'Update project: FMC SDRAM fixes and rasterizer reference' | git commit-tree "${TREE}" -p "${MAIN_SHA}")"
+          git push origin "${NEW_COMMIT}:refs/heads/main"
+          echo "Promoted commit: ${NEW_COMMIT}"
